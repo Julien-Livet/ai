@@ -88,11 +88,14 @@ class Brain:
     def connection_output(self, connection):
         inputs = []
 
-        for input in connection.inputs:
-            if (type(input) is Neuron):
-                inputs.append(input.output())
-            elif (type(input) is Connection):
-                inputs.append(self.connection_output(input))
+        try:
+            for input in connection.inputs:
+                if (type(input) is Neuron):
+                    inputs.append(input.output())
+                elif (type(input) is Connection):
+                    inputs.append(self.connection_output(input))
+        except:
+            return None
 
         return connection.neuron.output(*inputs)
 
@@ -283,7 +286,10 @@ class Brain:
         connections = []
         
         for connection in self.typesToConnections.get(type(value), []):
-            if (np.isclose(value, self.connection_output(connection))):
-                connections.append(connection)
+            try:
+                if (np.isclose(value, self.connection_output(connection))):
+                    connections.append(connection)
+            except:
+                pass
 
         return sorted(connections, key = lambda x: self.connection_len(x))

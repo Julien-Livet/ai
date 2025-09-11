@@ -15,8 +15,8 @@ neuronIds |= ints.add_value(brain, lambda: x, "x")
 neuronIds |= ints.add_value(brain, lambda: y, "y")
 neuronIds |= ints.add_value(brain, lambda: z, "z")
 
-#print(len(brain.connect(2)))
-#print(len(brain.connections))
+print(len(brain.connect(2)))
+print(len(brain.connections))
 
 #for connection in brain.connections:
 #    print(brain.connection_str(connection) + " -> " + str(brain.connection_output(connection)))
