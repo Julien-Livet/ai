@@ -4,6 +4,7 @@ from connection import Connection
 import math
 import networkx as nx
 from neuron import Neuron
+import numpy as np
 import random
 
 class Brain:
@@ -15,6 +16,7 @@ class Brain:
         self.connections = set()
         self.graph = BrainGraph()
         self.originNeuronIds = []
+        self.typesToConnections = {}
 
     def origin_neuron_ids_from_type(self, type):
         neurons_ids = []
@@ -93,6 +95,17 @@ class Brain:
                 inputs.append(self.connection_output(input))
 
         return connection.neuron.output(*inputs)
+
+    def connection_len(self, connection):
+        len = 0
+        
+        for input in connection.inputs:
+            if (type(input) is Neuron):
+                len = 1
+            elif (type(input) is Connection):
+                len += self.connection_len(input)
+
+        return len
 
     def show(self,
              seed = None,
@@ -247,5 +260,19 @@ class Brain:
             connections |= newConnections
             self.connections |= newConnections
 
+        for connection in new_connections:
+            l = self.typesToConnections.get(connection.neuron.outputType, [])
+            l.append(connection)
+            self.typesToConnections[connection.neuron.outputType] = l
+
         #return connections
         return new_connections
+
+    def learn(self, value):
+        connections = []
+        
+        for connection in self.typesToConnections.get(type(value), []):
+            if (np.isclose(value, self.connection_output(connection))):
+                connections.append(connection)
+
+        return sorted(connections, key = lambda x: self.connection_len(x))
