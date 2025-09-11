@@ -7,6 +7,14 @@ from neuron import Neuron
 import numpy as np
 import random
 
+def is_iterable(x) -> bool:
+    try:
+        it = iter(x)
+    except TypeError as te:
+        return False
+
+    return True
+
 class Brain:
     def __init__(self):
         self.neurons = {}
@@ -191,22 +199,6 @@ class Brain:
 
         s = set(self.neurons[id].inputTypes)
 
-        """
-        if (previousLevels):
-            for i in range(len(self.neurons)):
-                if (i != id):
-                    if (self.neurons[i].outputType in s):
-                        if (not self.neurons[i].activated):
-                            self.activate(i, activationLevel - 1)
-
-        if (nextLevels):
-            for i in range(len(self.neurons)):
-                if (i != id):
-                    if (self.neurons[id].outputType in self.neurons[i].inputTypes):
-                        if (not self.neurons[i].activated):
-                            self.activate(i, activationLevel + 1)
-        """
-
         if (previousLevels):
             for type in self.neurons[id].inputTypes:
                 for neuron in self.outputTypesToNeurons.get(type, []):
@@ -279,17 +271,42 @@ class Brain:
             l.append(connection)
             self.typesToConnections[connection.neuron.outputType] = l
 
-        #return connections
-        return new_connections
+        #return list(connections)
+        return list(new_connections)
 
-    def learn(self, value):
+    def learn(self, value, name = "", transform_best_to_neuron = True):
         connections = []
         
         for connection in self.typesToConnections.get(type(value), []):
             try:
-                if (np.isclose(value, self.connection_output(connection))):
-                    connections.append(connection)
+                if (is_iterable(value)):
+                    if (all(np.isclose(value, self.connection_output(connection)))):
+                        connections.append(connection)
+                else:
+                    if (np.isclose(value, self.connection_output(connection))):
+                        connections.append(connection)
             except:
                 pass
 
-        return sorted(connections, key = lambda x: self.connection_len(x))
+        connections = sorted(connections, key = lambda x: self.connection_len(x))
+
+        if (transform_best_to_neuron and len(connections)):
+            connection = list(connections)[0]
+
+            def function(*args):
+                def replace_inputs(connection, arg_iter):
+                    vals = []
+
+                    for input in connection.inputs:
+                        if (isinstance(input, Neuron) and len(input.inputTypes)):
+                            vals.append(next(arg_iter))
+                        elif (isinstance(input, Connection)):
+                            vals.append(replace_inputs(input, arg_iter))
+
+                    return connection.neuron.output(*vals)
+
+                return replace_inputs(connection, iter(args))
+
+            self.add(Neuron(function, name, connection.origin_input_types(), connection.neuron.outputType))
+
+        return connections

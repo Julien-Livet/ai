@@ -1,19 +1,20 @@
 from brain import Brain
 from connection import Connection
-import ints
+import ndarrays
 from neuron import Neuron
+import numpy as np
 
 brain = Brain()
 neuronIds = {}
 
-x = 6
-y = 5
-z = 4
+x = np.array((1, 2, 3))
+y = np.array((4, 5, 6))
+z = np.array((7, 8, 9))
 
-neuronIds |= ints.add(brain)
-neuronIds |= ints.add_value(brain, lambda: x, "x")
-neuronIds |= ints.add_value(brain, lambda: y, "y")
-neuronIds |= ints.add_value(brain, lambda: z, "z")
+neuronIds |= ndarrays.add(brain)
+neuronIds |= ndarrays.add_value(brain, lambda: x, "x")
+neuronIds |= ndarrays.add_value(brain, lambda: y, "y")
+neuronIds |= ndarrays.add_value(brain, lambda: z, "z")
 
 print(len(brain.connect(2)))
 print(len(brain.connections))
@@ -21,14 +22,16 @@ print(len(brain.connections))
 #for connection in brain.connections:
 #    print(brain.connection_str(connection) + " -> " + str(brain.connection_output(connection)))
 
-brain.activate_type(int, 1, False, False)
+brain.activate_type(np.ndarray, 1, False, False)
 
 #brain.show(seed = 0, levelColors = ["red", "green", "blue", "yellow", "cyan", "magenta", "purple", "brown", "orange", "gold", "indigo", "black", "white"])
 
+print(x * y + z)
 connections = brain.learn(x * y + z)
 brain.connections = set(connections)
 
 print(brain.connection_str(connections[0]) + " -> " + str(brain.connection_output(connections[0])))
+print(connections[0].origin_input_types())
 
 print(brain.neuron_name(brain.neurons[neuronIds["x"]]))
 print(brain.neuron_name(brain.neurons[neuronIds["y"]]))
