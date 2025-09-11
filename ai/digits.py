@@ -1,0 +1,31 @@
+from brain import Brain
+from neuron import Neuron
+
+class Digit:
+    def __init__(self, value: int):
+        assert(isinstance(value, int))
+        assert(0 <= value <= 9)
+
+        self.value = value
+
+    def __str__(self):
+        return str(self.value)
+
+    def __int__(self):
+        return self.value
+
+def digit_to_str(x: Digit) -> str:
+    return str(x)
+
+def add(brain: Brain):
+    neuronIds = {}
+
+    for i in range(10):
+        def number(i = i) -> Digit:
+            return Digit(int(i))
+
+        neuronIds[str(i)] = brain.add(Neuron(number, str(i)))
+    
+    neuronIds["digit_to_str"] = brain.add(Neuron(digit_to_str, "digit_to_str"))
+    
+    return neuronIds
