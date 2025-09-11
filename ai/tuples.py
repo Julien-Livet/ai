@@ -47,7 +47,7 @@ def add_value(brain: Brain, x: tuple, name = None):
         name = str(x)
 
     def value(x = x) -> tuple:
-        return x
+        return x if type(x) is tuple else x()
 
     neuronIds[name] = brain.add(Neuron(value, name))
 

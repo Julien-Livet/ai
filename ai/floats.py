@@ -103,7 +103,7 @@ def add_value(brain: Brain, x: float, name = None):
         name = str(x)
 
     def value(x = x) -> float:
-        return x
+        return x if type(x) is float else x()
 
     neuronIds[name] = brain.add(Neuron(value, name))
 

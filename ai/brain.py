@@ -107,6 +107,17 @@ class Brain:
 
         return len
 
+    def connection_str(self, connection):
+        inputs = []
+
+        for input in connection.inputs:
+            if (type(input) is Neuron):
+                inputs.append(input.output())
+            elif (type(input) is Connection):
+                inputs.append(self.connection_str(input))
+
+        return self.neuron_name(connection.neuron) + "(" + str(inputs) + ")"
+
     def show(self,
              seed = None,
              length = 100.0,
@@ -224,7 +235,7 @@ class Brain:
             for connection in self.connections:
                 type = connection.neuron.outputType
                 l = originTypes.get(type, [])
-                l.append(self.neurons[id])
+                l.append(connection)
                 originTypes[type] = l
 
             for k, v in self.neurons.items():

@@ -44,7 +44,7 @@ def add_value(brain: Brain, x: bool, name = None):
         name = str(x)
 
     def value(x = x) -> bool:
-        return x
+        return x if type(x) is bool else x()
 
     neuronIds[name] = brain.add(Neuron(value, name))
 

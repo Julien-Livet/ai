@@ -29,3 +29,16 @@ def add(brain: Brain):
     neuronIds["digit_to_str"] = brain.add(Neuron(digit_to_str, "digit_to_str"))
     
     return neuronIds
+
+def add_value(brain: Brain, x: Digit, name = None):
+    neuronIds = {}
+
+    if (name is None):
+        name = str(x)
+
+    def value(x = x) -> Digit:
+        return x if type(x) is Digit else x()
+
+    neuronIds[name] = brain.add(Neuron(value, name))
+
+    return neuronIds

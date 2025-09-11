@@ -181,7 +181,7 @@ def add_value(brain: Brain, x: np.ndarray, name = None):
         name = str(x)
 
     def value(x = x) -> np.ndarray:
-        return x
+        return x if type(x) is np.ndarray else x()
 
     neuronIds[name] = brain.add(Neuron(value, name))
 

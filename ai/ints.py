@@ -3,13 +3,13 @@ from neuron import Neuron
 
 def add_int(x: int, y: int) -> int:
     return x + y
-
+"""
 def sub_int(x: int, y: int) -> int:
     return x - y
-
+"""
 def mul_int(x: int, y: int) -> int:
     return x * y
-
+"""
 def div_int(x: int, y: int) -> int:
     return x // y
 
@@ -45,13 +45,14 @@ def complement_int(x: int) -> int:
 
 def int_to_str(x: int) -> str:
     return str(x)
-
+"""
 def add(brain: Brain):
     neuronIds = {}
 
     neuronIds["add_int"] = brain.add(Neuron(add_int, "add_int"))
-    neuronIds["sub_int"] = brain.add(Neuron(sub_int, "sub_int"))
+    #neuronIds["sub_int"] = brain.add(Neuron(sub_int, "sub_int"))
     neuronIds["mul_int"] = brain.add(Neuron(mul_int, "mul_int"))
+    """
     neuronIds["div_int"] = brain.add(Neuron(div_int, "div_int"))
     neuronIds["mod_int"] = brain.add(Neuron(mod_int, "mod_int"))
     neuronIds["pow_int"] = brain.add(Neuron(pow_int, "pow_int"))
@@ -64,6 +65,7 @@ def add(brain: Brain):
     neuronIds["neg_int"] = brain.add(Neuron(neg_int, "neg_int"))
     neuronIds["complement_int"] = brain.add(Neuron(complement_int, "complement_int"))
     neuronIds["int_to_str"] = brain.add(Neuron(int_to_str, "int_to_str"))
+    """
 
     return neuronIds
 
@@ -74,7 +76,7 @@ def add_value(brain: Brain, x: int, name = None):
         name = str(x)
 
     def value(x = x) -> int:
-        return x
+        return x if type(x) is int else x()
 
     neuronIds[name] = brain.add(Neuron(value, name))
 

@@ -45,7 +45,7 @@ def add_value(brain: Brain, x: set, name = None):
         name = str(x)
 
     def value(x = x) -> set:
-        return x
+        return x if type(x) is set else x()
 
     neuronIds[name] = brain.add(Neuron(value, name))
 

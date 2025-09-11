@@ -57,7 +57,7 @@ def add_value(brain: Brain, x: list, name = None):
         name = str(x)
 
     def value(x = x) -> list:
-        return x
+        return x if type(x) is list else x()
 
     neuronIds[name] = brain.add(Neuron(value, name))
 

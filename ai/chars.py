@@ -35,3 +35,16 @@ def add(brain: Brain):
     neuronIds["upper_char"] = brain.add(Neuron(upper_char, "upper_char"))
 
     return neuronIds
+
+def add_value(brain: Brain, x: Char, name = None):
+    neuronIds = {}
+
+    if (name is None):
+        name = str(x)
+
+    def value(x = x) -> Char:
+        return x if type(x) is Char else x()
+
+    neuronIds[name] = brain.add(Neuron(value, name))
+
+    return neuronIds

@@ -27,3 +27,16 @@ def add(brain: Brain):
     neuronIds["symbol_to_str"] = brain.add(Neuron(symbol_to_str, "symbol_to_str"))
 
     return neuronIds
+
+def add_value(brain: Brain, x: Symbol, name = None):
+    neuronIds = {}
+
+    if (name is None):
+        name = str(x)
+
+    def value(x = x) -> Symbol:
+        return x if type(x) is Symbol else x()
+
+    neuronIds[name] = brain.add(Neuron(value, name))
+
+    return neuronIds
