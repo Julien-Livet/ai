@@ -26,13 +26,8 @@ brain.activate_type(int, 1, False, False)
 #brain.show(seed = 0, levelColors = ["red", "green", "blue", "yellow", "cyan", "magenta", "purple", "brown", "orange", "gold", "indigo", "black", "white"])
 
 connections = brain.learn(x * y + z)
-brain.connections = set(connections)
 
 print(brain.connection_str(connections[0]) + " -> " + str(brain.connection_output(connections[0])))
-
-print(brain.neuron_name(brain.neurons[neuronIds["x"]]))
-print(brain.neuron_name(brain.neurons[neuronIds["y"]]))
-print(brain.neuron_name(brain.neurons[neuronIds["z"]]))
 
 brain.neurons[neuronIds["x"]].function = lambda: int(input("x? "))
 brain.neurons[neuronIds["y"]].function = lambda: int(input("y? "))

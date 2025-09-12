@@ -33,8 +33,7 @@ brain.connections = set(connections)
 print(brain.connection_str(connections[0]) + " -> " + str(brain.connection_output(connections[0])))
 print(connections[0].origin_input_types())
 
-brain.connections = set()
-brain.typesToConnections = {}
+brain.clear_connections()
 
 print(len(brain.connect(1)))
 print(len(brain.connections))
@@ -46,10 +45,6 @@ connections = brain.learn(x * y + z)
 
 print(brain.connection_str(connections[0]) + " -> " + str(brain.connection_output(connections[0])))
 print(connections[0].origin_input_types())
-
-print(brain.neuron_name(brain.neurons[neuronIds["x"]]))
-print(brain.neuron_name(brain.neurons[neuronIds["y"]]))
-print(brain.neuron_name(brain.neurons[neuronIds["z"]]))
 
 brain.neurons[neuronIds["x"]].function = lambda: int(input("x? "))
 brain.neurons[neuronIds["y"]].function = lambda: int(input("y? "))

@@ -35,13 +35,13 @@ class Brain:
 
         return neurons_ids
 
-    def _add_neuron_input_types(self):
+    def _add_neuron_input_types(self, neuron: Neuron):
         for type in neuron.inputTypes:
             l = self.inputTypesToNeurons.get(type, [])
             l.append(neuron)
             self.inputTypesToNeurons[type] = l
 
-    def _add_neuron_output_type(self):
+    def _add_neuron_output_type(self, neuron: Neuron):
         l = self.outputTypesToNeurons.get(neuron.outputType, [])
         l.append(neuron)
         self.outputTypesToNeurons[neuron.outputType] = l
@@ -85,7 +85,7 @@ class Brain:
         else:
             return self.neuronToIds[neuron]
 
-    def draw_connection(self, pos, color, width, connection):
+    def draw_connection(self, pos: list, color, width: float, connection: Connection):
         for input in connection.inputs:
             if (type(input) is Neuron):
                 self.graph.add_edge_arrow(pos[self.neuron_name(input)], pos[self.neuron_name(connection.neuron)],
@@ -98,7 +98,7 @@ class Brain:
 
                 self.draw_connection(pos, color, width + 1, input)
 
-    def connection_output(self, connection):
+    def connection_output(self, connection: Connection):
         inputs = []
 
         try:
@@ -112,7 +112,7 @@ class Brain:
 
         return connection.neuron.output(*inputs)
 
-    def connection_len(self, connection):
+    def connection_len(self, connection: Connection):
         len = 0
         
         for input in connection.inputs:
@@ -123,7 +123,7 @@ class Brain:
 
         return len
 
-    def connection_str(self, connection):
+    def connection_str(self, connection: Connection):
         inputs = []
 
         for input in connection.inputs:
@@ -135,10 +135,10 @@ class Brain:
         return self.neuron_name(connection.neuron) + "(" + str(inputs) + ")"
 
     def show(self,
-             seed = None,
-             length = 100.0,
-             levelColors = [str(x) for x in list(colour.Color("green").range_to(colour.Color("blue"), 16))],
-             connectionColors = (random.seed(0), ['#%06X' % random.randint(0, 0xFFFFFF) for _ in range(100)])[1]):
+             seed: int = None,
+             length: float = 100.0,
+             levelColors: list = [str(x) for x in list(colour.Color("green").range_to(colour.Color("blue"), 16))],
+             connectionColors: list = (random.seed(0), ['#%06X' % random.randint(0, 0xFFFFFF) for _ in range(100)])[1]):
         self.graph = BrainGraph()
 
         minActivationLevel = 0
@@ -186,13 +186,13 @@ class Brain:
             
         self.graph.show()
 
-    def activate_type(self, type, activationLevel = 0, previousLevels = True, nextLevels = True):
+    def activate_type(self, type, activationLevel: int = 0, previousLevels: bool = True, nextLevels: bool = True):
         neurons = self.inputTypesToNeurons.get(type, []) + self.outputTypesToNeurons.get(type, [])
 
         for neuron in neurons:
             self.activate(self.neuronToIds[neuron], activationLevel, previousLevels, nextLevels)
 
-    def activate(self, id: int, activationLevel = 0, previousLevels = True, nextLevels = True):
+    def activate(self, id: int, activationLevel: int = 0, previousLevels: bool = True, nextLevels: bool = True):
         assert(id < len(self.neurons))
 
         self.neurons[id].activationLevel = activationLevel
@@ -215,12 +215,12 @@ class Brain:
                 if (not neuron.activated):
                     self.activate(self.neuronToIds[neuron], activationLevel + 1)
 
-        def _add_connection_type(self, connection):
-            l = self.typesToConnections.get(connection.neuron.outputType, [])
-            l.append(connection)
-            self.typesToConnections[connection.neuron.outputType] = l
+    def _add_connection_type(self, connection):
+        l = self.typesToConnections.get(connection.neuron.outputType, [])
+        l.append(connection)
+        self.typesToConnections[connection.neuron.outputType] = l
             
-    def connect(self, depth = 1, number = math.inf):
+    def connect(self, depth: int = 1, number: int = math.inf):
         connections = set()
         new_connections = set()
 
@@ -282,12 +282,15 @@ class Brain:
         #return list(connections)
         return list(new_connections)
 
-    def learn(self, value, name = "", transform_best_to_neuron = True):
+    def learn(self, value, name: str = "", transform_best_to_neuron: bool = True):
         connections = []
         
         for connection in self.typesToConnections.get(type(value), []):
             try:
-                if (is_iterable(value)):
+                if (isinstance(value, str)):
+                    if (value == self.connection_output(connection)):
+                        connections.append(connection)
+                elif (is_iterable(value)):
                     if (all(np.isclose(value, self.connection_output(connection)))):
                         connections.append(connection)
                 else:
@@ -330,12 +333,12 @@ class Brain:
 
         return connections
 
-    def save(self, filename):
+    def save(self, filename: str):
         with open(filename, "wb") as f:
             dill.dump(self.neurons, f)
             dill.dump(self.connections, f)
 
-    def load(self, filename):
+    def load(self, filename: str):
         with open(filename, "rb") as f:
             self.neurons = dill.load(f)
             self.connections = dill.load(f)
@@ -355,6 +358,17 @@ class Brain:
 
             if (len(neuron.inputTypes) == 0):
                 self.originNeuronIds.append(id)
+
+        for connection in self.connections:
+            self._add_connection_type(connection)
+
+    def clear_connections(self):
+        self.connections = set()
+        self.typesToConnections = {}
+
+    def set_connections(self, connections: list[Connection]):
+        self.connections = set(connections)
+        self.typesToConnections = {}
 
         for connection in self.connections:
             self._add_connection_type(connection)
