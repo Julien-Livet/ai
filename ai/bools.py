@@ -16,24 +16,36 @@ def xor_bool(x: bool, y: bool) -> bool:
 def bool_to_str(x: int) -> str:
     return str(x)
 
+def eq_bool(x: bool, y: bool) -> bool:
+    return x == y
+
+def ne_bool(x: bool, y: bool) -> bool:
+    return x != y
+
+def bool_to_int(x: bool) -> int:
+    return int(x)
+
 def add(brain: Brain):
     neuronIds = {}
 
     def true() -> bool:
         return True
 
-    neuronIds["True"] = brain.add(Neuron(true, "True"))
+    neuronIds["True"] = brain.add(Neuron(true, "True", module = "bools.constants"))
 
     def false() -> bool:
         return False
 
-    neuronIds["False"] = brain.add(Neuron(false, "False"))
+    neuronIds["False"] = brain.add(Neuron(false, "False", module = "bools.constants"))
 
-    neuronIds["not_bool"] = brain.add(Neuron(not_bool, "not_bool"))
-    neuronIds["and_bool"] = brain.add(Neuron(and_bool, "and_bool"))
-    neuronIds["or_bool"] = brain.add(Neuron(or_bool, "or_bool"))
-    neuronIds["xor_bool"] = brain.add(Neuron(xor_bool, "xor_bool"))
-    neuronIds["bool_to_str"] = brain.add(Neuron(bool_to_str, "bool_to_str"))
+    neuronIds["not_bool"] = brain.add(Neuron(not_bool, "not_bool", module = "bools.functions"))
+    neuronIds["and_bool"] = brain.add(Neuron(and_bool, "and_bool", module = "bools.functions"))
+    neuronIds["or_bool"] = brain.add(Neuron(or_bool, "or_bool", module = "bools.functions"))
+    neuronIds["xor_bool"] = brain.add(Neuron(xor_bool, "xor_bool", module = "bools.functions"))
+    neuronIds["bool_to_str"] = brain.add(Neuron(bool_to_str, "bool_to_str", module = "bools.functions"))
+    neuronIds["eq_bool"] = brain.add(Neuron(eq_bool, "eq_bool", module = "bools.operators.comparison"))
+    neuronIds["ne_bool"] = brain.add(Neuron(ne_bool, "ne_bool", module = "bools.operators.comparison"))
+    neuronIds["bool_to_int"] = brain.add(Neuron(bool_to_int, "bool_to_int", module = "bools.functions.conversion"))
 
     return neuronIds
 

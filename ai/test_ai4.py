@@ -11,10 +11,13 @@ x = np.array((1, 2, 3))
 y = np.array((4, 5, 6))
 z = np.array((7, 8, 9))
 
-neuronIds["add_ndarray"] = brain.add(Neuron(ndarrays.add_ndarray, "add_ndarray"))
-neuronIds["sub_ndarray"] = brain.add(Neuron(ndarrays.sub_ndarray, "sub_ndarray"))
-neuronIds["mul_ndarray"] = brain.add(Neuron(ndarrays.mul_ndarray, "mul_ndarray"))
-neuronIds["div_ndarray"] = brain.add(Neuron(ndarrays.div_ndarray, "div_ndarray"))
+neuronIds |= ndarrays.add(brain)
+
+for k in brain.modules:
+    brain.modules[k] = False
+
+brain.modules["ndarrays.operators.arithmetic"] = True
+
 neuronIds |= ndarrays.add_value(brain, lambda: x, "x")
 neuronIds |= ndarrays.add_value(brain, lambda: y, "y")
 neuronIds |= ndarrays.add_value(brain, lambda: z, "z")
@@ -27,7 +30,11 @@ print(len(brain.connections))
 
 brain.activate_type(np.ndarray, 1, False, False)
 
-#brain.show2d(seed = 0, levelColors = ["red", "green", "blue", "yellow", "cyan", "magenta", "purple", "brown", "orange", "gold", "indigo", "black", "white"])
+try:
+    brain.show2d(seed = 0, levelColors = ["red", "green", "blue", "yellow", "cyan", "magenta", "purple", "brown", "orange", "gold", "indigo", "black", "white"])
+except:
+    pass
+
 #brain.show3d(seed = 0, levelColors = ["red", "green", "blue", "yellow", "cyan", "magenta", "purple", "brown", "orange", "gold", "indigo", "black", "white"])
 
 print(x * y + z)

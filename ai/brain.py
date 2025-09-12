@@ -24,6 +24,7 @@ class Brain:
         self.connections = set()
         self.originNeuronIds = []
         self.typesToConnections = {}
+        self.modules = {}
 
     def origin_neuron_ids_from_type(self, type):
         neurons_ids = []
@@ -64,6 +65,9 @@ class Brain:
 
         if (len(neuron.inputTypes) == 0):
             self.originNeuronIds.append(id)
+            
+        if (not neuron.module in self.modules):
+            self.modules[neuron.module] = True
 
         return id
 
@@ -81,6 +85,11 @@ class Brain:
 
         del self.neuronToIds[neuron]
         del self.neurons[id]
+
+    def is_enabled(self, id: int):
+        neuron = self.neurons[id]
+        
+        return self.modules[neuron.module]
 
     def neuron_name(self, neuron: Neuron):
         if (neuron.name != ""):
@@ -287,10 +296,11 @@ class Brain:
             originTypes = {}
 
             for id in self.originNeuronIds:
-                type = self.neurons[id].outputType
-                l = originTypes.get(type, [])
-                l.append(self.neurons[id])
-                originTypes[type] = l
+                if (self.is_enabled(id)):
+                    type = self.neurons[id].outputType
+                    l = originTypes.get(type, [])
+                    l.append(self.neurons[id])
+                    originTypes[type] = l
                     
             for connection in self.connections:
                 type = connection.neuron.outputType
@@ -299,6 +309,9 @@ class Brain:
                 originTypes[type] = l
 
             for k, v in self.neurons.items():
+                if (not self.is_enabled(k)):
+                    continue
+
                 inputsList = []
                 add = True
                 
@@ -338,7 +351,7 @@ class Brain:
         #return list(connections)
         return list(new_connections)
 
-    def learn(self, value, name: str = "", transform_best_to_neuron: bool = True):
+    def learn(self, value, name: str = "", transform_best_to_neuron: bool = True, module: str = None):
         connections = []
         
         for connection in self.typesToConnections.get(type(value), []):
@@ -385,7 +398,10 @@ class Brain:
 
                 return replace_inputs(connection, iter(args))
 
-            self.add(Neuron(function, name, connection.origin_input_types(), connection.neuron.outputType))
+            if (module == None):
+                module = connection.neuron.module
+
+            self.add(Neuron(function, name, connection.origin_input_types(), connection.neuron.outputType, module = module))
 
         return connections
 

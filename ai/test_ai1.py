@@ -34,5 +34,9 @@ brain.connections.add(connectionInt)
 
 print(brain.connection_output(connectionInt))
 
-#brain.show2d()
+try:
+    brain.show2d()
+except:
+    pass
+
 brain.show3d()

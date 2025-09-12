@@ -38,15 +38,15 @@ def list_to_str(x: list) -> str:
 def add(brain: Brain):
     neuronIds = {}
 
-    neuronIds["add_list"] = brain.add(Neuron(add_list, "add_list"))
-    neuronIds["len_list"] = brain.add(Neuron(len_list, "len_list"))
-    neuronIds["range_list"] = brain.add(Neuron(range_list, "range_list"))
-    neuronIds["reversed_list"] = brain.add(Neuron(reversed_list, "reversed_list"))
-    neuronIds["list_to_ndarray"] = brain.add(Neuron(list_to_ndarray, "list_to_ndarray"))
-    neuronIds["list_to_set"] = brain.add(Neuron(list_to_set, "list_to_set"))
-    neuronIds["list_to_tuple"] = brain.add(Neuron(list_to_tuple, "list_to_tuple"))
-    neuronIds["shuffle_list"] = brain.add(Neuron(shuffle_list, "shuffle_list"))
-    neuronIds["list_to_str"] = brain.add(Neuron(list_to_str, "list_to_str"))
+    neuronIds["add_list"] = brain.add(Neuron(add_list, "add_list", module = "lists.functions"))
+    neuronIds["len_list"] = brain.add(Neuron(len_list, "len_list", module = "lists.functions"))
+    neuronIds["range_list"] = brain.add(Neuron(range_list, "range_list", module = "lists.functions"))
+    neuronIds["reversed_list"] = brain.add(Neuron(reversed_list, "reversed_list", module = "lists.functions"))
+    neuronIds["shuffle_list"] = brain.add(Neuron(shuffle_list, "shuffle_list", module = "lists.functions"))
+    neuronIds["list_to_ndarray"] = brain.add(Neuron(list_to_ndarray, "list_to_ndarray", module = "lists.functions.conversion"))
+    neuronIds["list_to_set"] = brain.add(Neuron(list_to_set, "list_to_set", module = "lists.functions.conversion"))
+    neuronIds["list_to_tuple"] = brain.add(Neuron(list_to_tuple, "list_to_tuple", module = "lists.functions.conversion"))
+    neuronIds["list_to_str"] = brain.add(Neuron(list_to_str, "list_to_str", module = "lists.functions.conversion"))
 
     return neuronIds
 
@@ -59,6 +59,6 @@ def add_value(brain: Brain, x: list, name = None):
     def value(x = x) -> list:
         return x if type(x) is list else x()
 
-    neuronIds[name] = brain.add(Neuron(value, name))
+    neuronIds[name] = brain.add(Neuron(value, name, module = "lists.variables"))
 
     return neuronIds

@@ -29,14 +29,14 @@ def tuple_to_str(x: tuple) -> str:
 def add(brain: Brain):
     neuronIds = {}
 
-    neuronIds["add_tuple"] = brain.add(Neuron(add_tuple, "add_tuple"))
-    neuronIds["len_tuple"] = brain.add(Neuron(len_tuple, "len_tuple"))
-    neuronIds["range_tuple"] = brain.add(Neuron(range_tuple, "range_tuple"))
-    neuronIds["reversed_tuple"] = brain.add(Neuron(reversed_tuple, "reversed_tuple"))
-    neuronIds["tuple_to_ndarray"] = brain.add(Neuron(tuple_to_ndarray, "tuple_to_ndarray"))
-    neuronIds["tuple_to_list"] = brain.add(Neuron(tuple_to_list, "tuple_to_list"))
-    neuronIds["tuple_to_set"] = brain.add(Neuron(tuple_to_set, "tuple_to_set"))
-    neuronIds["tuple_to_str"] = brain.add(Neuron(tuple_to_str, "tuple_to_str"))
+    neuronIds["add_tuple"] = brain.add(Neuron(add_tuple, "add_tuple", module = "tuples.functions"))
+    neuronIds["len_tuple"] = brain.add(Neuron(len_tuple, "len_tuple", module = "tuples.functions"))
+    neuronIds["range_tuple"] = brain.add(Neuron(range_tuple, "range_tuple", module = "tuples.functions"))
+    neuronIds["reversed_tuple"] = brain.add(Neuron(reversed_tuple, "reversed_tuple", module = "tuples.functions"))
+    neuronIds["tuple_to_ndarray"] = brain.add(Neuron(tuple_to_ndarray, "tuple_to_ndarray", module = "tuples.functions.conversion"))
+    neuronIds["tuple_to_list"] = brain.add(Neuron(tuple_to_list, "tuple_to_list", module = "tuples.functions.conversion"))
+    neuronIds["tuple_to_set"] = brain.add(Neuron(tuple_to_set, "tuple_to_set", module = "tuples.functions.conversion"))
+    neuronIds["tuple_to_str"] = brain.add(Neuron(tuple_to_str, "tuple_to_str", module = "tuples.functions.conversion"))
 
     return neuronIds
 
@@ -49,6 +49,6 @@ def add_value(brain: Brain, x: tuple, name = None):
     def value(x = x) -> tuple:
         return x if type(x) is tuple else x()
 
-    neuronIds[name] = brain.add(Neuron(value, name))
+    neuronIds[name] = brain.add(Neuron(value, name, module = "tuples.variables"))
 
     return neuronIds

@@ -22,9 +22,9 @@ def add(brain: Brain):
         def symbol(i = i) -> Symbol:
             return Symbol(i)
 
-        neuronIds[Symbol.symbols[i]] = brain.add(Neuron(symbol, Symbol.symbols[i]))
+        neuronIds[Symbol.symbols[i]] = brain.add(Neuron(symbol, Symbol.symbols[i], module = "symbols.constants"))
 
-    neuronIds["symbol_to_str"] = brain.add(Neuron(symbol_to_str, "symbol_to_str"))
+    neuronIds["symbol_to_str"] = brain.add(Neuron(symbol_to_str, "symbol_to_str", module = "symbols.functions"))
 
     return neuronIds
 
@@ -37,6 +37,6 @@ def add_value(brain: Brain, x: Symbol, name = None):
     def value(x = x) -> Symbol:
         return x if type(x) is Symbol else x()
 
-    neuronIds[name] = brain.add(Neuron(value, name))
+    neuronIds[name] = brain.add(Neuron(value, name, module = "symbols.variables"))
 
     return neuronIds

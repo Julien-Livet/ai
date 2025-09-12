@@ -25,13 +25,13 @@ def str_to_int(x: str) -> int:
 def add(brain: Brain):
     neuronIds = {}
 
-    neuronIds["add_str"] = brain.add(Neuron(add_str, "add_str"))
-    neuronIds["len_str"] = brain.add(Neuron(len_str, "len_str"))
-    neuronIds["lower_str"] = brain.add(Neuron(lower_str, "lower_str"))
-    neuronIds["upper_str"] = brain.add(Neuron(upper_str, "upper_str"))
-    neuronIds["str_to_bool"] = brain.add(Neuron(str_to_bool, "str_to_bool"))
-    neuronIds["str_to_float"] = brain.add(Neuron(str_to_float, "str_to_float"))
-    neuronIds["str_to_int"] = brain.add(Neuron(str_to_int, "str_to_int"))
+    neuronIds["add_str"] = brain.add(Neuron(add_str, "add_str", module = "strs.functions"))
+    neuronIds["len_str"] = brain.add(Neuron(len_str, "len_str", module = "strs.functions"))
+    neuronIds["lower_str"] = brain.add(Neuron(lower_str, "lower_str", module = "strs.functions"))
+    neuronIds["upper_str"] = brain.add(Neuron(upper_str, "upper_str", module = "strs.functions"))
+    neuronIds["str_to_bool"] = brain.add(Neuron(str_to_bool, "str_to_bool", module = "strs.functions.conversion"))
+    neuronIds["str_to_float"] = brain.add(Neuron(str_to_float, "str_to_float", module = "strs.functions.conversion"))
+    neuronIds["str_to_int"] = brain.add(Neuron(str_to_int, "str_to_int", module = "strs.functions.conversion"))
 
     return neuronIds
 
@@ -44,6 +44,6 @@ def add_value(brain: Brain, x: str, name = None):
     def value(x = x) -> str:
         return x if type(x) is str else x()
 
-    neuronIds[name] = brain.add(Neuron(value, name))
+    neuronIds[name] = brain.add(Neuron(value, name, module = "strs.variables"))
 
     return neuronIds

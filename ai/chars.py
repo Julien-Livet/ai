@@ -28,11 +28,11 @@ def add(brain: Brain):
         def number(i = i) -> Char:
             return Char(chr(ord('a') + i))
 
-        neuronIds[chr(ord('a') + i)] = brain.add(Neuron(number, chr(ord('a') + i)))
+        neuronIds[chr(ord('a') + i)] = brain.add(Neuron(number, chr(ord('a') + i, module = "chars.constants")))
 
-    neuronIds["char_to_str"] = brain.add(Neuron(char_to_str, "char_to_str"))
-    neuronIds["lower_char"] = brain.add(Neuron(lower_char, "lower_char"))
-    neuronIds["upper_char"] = brain.add(Neuron(upper_char, "upper_char"))
+    neuronIds["char_to_str"] = brain.add(Neuron(char_to_str, "char_to_str", module = "chars.functions"))
+    neuronIds["lower_char"] = brain.add(Neuron(lower_char, "lower_char", module = "chars.functions"))
+    neuronIds["upper_char"] = brain.add(Neuron(upper_char, "upper_char", module = "chars.functions"))
 
     return neuronIds
 
@@ -45,6 +45,6 @@ def add_value(brain: Brain, x: Char, name = None):
     def value(x = x) -> Char:
         return x if type(x) is Char else x()
 
-    neuronIds[name] = brain.add(Neuron(value, name))
+    neuronIds[name] = brain.add(Neuron(value, name, module = "chars.variables"))
 
     return neuronIds

@@ -39,6 +39,6 @@ def add_value(brain: Brain, x: Digit, name = None):
     def value(x = x) -> Digit:
         return x if type(x) is Digit else x()
 
-    neuronIds[name] = brain.add(Neuron(value, name))
+    neuronIds[name] = brain.add(Neuron(value, name, module = "digits"))
 
     return neuronIds

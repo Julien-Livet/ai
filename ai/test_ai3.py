@@ -10,10 +10,13 @@ x = 6
 y = 5
 z = 4
 
-neuronIds["add_int"] = brain.add(Neuron(ints.add_int, "add_int"))
-neuronIds["sub_int"] = brain.add(Neuron(ints.sub_int, "sub_int"))
-neuronIds["mul_int"] = brain.add(Neuron(ints.mul_int, "mul_int"))
-neuronIds["div_int"] = brain.add(Neuron(ints.div_int, "div_int"))
+neuronIds |= ints.add(brain)
+
+for k in brain.modules:
+    brain.modules[k] = False
+
+brain.modules["ints.operators.arithmetic"] = True
+
 neuronIds |= ints.add_value(brain, lambda: x, "x")
 neuronIds |= ints.add_value(brain, lambda: y, "y")
 neuronIds |= ints.add_value(brain, lambda: z, "z")
@@ -26,7 +29,11 @@ print(len(brain.connections))
 
 brain.activate_type(int, 1, False, False)
 
-#brain.show2d(seed = 0, levelColors = ["red", "green", "blue", "yellow", "cyan", "magenta", "purple", "brown", "orange", "gold", "indigo", "black", "white"])
+try:
+    brain.show2d(seed = 0, levelColors = ["red", "green", "blue", "yellow", "cyan", "magenta", "purple", "brown", "orange", "gold", "indigo", "black", "white"])
+except:
+    pass
+
 #brain.show3d(seed = 0, levelColors = ["red", "green", "blue", "yellow", "cyan", "magenta", "purple", "brown", "orange", "gold", "indigo", "black", "white"])
 
 connections = brain.learn(x * y + z, "mul_add")
