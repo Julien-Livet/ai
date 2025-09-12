@@ -14,7 +14,7 @@ def mul_ndarray(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     return x * y
 
 def div_ndarray(x: np.ndarray, y: np.ndarray) -> np.ndarray:
-    return x * y
+    return x / y
 
 def pow_ndarray(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     return x ** y

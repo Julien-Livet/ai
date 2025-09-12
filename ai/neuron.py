@@ -1,10 +1,12 @@
+import datetime
 import inspect
 
 class Neuron:
     def __init__(self, function, name = "", inputTypes = None, outputType = None):
         self.function = function
         self.name = name
-        
+        self.datetime = datetime.now()
+
         sig = inspect.signature(function)
         
         self.parameters = sig.parameters

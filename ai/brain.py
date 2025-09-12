@@ -35,6 +35,17 @@ class Brain:
 
         return neurons_ids
 
+    def _add_neuron_input_types(self):
+        for type in neuron.inputTypes:
+            l = self.inputTypesToNeurons.get(type, [])
+            l.append(neuron)
+            self.inputTypesToNeurons[type] = l
+
+    def _add_neuron_output_type(self):
+        l = self.outputTypesToNeurons.get(neuron.outputType, [])
+        l.append(neuron)
+        self.outputTypesToNeurons[neuron.outputType] = l
+        
     def add(self, neuron: Neuron):
         id = 0
         
@@ -43,15 +54,9 @@ class Brain:
         
         self.neurons[id] = neuron
 
-        for type in neuron.inputTypes:
-            l = self.inputTypesToNeurons.get(type, [])
-            l.append(neuron)
-            self.inputTypesToNeurons[type] = l
+        self._add_neuron_input_types(neuron)
+        self._add_neuron_output_type(neuron)
 
-        l = self.outputTypesToNeurons.get(neuron.outputType, [])
-        l.append(neuron)
-        self.outputTypesToNeurons[neuron.outputType] = l
-        
         self.neuronToIds[neuron] = id
 
         if (len(neuron.inputTypes) == 0):
@@ -210,6 +215,11 @@ class Brain:
                 if (not neuron.activated):
                     self.activate(self.neuronToIds[neuron], activationLevel + 1)
 
+        def _add_connection_type(self, connection):
+            l = self.typesToConnections.get(connection.neuron.outputType, [])
+            l.append(connection)
+            self.typesToConnections[connection.neuron.outputType] = l
+            
     def connect(self, depth = 1, number = math.inf):
         connections = set()
         new_connections = set()
@@ -267,9 +277,7 @@ class Brain:
             self.connections |= newConnections
 
         for connection in new_connections:
-            l = self.typesToConnections.get(connection.neuron.outputType, [])
-            l.append(connection)
-            self.typesToConnections[connection.neuron.outputType] = l
+            self._add_connection_type(connection)
 
         #return list(connections)
         return list(new_connections)
@@ -292,13 +300,24 @@ class Brain:
 
         if (transform_best_to_neuron and len(connections)):
             connection = list(connections)[0]
+            
+            if (len(connection.origin_input_types()) == len(connection.inputs)):
+                added = False
+
+                for input in connection.inputs:
+                    if (not (isinstance(input, Neuron) and len(input.inputTypes) == 0)):
+                        added = True
+                        break
+
+                if (not added):
+                    return connections
 
             def function(*args):
                 def replace_inputs(connection, arg_iter):
                     vals = []
 
                     for input in connection.inputs:
-                        if (isinstance(input, Neuron) and len(input.inputTypes)):
+                        if (isinstance(input, Neuron) and len(input.inputTypes) == 0):
                             vals.append(next(arg_iter))
                         elif (isinstance(input, Connection)):
                             vals.append(replace_inputs(input, arg_iter))
@@ -310,3 +329,32 @@ class Brain:
             self.add(Neuron(function, name, connection.origin_input_types(), connection.neuron.outputType))
 
         return connections
+
+    def save(self, filename):
+        with open(filename, "wb") as f:
+            dill.dump(self.neurons, f)
+            dill.dump(self.connections, f)
+
+    def load(self, filename):
+        with open(filename, "rb") as f:
+            self.neurons = dill.load(f)
+            self.connections = dill.load(f)
+            
+        self.inputTypesToNeurons = {}
+        self.outputTypesToNeurons = {}
+        self.neuronToIds = {}
+        self.graph = BrainGraph()
+        self.originNeuronIds = []
+        self.typesToConnections = {}
+            
+        for neuron in self.neurons:
+            self._add_neuron_input_types(neuron)
+            self._add_neuron_output_type(neuron)
+            
+            self.neuronToIds[neuron] = id
+
+            if (len(neuron.inputTypes) == 0):
+                self.originNeuronIds.append(id)
+
+        for connection in self.connections:
+            self._add_connection_type(connection)

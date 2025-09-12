@@ -27,8 +27,22 @@ brain.activate_type(np.ndarray, 1, False, False)
 #brain.show(seed = 0, levelColors = ["red", "green", "blue", "yellow", "cyan", "magenta", "purple", "brown", "orange", "gold", "indigo", "black", "white"])
 
 print(x * y + z)
-connections = brain.learn(x * y + z)
+connections = brain.learn(x * y + z, "mul_add")
 brain.connections = set(connections)
+
+print(brain.connection_str(connections[0]) + " -> " + str(brain.connection_output(connections[0])))
+print(connections[0].origin_input_types())
+
+brain.connections = set()
+brain.typesToConnections = {}
+
+print(len(brain.connect(1)))
+print(len(brain.connections))
+
+#for connection in brain.connections:
+#    print(brain.connection_str(connection) + " -> " + str(brain.connection_output(connection)))
+
+connections = brain.learn(x * y + z)
 
 print(brain.connection_str(connections[0]) + " -> " + str(brain.connection_output(connections[0])))
 print(connections[0].origin_input_types())
