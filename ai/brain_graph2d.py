@@ -1,4 +1,8 @@
-from graph_tool.all import Graph, graph_draw
+try:
+    from graph_tool.all import Graph, graph_draw
+except:
+    pass
+
 import math
 from matplotlib.colors import to_rgb
 

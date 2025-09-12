@@ -30,8 +30,9 @@ connectionAdd2 = Connection([connectionAdd1, connection3], brain.neurons[neuronI
 
 connectionInt = Connection([connectionAdd2], brain.neurons[neuronIds["str_to_int"]])
 
-brain.connections.append(connectionInt)
+brain.connections.add(connectionInt)
 
 print(brain.connection_output(connectionInt))
 
-brain.show2d()
+#brain.show2d()
+brain.show3d()
