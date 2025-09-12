@@ -24,7 +24,7 @@ print(len(brain.connections))
 
 brain.activate_type(np.ndarray, 1, False, False)
 
-#brain.show(seed = 0, levelColors = ["red", "green", "blue", "yellow", "cyan", "magenta", "purple", "brown", "orange", "gold", "indigo", "black", "white"])
+#brain.show2d(seed = 0, levelColors = ["red", "green", "blue", "yellow", "cyan", "magenta", "purple", "brown", "orange", "gold", "indigo", "black", "white"])
 
 print(x * y + z)
 connections = brain.learn(x * y + z, "mul_add")

@@ -72,7 +72,7 @@ match (activationExample):
         for id in brain.origin_neuron_ids_from_type(str):
             brain.activate(id, 6, False, False)
 
-connectionExample = 1
+connectionExample = 0
 
 match (connectionExample):
     case 0: #First example
@@ -90,11 +90,11 @@ match (connectionExample):
 
             connectionInt = Connection([connectionAdd2], brain.neurons[neuronIds["str_to_int"]])
 
-            brain.connections.append(connectionInt)
+            brain.add_connection(connectionInt)
 
             print(brain.connection_output(connectionInt))
 
     case 1: #Second example
         print(len(brain.connect(2)))
 
-brain.show(seed = 0, levelColors = ["red", "green", "blue", "yellow", "cyan", "magenta", "purple", "brown", "orange", "gold", "indigo", "black", "white"])
+brain.show2d(seed = 0, levelColors = ["red", "green", "blue", "yellow", "cyan", "magenta", "purple", "brown", "orange", "gold", "indigo", "black", "white"])

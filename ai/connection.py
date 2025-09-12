@@ -1,11 +1,29 @@
 import datetime
+import math
 from neuron import Neuron
 
 class Connection:
-    def __init__(self, inputs, neuron: Neuron):
+    def __init__(self, inputs, neuron: Neuron, activationDuration: float = math.inf, weight: float = 0.0):
         self.inputs = inputs
         self.neuron = neuron
         self.datetime = datetime.datetime.now()
+        self.activationDuration = activationDuration
+        self.weight = weight
+
+    def __eq__(self, other):
+        return isinstance(other, Connection) \
+               and self.inputs == other.inputs \
+               and self.neuron == other.neuron \
+               and self.activationDuration == other.activationDuration \
+               and self.weight == other.weight
+
+    def __hash__(self):
+        h = hash(self.neuron) + hash(self.activationDuration) + hash(self.weight)
+        
+        for input in self.inputs:
+            h += hash(input)
+
+        return h
 
     def origin_input_types(self):
         types = []
@@ -17,3 +35,6 @@ class Connection:
                 types.extend(input.origin_input_types())
 
         return types
+
+    def is_active(self):
+        return (datetime.datetime.now() - self.datetime > self.activationDuration)

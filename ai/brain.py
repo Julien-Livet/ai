@@ -1,8 +1,8 @@
-from brain_graph import BrainGraph
+import brain_graph2d
+import brain_graph3d
 import colour
 from connection import Connection
 import math
-import networkx as nx
 from neuron import Neuron
 import numpy as np
 import random
@@ -18,11 +18,12 @@ def is_iterable(x) -> bool:
 class Brain:
     def __init__(self):
         self.neurons = {}
-        self.inputTypesToNeurons = {}
-        self.outputTypesToNeurons = {}
+        self.inputTypesToIds = {}
+        self.outputTypesToIds = {}
         self.neuronToIds = {}
         self.connections = set()
-        self.graph = BrainGraph()
+        self.graph2d = brain_graph2d.BrainGraph()
+        self.graph3d = brain_graph3d.BrainGraph()
         self.originNeuronIds = []
         self.typesToConnections = {}
 
@@ -35,16 +36,20 @@ class Brain:
 
         return neurons_ids
 
-    def _add_neuron_input_types(self, neuron: Neuron):
-        for type in neuron.inputTypes:
-            l = self.inputTypesToNeurons.get(type, [])
-            l.append(neuron)
-            self.inputTypesToNeurons[type] = l
+    def _add_neuron_input_types(self, id: int):
+        neuron = self.neurons[id]
 
-    def _add_neuron_output_type(self, neuron: Neuron):
-        l = self.outputTypesToNeurons.get(neuron.outputType, [])
-        l.append(neuron)
-        self.outputTypesToNeurons[neuron.outputType] = l
+        for type in neuron.inputTypes:
+            l = self.inputTypesToIds.get(type, [])
+            l.append(id)
+            self.inputTypesToIds[type] = l
+
+    def _add_neuron_output_type(self, id: int):
+        neuron = self.neurons[id]
+
+        l = self.outputTypesToIds.get(neuron.outputType, [])
+        l.append(id)
+        self.outputTypesToIds[neuron.outputType] = l
         
     def add(self, neuron: Neuron):
         id = 0
@@ -54,8 +59,8 @@ class Brain:
         
         self.neurons[id] = neuron
 
-        self._add_neuron_input_types(neuron)
-        self._add_neuron_output_type(neuron)
+        self._add_neuron_input_types(id)
+        self._add_neuron_output_type(id)
 
         self.neuronToIds[neuron] = id
 
@@ -63,15 +68,15 @@ class Brain:
             self.originNeuronIds.append(id)
 
         return id
-        
+
     def remove(self, id: int):
         neuron = self.neurons[id]
 
-        for k, v in self.inputTypesToNeurons.items():
-            self.inputTypesToNeurons[k] = list(filter((neuron).__ne__, v))
+        for k, v in self.inputTypesToIds.items():
+            self.inputTypesToIds[k] = list(filter((neuron).__ne__, v))
 
-        for k, v in self.outputTypesToNeurons.items():
-            self.outputTypesToNeurons[k] = list(filter((neuron).__ne__, v))
+        for k, v in self.outputTypesToIds.items():
+            self.outputTypesToIds[k] = list(filter((neuron).__ne__, v))
 
         if (id in self.originNeuronIds):
             del self.originNeuronIds[self.originNeuronIds.index(id)]
@@ -85,18 +90,18 @@ class Brain:
         else:
             return self.neuronToIds[neuron]
 
-    def draw_connection(self, pos: list, color, width: float, connection: Connection):
+    def draw_connection(self, graph, pos: list, color, width: float, connection: Connection):
         for input in connection.inputs:
             if (type(input) is Neuron):
-                self.graph.add_edge_arrow(pos[self.neuron_name(input)], pos[self.neuron_name(connection.neuron)],
-                                          self.neuron_name(input) + "→" + self.neuron_name(connection.neuron),
-                                          color, width)
+                graph.add_edge(pos[self.neuron_name(input)], pos[self.neuron_name(connection.neuron)],
+                               self.neuron_name(input) + "→" + self.neuron_name(connection.neuron),
+                               color, width)
             elif (type(input) is Connection):
-                self.graph.add_edge_arrow(pos[self.neuron_name(input.neuron)], pos[self.neuron_name(connection.neuron)],
-                                          self.neuron_name(input.neuron) + "→" + self.neuron_name(connection.neuron),
-                                          color, width)
+                graph.add_edge(pos[self.neuron_name(input.neuron)], pos[self.neuron_name(connection.neuron)],
+                               self.neuron_name(input.neuron) + "→" + self.neuron_name(connection.neuron),
+                               color, width)
 
-                self.draw_connection(pos, color, width + 1, input)
+                self.draw_connection(graph, pos, color, width + 1, input)
 
     def connection_output(self, connection: Connection):
         inputs = []
@@ -107,10 +112,10 @@ class Brain:
                     inputs.append(input.output())
                 elif (type(input) is Connection):
                     inputs.append(self.connection_output(input))
+
+            return connection.neuron.output(*inputs)
         except:
             return None
-
-        return connection.neuron.output(*inputs)
 
     def connection_len(self, connection: Connection):
         len = 0
@@ -134,12 +139,12 @@ class Brain:
 
         return self.neuron_name(connection.neuron) + "(" + str(inputs) + ")"
 
-    def show(self,
-             seed: int = None,
-             length: float = 100.0,
-             levelColors: list = [str(x) for x in list(colour.Color("green").range_to(colour.Color("blue"), 16))],
-             connectionColors: list = (random.seed(0), ['#%06X' % random.randint(0, 0xFFFFFF) for _ in range(100)])[1]):
-        self.graph = BrainGraph()
+    def show2d(self,
+               seed: int = None,
+               length: float = 100.0,
+               levelColors: list = [str(x) for x in list(colour.Color("green").range_to(colour.Color("blue"), 16))],
+               connectionColors: list = (random.seed(0), ['#%06X' % random.randint(0, 0xFFFFFF) for _ in range(100)])[1]):
+        self.graph2d = brain_graph2d.BrainGraph()
 
         minActivationLevel = 0
         maxActivationLevel = 0
@@ -177,20 +182,72 @@ class Brain:
         for i in range(0, len(self.neurons)):
             pos[self.neuron_name(self.neurons[i])] = positions[i]
 
-        self.graph.add_nodes(pos, colors)
+        self.graph2d.add_nodes(pos, colors)
 
         connections = list(self.connections)
 
         for i in range(0, len(self.connections)):
-            self.draw_connection(pos, connectionColors[i % len(connectionColors)], 1, connections[i])
+            self.draw_connection(self.graph2d, pos, connectionColors[i % len(connectionColors)], 1, connections[i])
             
-        self.graph.show()
+        self.graph2d.show()
+
+    def show3d(self,
+               seed: int = None,
+               length: float = 100.0,
+               levelColors: list = [str(x) for x in list(colour.Color("green").range_to(colour.Color("blue"), 16))],
+               connectionColors: list = (random.seed(0), ['#%06X' % random.randint(0, 0xFFFFFF) for _ in range(100)])[1]):
+        self.graph3d = brain_graph3d.BrainGraph()
+
+        minActivationLevel = 0
+        maxActivationLevel = 0
+
+        for id, neuron in self.neurons.items():
+            maxActivationLevel = max(maxActivationLevel, neuron.activationLevel)
+            minActivationLevel = min(minActivationLevel, neuron.activationLevel)
+        
+        if (not minActivationLevel and not maxActivationLevel):
+            maxActivationLevel = 1
+
+        positions = []
+        colors = {}
+        step = length ** (1 / 3)
+        size = math.ceil(len(self.neurons) ** (1 / 3))
+
+        for k in range(size):
+            for j in range(size):
+                for i in range(size):
+                    index = i + size * (j + size * k)
+
+                    if (index < len(self.neurons)):
+                        neuron = self.neurons[index]
+                        positions.append((i * step, j * step, k * step))
+
+                        i = int((neuron.activationLevel - minActivationLevel) / (maxActivationLevel - minActivationLevel) * (len(levelColors) - 1))
+                        colors[self.neuron_name(neuron)] = levelColors[i]
+
+        if (seed != None):
+            random.seed(seed)
+            random.shuffle(positions)
+
+        pos = {}
+
+        for i in range(0, len(self.neurons)):
+            pos[self.neuron_name(self.neurons[i])] = positions[i]
+
+        self.graph3d.add_nodes(pos, colors)
+
+        connections = list(self.connections)
+
+        for i in range(0, len(self.connections)):
+            self.draw_connection(self.graph3d, pos, connectionColors[i % len(connectionColors)], 1, connections[i])
+            
+        self.graph3d.show()
 
     def activate_type(self, type, activationLevel: int = 0, previousLevels: bool = True, nextLevels: bool = True):
-        neurons = self.inputTypesToNeurons.get(type, []) + self.outputTypesToNeurons.get(type, [])
+        ids = self.inputTypesToIds.get(type, []) + self.outputTypesToIds.get(type, [])
 
-        for neuron in neurons:
-            self.activate(self.neuronToIds[neuron], activationLevel, previousLevels, nextLevels)
+        for id in ids:
+            self.activate(id, activationLevel, previousLevels, nextLevels)
 
     def activate(self, id: int, activationLevel: int = 0, previousLevels: bool = True, nextLevels: bool = True):
         assert(id < len(self.neurons))
@@ -206,12 +263,12 @@ class Brain:
 
         if (previousLevels):
             for type in self.neurons[id].inputTypes:
-                for neuron in self.outputTypesToNeurons.get(type, []):
+                for neuron in self.outputTypesToIds.get(type, []):
                     if (not neuron.activated):
                         self.activate(self.neuronToIds[neuron], activationLevel - 1)
 
         if (nextLevels):
-            for neuron in self.inputTypesToNeurons.get(self.neurons[id].outputType, []):
+            for neuron in self.inputTypesToIds.get(self.neurons[id].outputType, []):
                 if (not neuron.activated):
                     self.activate(self.neuronToIds[neuron], activationLevel + 1)
 
@@ -343,10 +400,11 @@ class Brain:
             self.neurons = dill.load(f)
             self.connections = dill.load(f)
             
-        self.inputTypesToNeurons = {}
-        self.outputTypesToNeurons = {}
+        self.inputTypesToIds = {}
+        self.outputTypesToIds = {}
         self.neuronToIds = {}
-        self.graph = BrainGraph()
+        self.graph2d = brain_graph2d.BrainGraph()
+        self.graph3d = brain_graph3d.BrainGraph()
         self.originNeuronIds = []
         self.typesToConnections = {}
             

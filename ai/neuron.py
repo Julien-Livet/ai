@@ -1,11 +1,14 @@
 import datetime
 import inspect
+import math
 
 class Neuron:
-    def __init__(self, function, name = "", inputTypes = None, outputType = None):
+    def __init__(self, function, name: str = "", inputTypes = None, outputType = None, activationDuration: float = math.inf, weight: float = 0.0):
         self.function = function
         self.name = name
         self.datetime = datetime.datetime.now()
+        self.activationDuration = activationDuration
+        self.weight = weight
 
         sig = inspect.signature(function)
         
@@ -25,9 +28,28 @@ class Neuron:
             self.outputType = self.return_annotation
         else:
             self.outputType = outputType
-        
+
         self.activated = False
         self.activationLevel = 0
 
+    def __eq__(self, other):
+        return isinstance(other, Neuron) \
+               and self.function == other.function \
+               and self.name == other.name \
+               and self.activationDuration == other.activationDuration \
+               and self.weight == other.weight \
+               and self.parameters == other.parameters \
+               and self.return_annotation == other.return_annotation \
+               and self.inputTypes == other.inputTypes \
+               and self.outputType == other.outputType \
+               and self.activated == other.activated \
+               and self.activationLevel == other.activationLevel
+
+    def __hash__(self):
+        return hash(self.function) + hash(self.activationDuration) + hash(self.weight) + hash(self.activated) + hash(self.activationLevel)
+
     def output(self, *input):
         return self.function(*input)
+
+    def is_active(self):
+        return (datetime.datetime.now() - self.datetime > self.activationDuration)

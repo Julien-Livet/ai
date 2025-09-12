@@ -34,4 +34,4 @@ brain.connections.append(connectionInt)
 
 print(brain.connection_output(connectionInt))
 
-brain.show()
+brain.show2d()
