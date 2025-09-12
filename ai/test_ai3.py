@@ -12,10 +12,8 @@ z = 4
 
 neuronIds |= ints.add(brain)
 
-for k in brain.modules:
-    brain.modules[k] = False
-
-brain.modules["ints.operators.arithmetic"] = True
+brain.deactivate_all_modules()
+brain.activate_module("ints.operators.arithmetic")
 
 neuronIds |= ints.add_value(brain, lambda: x, "x")
 neuronIds |= ints.add_value(brain, lambda: y, "y")

@@ -1,5 +1,3 @@
-import brain_graph2d
-import brain_graph3d
 import colour
 from connection import Connection
 import math
@@ -155,6 +153,8 @@ class Brain:
                length: float = 100.0,
                levelColors: list = [str(x) for x in list(colour.Color("green").range_to(colour.Color("blue"), 16))],
                connectionColors: list = (random.seed(0), ['#%06X' % random.randint(0, 0xFFFFFF) for _ in range(100)])[1]):
+        import brain_graph2d
+
         graph = brain_graph2d.BrainGraph()
 
         minActivationLevel = 0
@@ -207,6 +207,8 @@ class Brain:
                length: float = 100.0,
                levelColors: list = [str(x) for x in list(colour.Color("green").range_to(colour.Color("blue"), 16))],
                connectionColors: list = (random.seed(0), ['#%06X' % random.randint(0, 0xFFFFFF) for _ in range(100)])[1]):
+        import brain_graph3d
+
         graph = brain_graph3d.BrainGraph()
 
         minActivationLevel = 0
@@ -451,3 +453,17 @@ class Brain:
     def add_connection(self, connection: Connection):
         self.connections.add(connection)
         self._add_connection_type(connection)
+
+    def deactivate_all_modules(self):
+        for k in self.modules:
+            self.modules[k] = False
+
+    def deactivate_modules(self, modules: list):
+        for module in modules:
+            self.deactivate_module(module)
+
+    def deactivate_module(self, module: str):
+        self.modules[module] = False
+
+    def activate_module(self, module: str):
+        self.modules[module] = True

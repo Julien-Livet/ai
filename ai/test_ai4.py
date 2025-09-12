@@ -13,10 +13,8 @@ z = np.array((7, 8, 9))
 
 neuronIds |= ndarrays.add(brain)
 
-for k in brain.modules:
-    brain.modules[k] = False
-
-brain.modules["ndarrays.operators.arithmetic"] = True
+brain.deactivate_all_modules()
+brain.activate_module("ndarrays.operators.arithmetic")
 
 neuronIds |= ndarrays.add_value(brain, lambda: x, "x")
 neuronIds |= ndarrays.add_value(brain, lambda: y, "y")
