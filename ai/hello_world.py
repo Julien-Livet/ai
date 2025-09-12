@@ -30,7 +30,7 @@ except:
 
 #brain.show3d(seed = 0, levelColors = ["red", "green", "blue", "yellow", "cyan", "magenta", "purple", "brown", "orange", "gold", "indigo", "black", "white"])
 
-connections = brain.learn(x + name + z)
+connections = brain.associate(x + name + z)
 
 print(brain.connection_str(connections[0]) + " -> " + str(brain.connection_output(connections[0])))
 

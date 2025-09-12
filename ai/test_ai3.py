@@ -34,7 +34,7 @@ except:
 
 #brain.show3d(seed = 0, levelColors = ["red", "green", "blue", "yellow", "cyan", "magenta", "purple", "brown", "orange", "gold", "indigo", "black", "white"])
 
-connections = brain.learn(x * y + z, "mul_add")
+connections = brain.associate(x * y + z, "mul_add")
 
 print(brain.connection_str(connections[0]) + " -> " + str(brain.connection_output(connections[0])))
 
@@ -46,7 +46,7 @@ print(len(brain.connections))
 #for connection in brain.connections:
 #    print(brain.connection_str(connection) + " -> " + str(brain.connection_output(connection)))
 
-connections = brain.learn(x * y + z)
+connections = brain.associate(x * y + z)
 
 print(brain.connection_str(connections[0]) + " -> " + str(brain.connection_output(connections[0])))
 print(connections[0].origin_input_types())

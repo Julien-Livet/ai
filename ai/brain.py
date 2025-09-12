@@ -357,7 +357,7 @@ class Brain:
         #return list(connections)
         return list(new_connections)
 
-    def learn(self, value, name: str = "", transform_best_to_neuron: bool = True, module: str = None):
+    def associate(self, value, name: str = "", transform_best_to_neuron: bool = True, module: str = None):
         connections = []
         
         for connection in self.typesToConnections.get(type(value), []):
