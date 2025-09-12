@@ -372,3 +372,7 @@ class Brain:
 
         for connection in self.connections:
             self._add_connection_type(connection)
+
+    def add_connection(self, connection: Connection):
+        self.connections.add(connection)
+        self._add_connection_type(connection)
