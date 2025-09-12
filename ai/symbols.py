@@ -24,7 +24,7 @@ def add(brain: Brain):
 
         neuronIds[Symbol.symbols[i]] = brain.add(Neuron(symbol, Symbol.symbols[i], module = "symbols.constants"))
 
-    neuronIds["symbol_to_str"] = brain.add(Neuron(symbol_to_str, "symbol_to_str", module = "symbols.functions"))
+    neuronIds["symbol_to_str"] = brain.add(Neuron(symbol_to_str, "symbol_to_str", module = "symbols.functions.conversion"))
 
     return neuronIds
 

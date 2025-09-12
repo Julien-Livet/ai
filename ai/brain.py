@@ -92,10 +92,14 @@ class Brain:
         return self.modules[neuron.module]
 
     def neuron_name(self, neuron: Neuron):
+        name = neuron.module + "."
+        
         if (neuron.name != ""):
-            return neuron.name
+            name += neuron.name
         else:
-            return "#" + str(self.neuronToIds[neuron])
+            name += "#" + str(self.neuronToIds[neuron])
+
+        return name
 
     def draw_connection(self, graph, pos: list, color, width: float, connection: Connection):
         for input in connection.inputs:

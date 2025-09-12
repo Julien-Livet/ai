@@ -24,9 +24,9 @@ def add(brain: Brain):
         def number(i = i) -> Digit:
             return Digit(int(i))
 
-        neuronIds[str(i)] = brain.add(Neuron(number, str(i)))
+        neuronIds[str(i)] = brain.add(Neuron(number, str(i), module = "digits.constants"))
     
-    neuronIds["digit_to_str"] = brain.add(Neuron(digit_to_str, "digit_to_str"))
+    neuronIds["digit_to_str"] = brain.add(Neuron(digit_to_str, "digit_to_str", module = "digits.functions.conversion"))
     
     return neuronIds
 
@@ -39,6 +39,6 @@ def add_value(brain: Brain, x: Digit, name = None):
     def value(x = x) -> Digit:
         return x if type(x) is Digit else x()
 
-    neuronIds[name] = brain.add(Neuron(value, name, module = "digits"))
+    neuronIds[name] = brain.add(Neuron(value, name, module = "digits.variables"))
 
     return neuronIds

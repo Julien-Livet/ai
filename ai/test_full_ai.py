@@ -72,6 +72,8 @@ match (activationExample):
         for id in brain.origin_neuron_ids_from_type(str):
             brain.activate(id, 6, False, False)
 
+print("Neuron number:", len(brain.neurons))
+
 connectionExample = 0
 
 match (connectionExample):
