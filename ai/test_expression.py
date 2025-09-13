@@ -49,7 +49,7 @@ brain.activate_module("strs.functions")
 brain.activate_module("strs.functions.conversion")
 brain.activate_module("symbols.constants")
 brain.activate_module("symbols.functions.conversion")
-brain.activate_str(expr)
+brain.activate_str(s)
 
 connections = brain.learn(expr.subs(variables), "expr", depth = 10)
 
