@@ -30,7 +30,7 @@ class Neuron:
         else:
             self.outputType = outputType
 
-        self.activated = False
+        self.activated = True
         self.activationLevel = 0
 
     def __eq__(self, other):
@@ -48,7 +48,7 @@ class Neuron:
                and self.module == other.module
 
     def __hash__(self):
-        return hash(self.function) + hash(self.activationDuration) + hash(self.weight) + hash(self.activated) + hash(self.activationLevel) + hash(self.module)
+        return hash(self.function) + hash(self.activationDuration) + hash(self.weight) + hash(self.activationLevel) + hash(self.module)
 
     def output(self, *input):
         return self.function(*input)

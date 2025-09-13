@@ -31,13 +31,13 @@ match (example):
         connections = brain.learn(x + y * z, "mul_add", depth = 2)
 
     case 1:
-        connections = brain.learn(w * x + y * z, "mul_add", depth = 3)
+        connections = brain.learn(w * x + y * z, "mul_add", depth = 2)
 
 print(brain.connection_str(connections[0]) + " -> " + str(brain.connection_output(connections[0])))
 print(connections[0].origin_input_types())
 
 try:
-    brain.show2d(seed = 0, levelColors = ["red", "green", "blue", "yellow", "cyan", "magenta", "purple", "brown", "orange", "gold", "indigo", "black", "white"])
+    brain.show2d(seed = 0, colorBy = "module", levelColors = ["red", "green", "blue", "yellow", "cyan", "magenta", "purple", "brown", "orange", "gold", "indigo", "black", "white"])
 except:
     pass
 
@@ -56,7 +56,7 @@ print(brain.connection_str(connections[0]) + " -> " + str(brain.connection_outpu
 print(connections[0].origin_input_types())
 
 try:
-    brain.show2d(seed = 0, levelColors = ["red", "green", "blue", "yellow", "cyan", "magenta", "purple", "brown", "orange", "gold", "indigo", "black", "white"])
+    brain.show2d(seed = 0, colorBy = "module", levelColors = ["red", "green", "blue", "yellow", "cyan", "magenta", "purple", "brown", "orange", "gold", "indigo", "black", "white"])
 except:
     pass
 

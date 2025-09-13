@@ -2,15 +2,15 @@ from brain import Brain
 from neuron import Neuron
 
 class Symbol:
-    symbols = ["+", "-", "=", ".", "&", "|", "(", ")", "[", "]", ",", "#", "{", "}", "~"; "'", '"', "/", "\\", "^", "`", "°", "%"; "$", "£", "*", "!", "?", "§", ";", ":"]
+    symbols = ["+", "-", "=", ".", "&", "|", "(", ")", "[", "]", ",", "#", "{", "}", "~", "'", '"', "/", "\\", "^", "`", "°", "%", "$", "£", "*", "!", "?", "§", ";", ":"]
 
     def __init__(self, value: int):
-        assert(value < len(symbols))
+        assert(value < len(Symbol.symbols))
 
         self.value = value
 
     def __str__(self):
-        return symbols[self.value]
+        return Symbol.symbols[self.value]
 
 def symbol_to_str(x: Symbol) -> str:
     return str(x)
@@ -28,7 +28,7 @@ def add(brain: Brain):
 
     return neuronIds
 
-def add_value(brain: Brain, x: Symbol, name = None):
+def add_value(brain: Brain, x: Symbol, name: str = None):
     neuronIds = {}
 
     if (name is None):

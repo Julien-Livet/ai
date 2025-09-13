@@ -98,6 +98,9 @@ def ceil_float(x: float) -> float:
 def floor_float(x: float) -> float:
     return math.floor(x)
 
+def trunc_float(x: float) -> float:
+    return math.trunc(x)
+
 def add(brain: Brain):
     neuronIds = {}
 
@@ -139,10 +142,11 @@ def add(brain: Brain):
     neuronIds["fabs_float"] = brain.add(Neuron(fabs_float, "fabs_float", module = "floats.functions.arithmetic"))
     neuronIds["ceil_float"] = brain.add(Neuron(ceil_float, "ceil_float", module = "floats.functions.arithmetic"))
     neuronIds["floor_float"] = brain.add(Neuron(floor_float, "floor_float", module = "floats.functions.arithmetic"))
-    
+    neuronIds["trunc_float"] = brain.add(Neuron(trunc_float, "trunc_float", module = "floats.functions.arithmetic"))
+
     return neuronIds
 
-def add_value(brain: Brain, x: float, name = None):
+def add_value(brain: Brain, x: float, name: str = None):
     neuronIds = {}
 
     if (name is None):

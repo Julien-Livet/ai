@@ -40,7 +40,7 @@ def add(brain: Brain):
 
     return neuronIds
 
-def add_value(brain: Brain, x: tuple, name = None):
+def add_value(brain: Brain, x: tuple, name: str = None):
     neuronIds = {}
 
     if (name is None):

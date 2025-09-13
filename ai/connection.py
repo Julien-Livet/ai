@@ -9,13 +9,15 @@ class Connection:
         self.datetime = datetime.datetime.now()
         self.activationDuration = activationDuration
         self.weight = weight
+        self.activated = True
 
     def __eq__(self, other):
         return isinstance(other, Connection) \
                and self.inputs == other.inputs \
                and self.neuron == other.neuron \
                and self.activationDuration == other.activationDuration \
-               and self.weight == other.weight
+               and self.weight == other.weight \
+               and self.activated == other.activated
 
     def __hash__(self):
         h = hash(self.neuron) + hash(self.activationDuration) + hash(self.weight)

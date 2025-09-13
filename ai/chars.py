@@ -4,7 +4,7 @@ from neuron import Neuron
 class Char:
     def __init__(self, value: str):
         assert(isinstance(value, str))
-        assert(len(str) == 1)
+        assert(len(value) == 1)
         assert('a' <= value <= 'z')
 
         self.value = value
@@ -36,7 +36,7 @@ def add(brain: Brain):
 
     return neuronIds
 
-def add_value(brain: Brain, x: Char, name = None):
+def add_value(brain: Brain, x: Char, name: str = None):
     neuronIds = {}
 
     if (name is None):

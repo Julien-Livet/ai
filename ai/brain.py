@@ -199,7 +199,7 @@ class Brain:
                seed: int = None,
                length: float = 100.0,
                colorBy: str = "level", #level, module or weight
-               levelColors: list = [str(x) for x in list(colour.Color("green").range_to(colour.Color("blue"), 16))],
+               neuronColors: list = [str(x) for x in list(colour.Color("green").range_to(colour.Color("blue"), 16))],
                connectionColors: list = (random.seed(0), ['#%06X' % random.randint(0, 0xFFFFFF) for _ in range(100)])[1]):
         import brain_graph2d
 
@@ -243,8 +243,8 @@ class Brain:
                         elif (colorBy == "weight"):
                             value = neuron.weight
 
-                        i = int((value - minValue) / (maxValue - minValue) * (len(levelColors) - 1))
-                        colors[self.neuron_name(neuron)] = levelColors[i]
+                        i = int((value - minValue) / (maxValue - minValue) * (len(neuronColors) - 1))
+                        colors[self.neuron_name(neuron)] = neuronColors[i]
 
         if (seed != None):
             random.seed(seed)
@@ -268,7 +268,7 @@ class Brain:
                seed: int = None,
                length: float = 100.0,
                colorBy: str = "level", #level, module or weight
-               levelColors: list = [str(x) for x in list(colour.Color("green").range_to(colour.Color("blue"), 16))],
+               neuronColors: list = [str(x) for x in list(colour.Color("green").range_to(colour.Color("blue"), 16))],
                connectionColors: list = (random.seed(0), ['#%06X' % random.randint(0, 0xFFFFFF) for _ in range(100)])[1]):
         import brain_graph3d
 
@@ -312,8 +312,8 @@ class Brain:
                         elif (colorBy == "weight"):
                             value = neuron.weight
 
-                        i = int((value - minValue) / (maxValue - minValue) * (len(levelColors) - 1))
-                        colors[self.neuron_name(neuron)] = levelColors[i]
+                        i = int((value - minValue) / (maxValue - minValue) * (len(neuronColors) - 1))
+                        colors[self.neuron_name(neuron)] = neuronColors[i]
 
         if (seed != None):
             random.seed(seed)
@@ -559,8 +559,14 @@ class Brain:
         neurons = {}
 
         for id, neuron in self.neurons.items():
-            if (self.is_enabled(id) and neuron.is_active()):
+            if (self.is_enabled(id) and neuron.is_active() and neuron.activated):
                 neurons[id] = neuron
+
+        connections = set()
+
+        for connection in self.connections:
+            if (connection.activated):
+                connections.add(connection)
 
         counter = itertools.count()
         frontier = []
@@ -599,7 +605,7 @@ class Brain:
 
             visited.add(state_id)
 
-            av = [(self.neurons[id].output(), self.neurons[id].outputType, self.neurons[id]) for id in self.originNeuronIds] + [(self.connection_output(c), c.neuron.outputType, c) for c in set(conns)]
+            av = [(self.neurons[id].output(), self.neurons[id].outputType, self.neurons[id]) for id in self.originNeuronIds] + [(self.connection_output(c), c.neuron.outputType, c) for c in set(conns) | connections]
 
             for id, neuron in neurons.items():
                 if (len(solutions)):
@@ -636,18 +642,22 @@ class Brain:
                     new_available = list(available) + [(new_value, neuron.outputType, new_conn)]
                     new_available = tuple(new_available)
                     new_path = path + [new_conn]
-                    new_g = g + 1 + neuron.weight #+ np.sum([p.weight for p in provs])
+                    new_g = g + 1 + 1 / neuron.weight #+ np.sum([p.weight for p in provs])
                     h = heuristic(new_value, value)
                     new_f = new_g + h
 
                     found = False
 
                     try:
-                        if (isinstance(new_value, str) and isinstance(new_value, value)):
-                            if (np.isclose(textdistance.levenshtein.distance(new_value, target), 0)):
+                        if (isinstance(new_value, str) and isinstance(value, str)):
+                            if (np.isclose(textdistance.levenshtein.distance(new_value, value), 0)):
                                 found = True
-                        elif (np.isclose(np.linalg.norm(np.subtract(new_value, value)), 0)):
-                            found = True
+                        elif (isinstance(new_value, np.ndarray) and isinstance(value, np.ndarray)):
+                            if (np.isclose(np.linalg.norm(new_value - value), 0)):
+                                found = True
+                        else:
+                            if (np.isclose(abs(new_value - value), 0)):
+                                found = True
                     except:
                         pass
 

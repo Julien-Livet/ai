@@ -115,7 +115,7 @@ def add(brain: Brain):
 
     return neuronIds
 
-def add_value(brain: Brain, x: int, name = None):
+def add_value(brain: Brain, x: int, name: str = None):
     neuronIds = {}
 
     if (name is None):
