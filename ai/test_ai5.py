@@ -14,8 +14,8 @@ z = np.array((7, 8, 9))
 
 neuronIds |= ndarrays.add(brain)
 
-#brain.deactivate_all_modules()
-#brain.activate_module("ndarrays.operators.arithmetic")
+brain.deactivate_all_modules()
+brain.activate_module("ndarrays.operators.arithmetic")
 
 example = 0
 
@@ -28,13 +28,20 @@ neuronIds |= ndarrays.add_value(brain, lambda: z, "z")
 
 match (example):
     case 0:
-        connections = brain.learn(x + y * z, "mul_add", depth = 3)
+        connections = brain.learn(x + y * z, "mul_add", depth = 2)
 
     case 1:
         connections = brain.learn(w * x + y * z, "mul_add", depth = 3)
 
 print(brain.connection_str(connections[0]) + " -> " + str(brain.connection_output(connections[0])))
 print(connections[0].origin_input_types())
+
+try:
+    brain.show2d(seed = 0, levelColors = ["red", "green", "blue", "yellow", "cyan", "magenta", "purple", "brown", "orange", "gold", "indigo", "black", "white"])
+except:
+    pass
+
+brain.show3d(seed = 0, colorBy = "module", levelColors = ["red", "green", "blue", "yellow", "cyan", "magenta", "purple", "brown", "orange", "gold", "indigo", "black", "white"])
 
 brain.clear_connections()
 

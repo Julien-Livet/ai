@@ -26,7 +26,7 @@ def heuristic(val, target):
         try:
             return abs(hash(val) - hash(target))
         except:
-            return math.inf
+            return 999.0
 
 def canonicalize_for_visit(val):
     if isinstance(val, np.ndarray):
@@ -569,7 +569,7 @@ class Brain:
 
         start_available = []
 
-        for k, n in self.neurons.items():
+        for k, n in neurons.items():
             if (len(n.inputTypes) == 0):
                 val = n.output()
                 start_available.append((val, type(val), n))
@@ -582,28 +582,12 @@ class Brain:
         h0 = heuristic(start_available[0][0], value)
         heapq.heappush(frontier, (g0 + h0, next(counter), g0, start_available, []))
 
-        while (frontier):
+        conns = []
+
+        while (frontier and len(solutions) == 0):
             f, _, g, available, path = heapq.heappop(frontier)
 
-            found = False
-            
-            for val, t, prov in available:
-                try:
-                    if (isinstance(val, str) and isinstance(val, value)):
-                        if (textdistance.levenshtein.distance(val, target) == 0):
-                            found = True
-                            break
-                    elif (np.isclose(np.linalg.norm(np.subtract(val, value)), 0)):
-                        found = True
-                        break
-                except:
-                    pass
-
-            if (found):
-                solutions.append(path)
-                continue
-
-            if (g >= depth):
+            if (g > depth):
                 continue
 
             avail_key = tuple((canonicalize_for_visit(v), getattr(t, "__name__", str(t))) for v, t, _ in available)
@@ -614,14 +598,19 @@ class Brain:
                 continue
 
             visited.add(state_id)
+            
+            av = [(self.neurons[id].output(), self.neurons[id].outputType, self.neurons[id]) for id in self.originNeuronIds] + [(self.connection_output(c), c.neuron.outputType, c) for c in set(conns)]
 
             for id, neuron in neurons.items():
+                if (len(solutions)):
+                    break
+
                 k = len(neuron.inputTypes)
 
                 if (k == 0):
                     continue
 
-                for combo in itertools.permutations(available, k):
+                for combo in itertools.permutations(av, k):
                     args = []
                     provs = []
                     ok = True
@@ -643,12 +632,25 @@ class Brain:
                         continue
 
                     new_conn = Connection(provs, neuron)
+                    conns.append(new_conn)
                     new_available = list(available) + [(new_value, neuron.outputType, new_conn)]
                     new_available = tuple(new_available)
                     new_path = path + [new_conn]
                     new_g = g + 1 + neuron.weight #+ np.sum([p.weight for p in provs])
                     h = heuristic(new_value, value)
                     new_f = new_g + h
+
+                    found = False
+
+                    if (isinstance(new_value, str) and isinstance(new_value, value)):
+                        if (np.isclose(textdistance.levenshtein.distance(new_value, target), 0)):
+                            found = True
+                    elif (np.isclose(np.linalg.norm(np.subtract(new_value, value)), 0)):
+                        found = True
+
+                    if (found):
+                        solutions.append(new_path)
+                        break
 
                     heapq.heappush(frontier, (new_f, next(counter), new_g, new_available, new_path))
 
