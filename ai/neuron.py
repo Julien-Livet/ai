@@ -3,7 +3,7 @@ import inspect
 import math
 
 class Neuron:
-    def __init__(self, function, name: str = "", inputTypes = None, outputType = None, activationDuration: float = math.inf, weight: float = 0.0, module: str = ""):
+    def __init__(self, function, name: str = "", inputTypes = None, outputType = None, activationDuration: float = math.inf, weight: float = 1.0, module: str = ""):
         self.function = function
         self.name = name
         self.datetime = datetime.datetime.now()
@@ -54,4 +54,7 @@ class Neuron:
         return self.function(*input)
 
     def is_active(self):
-        return (datetime.datetime.now() - self.datetime > self.activationDuration)
+        if (self.activationDuration == math.inf):
+            return True
+
+        return (datetime.datetime.now() - self.datetime > datetime.timedelta(milliseconds = self.activationDuration))

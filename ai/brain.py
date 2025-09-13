@@ -1,5 +1,7 @@
 import colour
 from connection import Connection
+import heapq
+import itertools
 import math
 from neuron import Neuron
 import numpy as np
@@ -12,6 +14,23 @@ def is_iterable(x) -> bool:
         return False
 
     return True
+
+def heuristic(val, target):
+    try:
+        return np.linalg.norm(np.subtract(val, target))
+    except:
+        return math.inf
+
+def canonicalize_for_visit(val):
+    if isinstance(val, np.ndarray):
+        if val.size == 1:
+            return float(val.item())
+        return ("ndarray", val.shape, hash(val.tobytes()))
+    try:
+        hash(val)
+        return val
+    except TypeError:
+        return repr(val)
 
 class Brain:
     def __init__(self):
@@ -357,9 +376,9 @@ class Brain:
         #return list(connections)
         return list(new_connections)
 
-    def associate(self, value, name: str = "", transform_best_to_neuron: bool = True, module: str = None):
+    def associate(self, value, name: str = "", transform_best_into_neuron: bool = True, module: str = None):
         connections = []
-        
+
         for connection in self.typesToConnections.get(type(value), []):
             try:
                 if (isinstance(value, str)):
@@ -376,40 +395,41 @@ class Brain:
 
         connections = sorted(connections, key = lambda x: self.connection_len(x))
 
-        if (transform_best_to_neuron and len(connections)):
-            connection = list(connections)[0]
-            
-            if (len(connection.origin_input_types()) == len(connection.inputs)):
-                added = False
-
-                for input in connection.inputs:
-                    if (not (isinstance(input, Neuron) and len(input.inputTypes) == 0)):
-                        added = True
-                        break
-
-                if (not added):
-                    return connections
-
-            def function(*args):
-                def replace_inputs(connection, arg_iter):
-                    vals = []
-
-                    for input in connection.inputs:
-                        if (isinstance(input, Neuron) and len(input.inputTypes) == 0):
-                            vals.append(next(arg_iter))
-                        elif (isinstance(input, Connection)):
-                            vals.append(replace_inputs(input, arg_iter))
-
-                    return connection.neuron.output(*vals)
-
-                return replace_inputs(connection, iter(args))
-
-            if (module == None):
-                module = connection.neuron.module
-
-            self.add(Neuron(function, name, connection.origin_input_types(), connection.neuron.outputType, module = module))
+        if (transform_best_into_neuron and len(connections)):
+            self.transform_connection_into_neuron(connection, name, module)
 
         return connections
+
+    def transform_connection_into_neuron(self, connection: Connection, name: str = "", module = None):
+        if (len(connection.origin_input_types()) == len(connection.inputs)):
+            added = False
+
+            for input in connection.inputs:
+                if (not (isinstance(input, Neuron) and len(input.inputTypes) == 0)):
+                    added = True
+                    break
+
+            if (not added):
+                return None
+
+        def function(*args):
+            def replace_inputs(connection, arg_iter):
+                vals = []
+
+                for input in connection.inputs:
+                    if (isinstance(input, Neuron) and len(input.inputTypes) == 0):
+                        vals.append(next(arg_iter))
+                    elif (isinstance(input, Connection)):
+                        vals.append(replace_inputs(input, arg_iter))
+
+                return connection.neuron.output(*vals)
+
+            return replace_inputs(connection, iter(args))
+
+        if (module == None):
+            module = connection.neuron.module
+
+        return self.add(Neuron(function, name, connection.origin_input_types(), connection.neuron.outputType, module = module))
 
     def save(self, filename: str):
         with open(filename, "wb") as f:
@@ -467,3 +487,117 @@ class Brain:
 
     def activate_module(self, module: str):
         self.modules[module] = True
+
+    def module_neuron_ids(self, module: str):
+        ids = []
+
+        for id in self.neurons:
+            if (self.neurons[id].module == module):
+                ids.append(id)
+
+        return ids
+        
+    def learn(self, value, name: str = "", depth: int = 10, transform_best_into_neuron: bool = True, module: str = None):
+        neurons = {}
+
+        for id, neuron in self.neurons.items():
+            if (self.is_enabled(id) and neuron.is_active()):
+                neurons[id] = neuron
+
+        counter = itertools.count()
+        frontier = []
+        visited = set()
+        solutions = []
+
+        start_available = []
+
+        for k, n in self.neurons.items():
+            if (len(n.inputTypes) == 0):
+                val = n.output()
+                start_available.append((val, type(val), n))
+
+        if (not start_available):
+            return []
+
+        start_available = tuple(start_available)
+        g0 = 0.0
+        h0 = heuristic(start_available[0][0], value)
+        heapq.heappush(frontier, (g0 + h0, next(counter), g0, start_available, []))
+
+        while (frontier):
+            f, _, g, available, path = heapq.heappop(frontier)
+
+            found = False
+            
+            for val, t, prov in available:
+                try:
+                    if (np.isclose(np.linalg.norm(np.subtract(val, value)), 0)):
+                        found = True
+                        break
+                except:
+                    pass
+
+            if (found):
+                solutions.append(path)
+                continue
+
+            if (g >= depth):
+                continue
+
+            avail_key = tuple((canonicalize_for_visit(v), getattr(t, "__name__", str(t))) for v, t, _ in available)
+            path_key = tuple(getattr(c, "neuron", getattr(c, "name", repr(c))) if hasattr(c, "neuron") else repr(c) for c in path)
+            state_id = (avail_key, path_key)
+
+            if (state_id in visited):
+                continue
+
+            visited.add(state_id)
+
+            for id, neuron in neurons.items():
+                k = len(neuron.inputTypes)
+
+                if (k == 0):
+                    continue
+
+                for combo in itertools.permutations(available, k):
+                    args = []
+                    provs = []
+                    ok = True
+
+                    for (val, t, prov), expected_type in zip(combo, neuron.inputTypes):
+                        if (t != expected_type):
+                            ok = False
+                            break
+                            
+                        args.append(val)
+                        provs.append(prov)
+
+                    if (not ok):
+                        continue
+
+                    try:
+                        new_value = neuron.output(*args)
+                    except:
+                        continue
+
+                    new_conn = Connection(provs, neuron)
+                    new_available = list(available) + [(new_value, neuron.outputType, new_conn)]
+                    new_available = tuple(new_available)
+                    new_path = path + [new_conn]
+                    new_g = g + 1 + neuron.weight #+ np.sum([p.weight for p in provs])
+                    h = heuristic(new_value, value)
+                    new_f = new_g + h
+
+                    heapq.heappush(frontier, (new_f, next(counter), new_g, new_available, new_path))
+
+        solutions.sort(key = lambda p: (len(p), ))
+
+        connections = []
+        
+        for solution in solutions:
+            connections.append(solution[-1])
+
+        if (len(connections) and transform_best_into_neuron):
+            self.transform_connection_into_neuron(connections[0], name = name, module = module)
+        
+        return connections

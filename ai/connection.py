@@ -3,7 +3,7 @@ import math
 from neuron import Neuron
 
 class Connection:
-    def __init__(self, inputs, neuron: Neuron, activationDuration: float = math.inf, weight: float = 0.0):
+    def __init__(self, inputs, neuron: Neuron, activationDuration: float = math.inf, weight: float = 1.0):
         self.inputs = inputs
         self.neuron = neuron
         self.datetime = datetime.datetime.now()
@@ -37,4 +37,7 @@ class Connection:
         return types
 
     def is_active(self):
-        return (datetime.datetime.now() - self.datetime > self.activationDuration)
+        if (self.activationDuration == math.inf):
+            return True
+
+        return (datetime.datetime.now() - self.datetime > datetime.timedelta(milliseconds = self.activationDuration))
