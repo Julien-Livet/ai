@@ -13,7 +13,7 @@ import sympy
 brain = Brain()
 neuronIds = {}
 
-s = input("What is you expression?" )
+s = input("What is you expression (for example: x + y * z)?" )
 
 expr = sympy.sympify(s)
 
@@ -43,6 +43,8 @@ brain.activate_module("floats.operators.arithmetic")
 brain.activate_module("floats.variables")
 brain.activate_module("strs.functions")
 brain.activate_module("strs.functions.conversion")
+brain.activate_module("symbols.constants")
+brain.activate_module("symbols.functions.conversion")
 
 connections = brain.learn(expr.subs(variables), "expr", depth = 10)
 

@@ -110,11 +110,6 @@ class Brain:
         del self.neuronToIds[neuron]
         del self.neurons[id]
 
-    def is_enabled(self, id: int):
-        neuron = self.neurons[id]
-
-        return self.modules[neuron.module]
-
     def neuron_name(self, neuron: Neuron):
         name = neuron.module + "."
 
@@ -379,7 +374,7 @@ class Brain:
             originTypes = {}
 
             for id in self.originNeuronIds:
-                if (self.is_enabled(id)):
+                if (self.neurons[id].is_active() and self.neurons[id].activated):
                     type = self.neurons[id].outputType
                     l = originTypes.get(type, [])
                     l.append(self.neurons[id])
@@ -533,8 +528,8 @@ class Brain:
         self._add_connection_type(connection)
 
     def deactivate_all_modules(self):
-        for k in self.modules:
-            self.modules[k] = False
+        for module in self.modules:
+            self.deactivate_module(module)
 
     def deactivate_modules(self, modules: list):
         for module in modules:
@@ -543,8 +538,16 @@ class Brain:
     def deactivate_module(self, module: str):
         self.modules[module] = False
 
+        for id in self.neurons:
+            if (self.neurons[id].module == module):
+                self.neurons[id].activated = False
+
     def activate_module(self, module: str):
         self.modules[module] = True
+
+        for id in self.neurons:
+            if (self.neurons[id].module == module):
+                self.neurons[id].activated = True
 
     def module_neuron_ids(self, module: str):
         ids = []
@@ -559,7 +562,7 @@ class Brain:
         neurons = {}
 
         for id, neuron in self.neurons.items():
-            if (self.is_enabled(id) and neuron.is_active() and neuron.activated):
+            if (neuron.is_active() and neuron.activated):
                 neurons[id] = neuron
 
         connections = set()
@@ -575,7 +578,7 @@ class Brain:
 
         start_available = []
 
-        for k, n in neurons.items():
+        for id, n in neurons.items():
             if (len(n.inputTypes) == 0):
                 val = n.output()
                 start_available.append((val, type(val), n))
@@ -685,3 +688,45 @@ class Brain:
         self.connections |= set(connections)
 
         return connections
+
+    def activate_all_neurons(self):
+        for id in self.neurons:
+            self.activate_neuron(id)
+
+    def deactivate_all_neurons(self):
+        for id in self.neurons:
+            self.deactivate_neuron(id)
+
+    def deactivate_neuron(self, id :int):
+        self.neurons[id].activated = False
+
+    def activate_neuron(self, id :int):
+        self.neurons[id].activated = True
+
+    def activate_str(self, s: str):
+        from chars import Char
+        from digits import Digit
+        from symbols import Symbol
+
+        for id in self.neurons:
+            n = self.neurons[id]
+
+            if (len(n.inputTypes) == 0):
+                v = n.output()
+
+                if ((isinstance(v, Char) or isinstance(v, Digit) or isinstance(v, Symbol)) and str(v) in s):
+                    self.activate_neuron(id)
+
+    def deactivate_str(self, s: str):
+        from chars import Char
+        from digits import Digit
+        from symbols import Symbol
+
+        for id in self.neurons:
+            n = self.neurons[id]
+
+            if (len(n.inputTypes) == 0):
+                v = n.output()
+
+                if ((isinstance(v, Char) or isinstance(v, Digit) or isinstance(v, Symbol)) and str(v) in s):
+                    self.deactivate_neuron(id)

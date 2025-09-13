@@ -20,7 +20,7 @@ class Connection:
                and self.activated == other.activated
 
     def __hash__(self):
-        h = hash(self.neuron) + hash(self.activationDuration) + hash(self.weight)
+        h = hash(self.neuron) + hash(self.activationDuration)
         
         for input in self.inputs:
             h += hash(input)
