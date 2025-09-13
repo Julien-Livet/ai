@@ -134,6 +134,15 @@ def ceil_ndarray(x: np.ndarray) -> np.ndarray:
 def floor_ndarray(x: np.ndarray) -> np.ndarray:
     return np.floor(x)
 
+def inv_ndarray(x: np.ndarray) -> np.ndarray:
+    return np.linalg.inv(x)
+
+def eye_ndarray(x: int) -> np.ndarray:
+    return np.eye(x)
+
+def trace_ndarray(x: np.ndarray) -> float:
+    return np.trace(x)
+
 def add(brain: Brain):
     neuronIds = {}
 
@@ -179,6 +188,9 @@ def add(brain: Brain):
     neuronIds["ndarray_to_str"] = brain.add(Neuron(ndarray_to_str, "ndarray_to_str", module = "ndarrays.functions"))
     neuronIds["ceil_ndarray"] = brain.add(Neuron(ceil_ndarray, "ceil_ndarray", module = "ndarrays.functions.arithmetic"))
     neuronIds["floor_ndarray"] = brain.add(Neuron(floor_ndarray, "floor_ndarray", module = "ndarrays.functions.arithmetic"))
+    neuronIds["inv_ndarray"] = brain.add(Neuron(inv_ndarray, "inv_ndarray", module = "ndarrays.functions.linearalgebra"))
+    neuronIds["trace_ndarray"] = brain.add(Neuron(trace_ndarray, "trace_ndarray", module = "ndarrays.functions.linearalgebra"))
+    neuronIds["eye_ndarray"] = brain.add(Neuron(eye_ndarray, "eye_ndarray", module = "ndarrays.functions.linearalgebra"))
 
     return neuronIds
 
