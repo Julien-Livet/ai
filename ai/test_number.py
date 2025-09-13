@@ -23,7 +23,6 @@ while (True):
     number = input("What is you number (for example: 3.1)? ")
 
     brain.deactivate_all_modules()
-    brain.deactivate_all_neurons()
     brain.activate_module("chars.functions.conversion")
     brain.activate_module("digits.functions.conversion")
     brain.activate_module("strs.variables")

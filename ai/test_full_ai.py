@@ -12,6 +12,7 @@ import numpy as np
 import random
 import sets
 import strs
+import symbols
 import tuples
 
 brain = Brain()
@@ -26,6 +27,7 @@ neuronIds |= lists.add(brain)
 neuronIds |= ndarrays.add(brain)
 neuronIds |= sets.add(brain)
 neuronIds |= strs.add(brain)
+neuronIds |= symbols.add(brain)
 neuronIds |= tuples.add(brain)
 
 activationExample = 2
@@ -41,7 +43,8 @@ match (activationExample):
         brain.activate_type(np.ndarray, 6, False, False)
         brain.activate_type(set, 7, False, False)
         brain.activate_type(str, 8, False, False)
-        brain.activate_type(tuple, 9, False, False)
+        brain.activate_type(symbols.Symbol, 9, False, False)
+        brain.activate_type(tuple, 10, False, False)
 
     case 1: #Second example
         for i in range(0, len(brain.originNeuronIds)):
@@ -71,6 +74,9 @@ match (activationExample):
 
         for id in brain.origin_neuron_ids_from_type(str):
             brain.activate(id, 6, False, False)
+            
+        for id in brain.origin_neuron_ids_from_type(symbols.Symbol):
+            brain.activate(id, 7, False, False)
 
 print("Neuron number:", len(brain.neurons))
 

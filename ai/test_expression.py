@@ -1,4 +1,5 @@
 from brain import Brain
+import chars
 from connection import Connection
 import digits
 import floats
@@ -25,6 +26,7 @@ for node in sympy.preorder_traversal(expr):
         variables[node] = random.random()
         seen.add(node)
 
+neuronIds |= chars.add(brain)
 neuronIds |= digits.add(brain)
 neuronIds |= ints.add(brain)
 neuronIds |= floats.add(brain)
@@ -37,6 +39,8 @@ for variable, value in variables.items():
     neuronIds |= floats.add_value(brain, lambda value = value: value, str(variable))
 
 brain.deactivate_all_modules()
+brain.activate_module("chars.constants")
+brain.activate_module("chars.functions.conversion")
 brain.activate_module("digits.constants")
 brain.activate_module("digits.functions.conversion")
 brain.activate_module("floats.operators.arithmetic")
@@ -45,6 +49,7 @@ brain.activate_module("strs.functions")
 brain.activate_module("strs.functions.conversion")
 brain.activate_module("symbols.constants")
 brain.activate_module("symbols.functions.conversion")
+brain.activate_str(expr)
 
 connections = brain.learn(expr.subs(variables), "expr", depth = 10)
 
