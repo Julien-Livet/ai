@@ -14,8 +14,8 @@ z = np.array((7, 8, 9))
 
 neuronIds |= ndarrays.add(brain)
 
-brain.deactivate_all_modules()
-brain.activate_module("ndarrays.operators.arithmetic")
+#brain.deactivate_all_modules()
+#brain.activate_module("ndarrays.operators.arithmetic")
 
 example = 0
 

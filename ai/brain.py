@@ -73,13 +73,13 @@ class Brain:
         l = self.outputTypesToIds.get(neuron.outputType, [])
         l.append(id)
         self.outputTypesToIds[neuron.outputType] = l
-        
+
     def add(self, neuron: Neuron):
         id = 0
-        
+
         if (len(self.neurons)):
             id = list(self.neurons.keys())[-1] + 1
-        
+
         self.neurons[id] = neuron
 
         self._add_neuron_input_types(id)
@@ -89,7 +89,7 @@ class Brain:
 
         if (len(neuron.inputTypes) == 0):
             self.originNeuronIds.append(id)
-            
+
         if (not neuron.module in self.modules):
             self.modules[neuron.module] = True
 
@@ -112,12 +112,12 @@ class Brain:
 
     def is_enabled(self, id: int):
         neuron = self.neurons[id]
-        
+
         return self.modules[neuron.module]
 
     def neuron_name(self, neuron: Neuron):
         name = neuron.module + "."
-        
+
         if (neuron.name != ""):
             name += neuron.name
         else:
@@ -154,7 +154,7 @@ class Brain:
 
     def connection_len(self, connection: Connection):
         len = 0
-        
+
         for input in connection.inputs:
             if (type(input) is Neuron):
                 len += 1
@@ -165,7 +165,7 @@ class Brain:
 
     def connection_weight(self, connection: Connection):
         weight = 0
-        
+
         for input in connection.inputs:
             if (type(input) is Neuron):
                 weight += input.weight
@@ -218,7 +218,7 @@ class Brain:
             for id, neuron in self.neurons.items():
                 maxValue = max(maxValue, neuron.weight)
                 minValue = min(minValue, neuron.weight)
-        
+
         if (not minValue and not maxValue):
             maxValue = 1
 
@@ -261,7 +261,7 @@ class Brain:
 
         for i in range(0, len(self.connections)):
             self.draw_connection(graph, pos, connectionColors[i % len(connectionColors)], 1, connections[i])
-            
+
         graph.show()
 
     def show3d(self,
@@ -287,7 +287,7 @@ class Brain:
             for id, neuron in self.neurons.items():
                 maxValue = max(maxValue, neuron.weight)
                 minValue = min(minValue, neuron.weight)
-        
+
         if (not minValue and not maxValue):
             maxValue = 1
 
@@ -330,7 +330,7 @@ class Brain:
 
         for i in range(0, len(self.connections)):
             self.draw_connection(graph, pos, connectionColors[i % len(connectionColors)], 1, connections[i])
-            
+
         graph.show()
 
     def activate_type(self, type, activationLevel: int = 0, previousLevels: bool = True, nextLevels: bool = True):
@@ -366,7 +366,7 @@ class Brain:
         l = self.typesToConnections.get(connection.neuron.outputType, [])
         l.append(connection)
         self.typesToConnections[connection.neuron.outputType] = l
-            
+
     def connect(self, depth: int = 1, number: int = math.inf):
         connections = set()
         new_connections = set()
@@ -384,7 +384,7 @@ class Brain:
                     l = originTypes.get(type, [])
                     l.append(self.neurons[id])
                     originTypes[type] = l
-                    
+
             for connection in self.connections:
                 type = connection.neuron.outputType
                 l = originTypes.get(type, [])
@@ -397,10 +397,10 @@ class Brain:
 
                 inputsList = []
                 add = True
-                
+
                 for type in v.inputTypes:
                     neurons = originTypes.get(type, [])
-                    
+
                     if (not len(neurons)):
                         add = False
                         break
@@ -409,11 +409,11 @@ class Brain:
                         inputsList = [[x] for x in neurons]
                     else:
                         newList = []
-                        
+
                         for inputs in inputsList:
                             for neuron in neurons:
                                 newList.append(inputs + [neuron])
-                            
+
                         inputsList = newList
 
                 if (not add):
@@ -498,17 +498,17 @@ class Brain:
         with open(filename, "rb") as f:
             self.neurons = dill.load(f)
             self.connections = dill.load(f)
-            
+
         self.inputTypesToIds = {}
         self.outputTypesToIds = {}
         self.neuronToIds = {}
         self.originNeuronIds = []
         self.typesToConnections = {}
-            
+
         for neuron in self.neurons:
             self._add_neuron_input_types(neuron)
             self._add_neuron_output_type(neuron)
-            
+
             self.neuronToIds[neuron] = id
 
             if (len(neuron.inputTypes) == 0):
@@ -554,7 +554,7 @@ class Brain:
                 ids.append(id)
 
         return ids
-        
+
     def learn(self, value, name: str = "", depth: int = 10, transform_best_into_neuron: bool = True, module: str = None, reinforcement_weight: float = 1.0):
         neurons = {}
 
@@ -598,7 +598,7 @@ class Brain:
                 continue
 
             visited.add(state_id)
-            
+
             av = [(self.neurons[id].output(), self.neurons[id].outputType, self.neurons[id]) for id in self.originNeuronIds] + [(self.connection_output(c), c.neuron.outputType, c) for c in set(conns)]
 
             for id, neuron in neurons.items():
@@ -619,7 +619,7 @@ class Brain:
                         if (t != expected_type):
                             ok = False
                             break
-                            
+
                         args.append(val)
                         provs.append(prov)
 
@@ -642,11 +642,14 @@ class Brain:
 
                     found = False
 
-                    if (isinstance(new_value, str) and isinstance(new_value, value)):
-                        if (np.isclose(textdistance.levenshtein.distance(new_value, target), 0)):
+                    try:
+                        if (isinstance(new_value, str) and isinstance(new_value, value)):
+                            if (np.isclose(textdistance.levenshtein.distance(new_value, target), 0)):
+                                found = True
+                        elif (np.isclose(np.linalg.norm(np.subtract(new_value, value)), 0)):
                             found = True
-                    elif (np.isclose(np.linalg.norm(np.subtract(new_value, value)), 0)):
-                        found = True
+                    except:
+                        pass
 
                     if (found):
                         solutions.append(new_path)
@@ -657,12 +660,12 @@ class Brain:
         solutions.sort(key = lambda p: (len(p), ))
 
         connections = []
-        
+
         for solution in solutions:
             connections.append(solution[-1])
 
         connections = sorted(connections, key = lambda x: self.connection_len(x))
-        
+
         for connection in connections:
             self.reinforce_connection(connection, reinforcement_weight)
 
@@ -670,5 +673,5 @@ class Brain:
             self.transform_connection_into_neuron(connections[0], name = name, module = module)
 
         self.connections |= set(connections)
-        
+
         return connections
