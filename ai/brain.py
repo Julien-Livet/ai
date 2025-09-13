@@ -578,10 +578,13 @@ class Brain:
 
         start_available = []
 
+        origin_neurons = []
+
         for id, n in neurons.items():
             if (len(n.inputTypes) == 0):
                 val = n.output()
                 start_available.append((val, type(val), n))
+                origin_neurons.append(id)
 
         if (not start_available):
             return []
@@ -608,7 +611,7 @@ class Brain:
 
             visited.add(state_id)
 
-            av = [(self.neurons[id].output(), self.neurons[id].outputType, self.neurons[id]) for id in self.originNeuronIds] + [(self.connection_output(c), c.neuron.outputType, c) for c in set(conns) | connections]
+            av = [(self.neurons[id].output(), self.neurons[id].outputType, self.neurons[id]) for id in origin_neurons] + [(self.connection_output(c), c.neuron.outputType, c) for c in set(conns) | connections]
 
             for id, neuron in neurons.items():
                 if (len(solutions)):

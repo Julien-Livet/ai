@@ -12,12 +12,21 @@ import sympy
 brain = Brain()
 neuronIds = {}
 
-neuronIds |= chars.add(brain)
+neuronIds["e"] = brain.add(Neuron(lambda: chars.Char("e"), "e", outputType = chars.Char, module = "chars.constants"))
+neuronIds["char_to_str"] = brain.add(Neuron(chars.char_to_str, "char_to_str", module = "chars.functions.conversion"))
+neuronIds["lower_char"] = brain.add(Neuron(chars.lower_char, "lower_char", module = "chars.functions"))
+neuronIds["upper_char"] = brain.add(Neuron(chars.upper_char, "upper_char", module = "chars.functions"))
+
 neuronIds |= digits.add(brain)
 neuronIds |= strs.add(brain)
-neuronIds |= symbols.add(brain)
 
-neuronIds |= strs.add_value(brain, lambda: 0, "number")
+for c in ["+", "-", "."]:
+    def symbol(c = c) -> symbols.Symbol:
+        return symbols.Symbol(symbols.Symbol.symbols.index(c))
+
+    neuronIds[c] = brain.add(Neuron(symbol, c, module = "symbols.constants"))
+
+neuronIds["symbol_to_str"] = brain.add(Neuron(symbols.symbol_to_str, "symbol_to_str", module = "symbols.functions.conversion"))
 
 while (True):
     number = input("What is you number (for example: 3.1)? ")
@@ -27,13 +36,9 @@ while (True):
     brain.activate_module("digits.functions.conversion")
     brain.activate_module("strs.variables")
     brain.activate_module("strs.functions")
-    brain.neurons[neuronIds["lower_str"]].activated = False
-    brain.neurons[neuronIds["upper_str"]].activated = False
     brain.activate_module("strs.functions.conversion")
     brain.activate_module("symbols.functions.conversion")
     brain.activate_str(number)
-    
-    brain.neurons[neuronIds["number"]].function = lambda number = number: number
 
     connections = brain.learn(number, depth = 10)
 

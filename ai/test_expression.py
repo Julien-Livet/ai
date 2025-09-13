@@ -14,7 +14,7 @@ import sympy
 brain = Brain()
 neuronIds = {}
 
-s = input("What is you expression (for example: x + y * z)?" )
+s = input("What is you expression (for example: x + y * z)? ")
 
 expr = sympy.sympify(s)
 
