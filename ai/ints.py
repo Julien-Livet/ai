@@ -70,6 +70,18 @@ def ge_int(x: int, y: int) -> bool:
 def le_int(x: int, y: int) -> bool:
     return x < y
 
+def factorial_int(x: int) -> int:
+    return math.factorial(x)
+
+def comb_int(n: int, k: int) -> int:
+    return math.comb(n, k)
+
+def perm_int(n: int, k: int) -> int:
+    return math.perm(n, k)
+
+def isqrt_int(x: int) -> int:
+    return math.isqrt(x)
+
 def add(brain: Brain):
     neuronIds = {}
 
@@ -96,6 +108,10 @@ def add(brain: Brain):
     neuronIds["lt_int"] = brain.add(Neuron(lt_int, "lt_int", module = "ints.operators.comparison"))
     neuronIds["ge_int"] = brain.add(Neuron(ge_int, "ge_int", module = "ints.operators.comparison"))
     neuronIds["le_int"] = brain.add(Neuron(le_int, "le_int", module = "ints.operators.comparison"))
+    neuronIds["factorial_int"] = brain.add(Neuron(factorial_int, "factorial_int", module = "ints.functions.numbertheoric"))
+    neuronIds["comb_int"] = brain.add(Neuron(comb_int, "comb_int", module = "ints.functions.numbertheoric"))
+    neuronIds["perm_int"] = brain.add(Neuron(perm_int, "perm_int", module = "ints.functions.numbertheoric"))
+    neuronIds["isqrt_int"] = brain.add(Neuron(isqrt_int, "isqrt_int", module = "ints.functions.numbertheoric"))
 
     return neuronIds
 
