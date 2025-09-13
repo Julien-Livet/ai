@@ -7,3 +7,4 @@ pip install colour
 pip install matplotlib
 pip install numpy
 pip install plotly
+pip install textdistance

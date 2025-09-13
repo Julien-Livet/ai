@@ -6,6 +6,7 @@ import math
 from neuron import Neuron
 import numpy as np
 import random
+import textdistance
 
 def is_iterable(x) -> bool:
     try:
@@ -16,10 +17,16 @@ def is_iterable(x) -> bool:
     return True
 
 def heuristic(val, target):
+    if (isinstance(val, str) and isinstance(target, str)):
+        return textdistance.levenshtein.distance(val, target)
+
     try:
         return np.linalg.norm(np.subtract(val, target))
     except:
-        return math.inf
+        try:
+            return abs(hash(val) - hash(target))
+        except:
+            return math.inf
 
 def canonicalize_for_visit(val):
     if isinstance(val, np.ndarray):
@@ -150,11 +157,32 @@ class Brain:
         
         for input in connection.inputs:
             if (type(input) is Neuron):
-                len = 1
+                len += 1
             elif (type(input) is Connection):
                 len += self.connection_len(input)
 
         return len
+
+    def connection_weight(self, connection: Connection):
+        weight = 0
+        
+        for input in connection.inputs:
+            if (type(input) is Neuron):
+                weight += input.weight
+            elif (type(input) is Connection):
+                weight += self.connection_weight(input)
+
+        return weight
+
+    def reinforce_connection(self, connection: Connection, weight: float):
+        connection.weight += weight
+        connection.neuron.weight += weight
+
+        for input in connection.inputs:
+            if (type(input) is Neuron):
+                input.weight += weight
+            elif (type(input) is Connection):
+                self.reinforce_connection(input, weight)
 
     def connection_str(self, connection: Connection):
         inputs = []
@@ -170,21 +198,29 @@ class Brain:
     def show2d(self,
                seed: int = None,
                length: float = 100.0,
+               colorBy: str = "level", #level, module or weight
                levelColors: list = [str(x) for x in list(colour.Color("green").range_to(colour.Color("blue"), 16))],
                connectionColors: list = (random.seed(0), ['#%06X' % random.randint(0, 0xFFFFFF) for _ in range(100)])[1]):
         import brain_graph2d
 
         graph = brain_graph2d.BrainGraph()
 
-        minActivationLevel = 0
-        maxActivationLevel = 0
+        minValue = 0
+        maxValue = 0
 
-        for id, neuron in self.neurons.items():
-            maxActivationLevel = max(maxActivationLevel, neuron.activationLevel)
-            minActivationLevel = min(minActivationLevel, neuron.activationLevel)
+        if (colorBy == "level"):
+            for id, neuron in self.neurons.items():
+                maxValue = max(maxValue, neuron.activationLevel)
+                minValue = min(minValue, neuron.activationLevel)
+        elif (colorBy == "module"):
+            maxValue = len(self.modules)
+        elif (colorBy == "weight"):
+            for id, neuron in self.neurons.items():
+                maxValue = max(maxValue, neuron.weight)
+                minValue = min(minValue, neuron.weight)
         
-        if (not minActivationLevel and not maxActivationLevel):
-            maxActivationLevel = 1
+        if (not minValue and not maxValue):
+            maxValue = 1
 
         positions = []
         colors = {}
@@ -200,7 +236,15 @@ class Brain:
                         neuron = self.neurons[index]
                         positions.append((i * step, j * step, k * step))
 
-                        i = int((neuron.activationLevel - minActivationLevel) / (maxActivationLevel - minActivationLevel) * (len(levelColors) - 1))
+                        if (colorBy == "level"):
+                            value = neuron.activationLevel
+                        elif (colorBy == "module"):
+                            value = self.modules.index(neuron.module)
+                        elif (colorBy == "weight"):
+                            value = weight
+
+                        i = int((value - minValue) / (maxValue - minValue) * (len(levelColors) - 1))
+
                         colors[self.neuron_name(neuron)] = levelColors[i]
 
         if (seed != None):
@@ -497,7 +541,7 @@ class Brain:
 
         return ids
         
-    def learn(self, value, name: str = "", depth: int = 10, transform_best_into_neuron: bool = True, module: str = None):
+    def learn(self, value, name: str = "", depth: int = 10, transform_best_into_neuron: bool = True, module: str = None, reinforcement_weight: float = 1.0):
         neurons = {}
 
         for id, neuron in self.neurons.items():
@@ -531,7 +575,11 @@ class Brain:
             
             for val, t, prov in available:
                 try:
-                    if (np.isclose(np.linalg.norm(np.subtract(val, value)), 0)):
+                    if (isinstance(val, str) and isinstance(val, value)):
+                        if (textdistance.levenshtein.distance(val, target) == 0):
+                            found = True
+                            break
+                    elif (np.isclose(np.linalg.norm(np.subtract(val, value)), 0)):
                         found = True
                         break
                 except:
@@ -596,6 +644,11 @@ class Brain:
         
         for solution in solutions:
             connections.append(solution[-1])
+
+        connections = sorted(connections, key = lambda x: self.connection_len(x))
+        
+        for connection in connections:
+            self.reinforce_connection(connection, reinforcement_weight)
 
         if (len(connections) and transform_best_into_neuron):
             self.transform_connection_into_neuron(connections[0], name = name, module = module)
