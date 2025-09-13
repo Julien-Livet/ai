@@ -41,8 +41,8 @@ while (True):
     print(brain.connection_str(connections[0]) + " -> " + str(brain.connection_output(connections[0])))
 
     try:
-        brain.show2d(seed = 0, colorBy = "module")
+        brain.show2d(seed = 0, colorBy = "weight")
     except:
         pass
 
-    brain.show3d(seed = 0, colorBy = "module")
+    brain.show3d(seed = 0, colorBy = "weight")
