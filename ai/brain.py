@@ -239,12 +239,11 @@ class Brain:
                         if (colorBy == "level"):
                             value = neuron.activationLevel
                         elif (colorBy == "module"):
-                            value = self.modules.index(neuron.module)
+                            value = list(self.modules.keys()).index(neuron.module)
                         elif (colorBy == "weight"):
-                            value = weight
+                            value = neuron.weight
 
                         i = int((value - minValue) / (maxValue - minValue) * (len(levelColors) - 1))
-
                         colors[self.neuron_name(neuron)] = levelColors[i]
 
         if (seed != None):
@@ -268,21 +267,29 @@ class Brain:
     def show3d(self,
                seed: int = None,
                length: float = 100.0,
+               colorBy: str = "level", #level, module or weight
                levelColors: list = [str(x) for x in list(colour.Color("green").range_to(colour.Color("blue"), 16))],
                connectionColors: list = (random.seed(0), ['#%06X' % random.randint(0, 0xFFFFFF) for _ in range(100)])[1]):
         import brain_graph3d
 
         graph = brain_graph3d.BrainGraph()
 
-        minActivationLevel = 0
-        maxActivationLevel = 0
+        minValue = 0
+        maxValue = 0
 
-        for id, neuron in self.neurons.items():
-            maxActivationLevel = max(maxActivationLevel, neuron.activationLevel)
-            minActivationLevel = min(minActivationLevel, neuron.activationLevel)
+        if (colorBy == "level"):
+            for id, neuron in self.neurons.items():
+                maxValue = max(maxValue, neuron.activationLevel)
+                minValue = min(minValue, neuron.activationLevel)
+        elif (colorBy == "module"):
+            maxValue = len(self.modules)
+        elif (colorBy == "weight"):
+            for id, neuron in self.neurons.items():
+                maxValue = max(maxValue, neuron.weight)
+                minValue = min(minValue, neuron.weight)
         
-        if (not minActivationLevel and not maxActivationLevel):
-            maxActivationLevel = 1
+        if (not minValue and not maxValue):
+            maxValue = 1
 
         positions = []
         colors = {}
@@ -298,7 +305,14 @@ class Brain:
                         neuron = self.neurons[index]
                         positions.append((i * step, j * step, k * step))
 
-                        i = int((neuron.activationLevel - minActivationLevel) / (maxActivationLevel - minActivationLevel) * (len(levelColors) - 1))
+                        if (colorBy == "level"):
+                            value = neuron.activationLevel
+                        elif (colorBy == "module"):
+                            value = list(self.modules.keys()).index(neuron.module)
+                        elif (colorBy == "weight"):
+                            value = neuron.weight
+
+                        i = int((value - minValue) / (maxValue - minValue) * (len(levelColors) - 1))
                         colors[self.neuron_name(neuron)] = levelColors[i]
 
         if (seed != None):
@@ -652,5 +666,7 @@ class Brain:
 
         if (len(connections) and transform_best_into_neuron):
             self.transform_connection_into_neuron(connections[0], name = name, module = module)
+
+        self.connections |= set(connections)
         
         return connections

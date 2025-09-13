@@ -53,7 +53,7 @@ try:
 except:
     pass
 
-#brain.show3d(seed = 0, levelColors = ["red", "green", "blue", "yellow", "cyan", "magenta", "purple", "brown", "orange", "gold", "indigo", "black", "white"])
+brain.show3d(seed = 0, colorBy = "module", levelColors = ["red", "green", "blue", "yellow", "cyan", "magenta", "purple", "brown", "orange", "gold", "indigo", "black", "white"])
 
 brain.neurons[neuronIds["w"]].function = lambda: int(input("w? "))
 brain.neurons[neuronIds["x"]].function = lambda: int(input("x? "))
