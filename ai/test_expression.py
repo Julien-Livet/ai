@@ -9,22 +9,9 @@ import numpy as np
 import random
 import strs
 import symbols
-import sympy
 
 brain = Brain()
 neuronIds = {}
-
-s = input("What is you expression (for example: x + y * z)? ")
-
-expr = sympy.sympify(s)
-
-seen = set()
-variables = {}
-
-for node in sympy.preorder_traversal(expr):
-    if (isinstance(node, sympy.Symbol) and node not in seen):
-        variables[node] = random.random()
-        seen.add(node)
 
 neuronIds |= chars.add(brain)
 neuronIds |= digits.add(brain)
@@ -33,32 +20,59 @@ neuronIds |= floats.add(brain)
 neuronIds |= strs.add(brain)
 neuronIds |= symbols.add(brain)
 
-values = []
+with_pretraining = True
 
-for variable, value in variables.items():
-    neuronIds |= floats.add_value(brain, lambda value = value: value, str(variable))
+if (with_pretraining):
+    expressions = ["0", "10", "-2", "3e4", "5e-6", "-7e-8", "9.0", "1.e2", "-3.e4", "5.e-6", "-7.e-8", "9.0e0",
+                   "1.2e-3", "-4.5e-6", "-23", "0.3", "-6.4", "1e6", "-3e4", "2e-4", "-1e-2", "1.5e2", "-3.4e2",
+                   "5.1e-4", "-3.6e-2", "2*x", "-3*x", "x+y", "2.*x", "3.1*x", "-4.*y", "-5.1*y", "3*x+y",
+                   "3.1*x+y", "-2.1*x+4.5*y", "x*y", "1.2*x*y", "(x+y)*z", "1.2*(x+y)", "(x-y)*4.6", "(x-y)*(-3.8)"]
 
-brain.deactivate_all_modules()
-brain.activate_module("chars.constants")
-brain.activate_module("chars.functions.conversion")
-brain.activate_module("digits.constants")
-brain.activate_module("digits.functions.conversion")
-brain.activate_module("floats.operators.arithmetic")
-brain.activate_module("floats.variables")
-brain.activate_module("strs.functions")
-brain.activate_module("strs.functions.conversion")
-brain.activate_module("symbols.constants")
-brain.activate_module("symbols.functions.conversion")
-brain.activate_str(s)
+    for expression in expressions:
+        print("Expression:", expression)
 
-connections = brain.learn(expr.subs(variables), "expr", depth = 10)
+        brain.clear_connections()
+        brain.deactivate_all_modules()
+        brain.activate_module("chars.functions.conversion")
+        brain.activate_module("digits.functions.conversion")
+        brain.activate_module("floats.operators.arithmetic")
+        brain.activate_module("floats.variables")
+        brain.activate_module("strs.functions")
+        brain.activate_module("strs.functions.conversion")
+        brain.activate_module("symbols.functions.conversion")
+        brain.activate_str(expression)
 
-print(variables, "->", expr.subs(variables))
-print(brain.connection_str(connections[0]), "->", str(brain.connection_output(connections[0])))
+        connections = brain.learn(expression, depth = 10)
 
-try:
-    brain.show2d(seed = 0, colorBy = "module")
-except:
-    pass
+        print(brain.connection_str(connections[0]) + " -> " + str(brain.connection_output(connections[0])))
 
-brain.show3d(seed = 0, colorBy = "module")
+        try:
+            brain.show2d(seed = 0, title = expression, colorBy = "weight")
+        except:
+            pass
+
+        brain.show3d(seed = 0, title = expression, colorBy = "weight")
+
+while (True):
+    expression = input("What is you expression (for example: x + y * z)? ")
+
+    brain.deactivate_all_modules()
+    brain.activate_module("chars.functions.conversion")
+    brain.activate_module("digits.functions.conversion")
+    brain.activate_module("floats.operators.arithmetic")
+    brain.activate_module("floats.variables")
+    brain.activate_module("strs.functions")
+    brain.activate_module("strs.functions.conversion")
+    brain.activate_module("symbols.functions.conversion")
+    brain.activate_str(expression)
+
+    connections = brain.learn(expression, depth = 10)
+
+    print(brain.connection_str(connections[0]), "->", str(brain.connection_output(connections[0])))
+
+    try:
+        brain.show2d(seed = 0, title = expression, colorBy = "weight")
+    except:
+        pass
+
+    brain.show3d(seed = 0, title = expression, colorBy = "weight")

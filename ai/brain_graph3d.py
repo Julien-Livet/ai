@@ -33,7 +33,7 @@ class BrainGraph:
                                        colorscale = [[0, color], [1, color]],
                                        sizemode = "absolute", sizeref = 0.1 * width, anchor = "tip"))
 
-    def show(self):
+    def show(self, title: str = ""):
         fig = go.Figure(data = self.nodes + self.edges + self.arrows)
-        fig.update_layout(scene = dict(aspectmode = "cube"))
+        fig.update_layout(title_text = title, scene = dict(aspectmode = "cube"))
         fig.show()

@@ -51,11 +51,11 @@ if (with_pretraining):
         print(brain.connection_str(connections[0]) + " -> " + str(brain.connection_output(connections[0])))
 
         try:
-            brain.show2d(seed = 0, colorBy = "weight")
+            brain.show2d(seed = 0, title = number, colorBy = "weight")
         except:
             pass
 
-        brain.show3d(seed = 0, colorBy = "weight")
+        brain.show3d(seed = 0, title = number, colorBy = "weight")
 
 while (True):
     number = input("What is you number (for example: 3.1)? ")
@@ -75,8 +75,8 @@ while (True):
     print(brain.connection_str(connections[0]) + " -> " + str(brain.connection_output(connections[0])))
 
     try:
-        brain.show2d(seed = 0, colorBy = "weight")
+        brain.show2d(seed = 0, title = number, colorBy = "weight")
     except:
         pass
 
-    brain.show3d(seed = 0, colorBy = "weight")
+    brain.show3d(seed = 0, title = number, colorBy = "weight")

@@ -191,6 +191,7 @@ class Brain:
         return self.neuron_name(connection.neuron) + "(" + str(inputs) + ")"
 
     def show2d(self,
+               title: str = "",
                seed: int = None,
                length: float = 100.0,
                colorBy: str = "level", #level, module or weight
@@ -257,9 +258,10 @@ class Brain:
         for i in range(0, len(self.connections)):
             self.draw_connection(graph, pos, connectionColors[i % len(connectionColors)], 1, connections[i])
 
-        graph.show()
+        graph.show(title)
 
     def show3d(self,
+               title: str = "",
                seed: int = None,
                length: float = 100.0,
                colorBy: str = "level", #level, module or weight
@@ -326,7 +328,7 @@ class Brain:
         for i in range(0, len(self.connections)):
             self.draw_connection(graph, pos, connectionColors[i % len(connectionColors)], 1, connections[i])
 
-        graph.show()
+        graph.show(title)
 
     def activate_type(self, type, activationLevel: int = 0, previousLevels: bool = True, nextLevels: bool = True):
         ids = self.inputTypesToIds.get(type, []) + self.outputTypesToIds.get(type, [])

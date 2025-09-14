@@ -39,7 +39,7 @@ class BrainGraph:
         
         return e
 
-    def show(self):
+    def show(self, title: str = ""):
         """
         from graph_tool.draw import sfdp_layout
 
@@ -57,6 +57,7 @@ class BrainGraph:
             pos[v] = [x, y]
         
         graph_draw(
+            title = title,
             self.g,
             pos = pos,
             vertex_fill_color = self.v_color,
