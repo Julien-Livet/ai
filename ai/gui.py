@@ -75,22 +75,25 @@ class Window(QtWidgets.QWidget):
 
         self.updateHistrogram()
 
-        self.connectPushButton = QtWidgets.QPushButton("Connect")
-        self.clearConnectionsPushButton = QtWidgets.QPushButton("Clear connections")
-
         self.expressionLabel = QtWidgets.QLabel("Expression:")
-        self.learnPushButton = QtWidgets.QPushButton("Learn")
-        self.associatePushButton = QtWidgets.QPushButton("Associate")
         self.expressionLineEdit = QtWidgets.QLineEdit("x+y")
+        self.activatePushButton = QtWidgets.QPushButton("Activate")
+        self.deactivatePushButton = QtWidgets.QPushButton("Deactivate")
         self.depthSpinBox = QtWidgets.QSpinBox()
         self.depthLabel = QtWidgets.QLabel("Depth:")
         self.depthSpinBox.setValue(5)
         self.learnModuleLabel = QtWidgets.QLabel("Module:")
         self.moduleLineEdit = QtWidgets.QLineEdit()
+        self.learnPushButton = QtWidgets.QPushButton("Learn")
+        self.connectPushButton = QtWidgets.QPushButton("Connect")
+        self.clearConnectionsPushButton = QtWidgets.QPushButton("Clear connections")
+        self.associatePushButton = QtWidgets.QPushButton("Associate")
 
         self.learnLayout = QtWidgets.QHBoxLayout()
         self.learnLayout.addWidget(self.expressionLabel)
         self.learnLayout.addWidget(self.expressionLineEdit)
+        self.learnLayout.addWidget(self.activatePushButton)
+        self.learnLayout.addWidget(self.deactivatePushButton)
         self.learnLayout.addWidget(self.depthLabel)
         self.learnLayout.addWidget(self.depthSpinBox)
         self.learnLayout.addWidget(self.learnModuleLabel)
@@ -129,6 +132,8 @@ class Window(QtWidgets.QWidget):
         self.clearConnectionsPushButton.clicked.connect(self.clearConnections)
         self.learnPushButton.clicked.connect(self.learn)
         self.associatePushButton.clicked.connect(self.associate)
+        self.activatePushButton.clicked.connect(self.activate)
+        self.deactivatePushButton.clicked.connect(self.deactivate)
 
     @QtCore.Slot()
     def load(self):
@@ -295,6 +300,16 @@ class Window(QtWidgets.QWidget):
         self.bar_graph = pg.BarGraphItem(x = x, height = y, width = (x[1] - x[0]), brush = 'b')
         self.plot_widget.clear()
         self.plot_widget.addItem(self.bar_graph)
+
+    @QtCore.Slot()
+    def activate(self):
+        self.brain.activate_str(self.expressionLineEdit.text())
+        self.neuronChanged(self.neuronsComboBox.currentText())
+
+    @QtCore.Slot()
+    def deactivate(self):
+        self.brain.deactivate_str(self.expressionLineEdit.text())
+        self.neuronChanged(self.neuronsComboBox.currentText())
 
 if (__name__ == "__main__"):
     app = QtWidgets.QApplication([])
