@@ -530,6 +530,10 @@ class Brain:
         self.connections.add(connection)
         self._add_connection_type(connection)
 
+    def activate_all_modules(self):
+        for module in self.modules:
+            self.activate_module(module)
+
     def deactivate_all_modules(self):
         for module in self.modules:
             self.deactivate_module(module)
