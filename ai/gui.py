@@ -30,7 +30,7 @@ class Window(QtWidgets.QWidget):
 
         self.neuronTotalNumberLabel = QtWidgets.QLabel("Neuron total number: " + str(len(self.brain.neurons)))
 
-        self.neuronLabel = QtWidgets.QLabel("Neuron :")
+        self.neuronLabel = QtWidgets.QLabel("Neuron:")
         self.neuronCheckBox = QtWidgets.QCheckBox("Activated")
         self.neuronCheckBox.checkStateChanged.connect(self.neuronCheckStateChanged)
         self.neuronTimestampDateTimeEdit = QtWidgets.QDateTimeEdit()
@@ -55,7 +55,7 @@ class Window(QtWidgets.QWidget):
         self.activateAllNeuronsPushButton = QtWidgets.QPushButton("Activate all neurons")
         self.deactivateAllNeuronsPushButton = QtWidgets.QPushButton("Deactivate all neurons")
 
-        self.moduleLabel = QtWidgets.QLabel("Module :")
+        self.moduleLabel = QtWidgets.QLabel("Module:")
         self.moduleCheckBox = QtWidgets.QCheckBox("Activated")
         self.moduleCheckBox.checkStateChanged.connect(self.moduleCheckStateChanged)
         self.modulesComboBox = QtWidgets.QComboBox()
@@ -135,6 +135,8 @@ class Window(QtWidgets.QWidget):
         fileName, selectedFilter = QtWidgets.QFileDialog.getOpenFileName(filter = "*.bin")
 
         if (os.path.exists(fileName)):
+            self.fileName = fileName
+
             self.brain.load(fileName)
 
             self.neuronsComboBox.clear()
@@ -160,6 +162,8 @@ class Window(QtWidgets.QWidget):
         fileName, selectedFilter = QtWidgets.QFileDialog.getSaveFileName(dir = self.fileName, filter = "*.bin")
 
         self.brain.save(fileName)
+
+        self.fileName = fileName
 
     @QtCore.Slot()
     def show2d(self):
