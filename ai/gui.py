@@ -233,6 +233,7 @@ class Window(QtWidgets.QWidget):
     @QtCore.Slot()
     def neuronWeightChanged(self, value: float):
         self.brain.neurons[self.neuronIdFromName(self.neuronsComboBox.currentText())].weight = value
+        self.updateHistrogram()
 
     @QtCore.Slot()
     def learn(self):
