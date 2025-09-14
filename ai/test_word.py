@@ -9,7 +9,7 @@ import strs
 import symbols
 import sympy
 
-def process(brain: Brain, number: str, category: str):
+def process(brain: Brain, word: str, category: str):
     brain.clear_connections()
     brain.deactivate_all_modules()
     brain.activate_module("chars.functions.conversion")
@@ -22,18 +22,18 @@ def process(brain: Brain, number: str, category: str):
         if ("words" in module):
             brain.activate_module(module)
 
-    brain.activate_str(number)
+    brain.activate_str(word)
 
-    connections = brain.learn(number, depth = 10, module = "words." + category)
+    connections = brain.learn(word, depth = 10, name = "word", module = "words." + category)
 
     print(brain.connection_str(connections[0]) + " -> " + str(brain.connection_output(connections[0])))
 
     try:
-        brain.show2d(seed = 0, title = number, colorBy = "weight")
+        brain.show2d(seed = 0, title = word, colorBy = "weight")
     except:
         pass
 
-    brain.show3d(seed = 0, title = number, colorBy = "weight")
+    brain.show3d(seed = 0, title = word, colorBy = "weight")
 
 brain = Brain()
 with_pretraining = True
