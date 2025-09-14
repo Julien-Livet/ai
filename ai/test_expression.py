@@ -2,8 +2,6 @@ from brain import Brain
 import chars
 from connection import Connection
 import digits
-import floats
-import ints
 from neuron import Neuron
 import numpy as np
 import random
@@ -37,9 +35,10 @@ brain = Brain()
 with_pretraining = True
 number_filename = "number_brain.bin"
 expression_filename = "expression_brain.bin"
-numbers = ["0", "10", "-2", "3e4", "5e-6", "-7e-8", "9.0", "1.e2", "-3.e4", "5.e-6", "-7.e-8", "9.0e0",
-           "1.2e-3", "-4.5e-6", "-23", "0.3", "-6.4", "1e6", "-3e4", "2e-4", "-1e-2", "1.5e2", "-3.4e2",
-           "5.1e-4", "-3.6e-2"]
+numbers = [str(i) for i in range(10)] \
+          + ["10", "-2", "3e4", "5e-6", "-7e-8", "9.0", "1.e2", "-3.e4", "5.e-6", "-7.e-8", "9.0e0",
+             "1.2e-3", "-4.5e-6", "-23", "0.3", "-6.4", "1e6", "-3e4", "2e-4", "-1e-2", "1.5e2", "-3.4e2",
+             "5.1e-4", "-3.6e-2"]
 expressions = ["2*x", "-3*x", "x+y", "2.*x", "3.1*x", "-4.*y", "-5.1*y", "3*x+y", "3.1*x+y",
                "-2.1*x+4.5*y", "x*y", "1.2*x*y", "(x+y)*z", "1.2*(x+y)", "(x-y)*4.6", "(x-y)*(-3.8)"]
 
@@ -58,8 +57,6 @@ elif (os.path.exists(number_filename)):
 else:
     chars.add(brain)
     digits.add(brain)
-    ints.add(brain)
-    floats.add(brain)
     strs.add(brain)
     symbols.add(brain)
 

@@ -39,24 +39,16 @@ filename = "number_brain.bin"
 if (os.path.exists(filename)):
     brain.load(filename)
 else:
-    brain.add(Neuron(lambda: chars.Char("e"), "e", outputType = chars.Char, module = "chars.constants"))
-    brain.add(Neuron(chars.char_to_str, "char_to_str", module = "chars.functions.conversion"))
-    brain.add(Neuron(chars.lower_char, "lower_char", module = "chars.functions"))
-    brain.add(Neuron(chars.upper_char, "upper_char", module = "chars.functions"))
-
+    chars.add(brain)
     digits.add(brain)
     strs.add(brain)
-
-    for c in ["+", "-", "."]:
-        def symbol(c = c) -> symbols.Symbol:
-            return symbols.Symbol(symbols.Symbol.symbols.index(c))
-
-        brain.add(Neuron(symbol, c, module = "symbols.constants"))
-
-    brain.add(Neuron(symbols.symbol_to_str, "symbol_to_str", module = "symbols.functions.conversion"))
+    symbols.add(brain)
 
     if (with_pretraining):
-        numbers = ["0", "10", "-2", "3e4", "5e-6", "-7e-8", "9.0", "1.e2", "-3.e4", "5.e-6", "-7.e-8", "9.0e0", "1.2e-3", "-4.5e-6", "-23", "0.3", "-6.4", "1e6", "-3e4", "2e-4", "-1e-2", "1.5e2", "-3.4e2", "5.1e-4", "-3.6e-2"]
+        numbers = [str(i) for i in range(10)] \
+                  + ["10", "-2", "3e4", "5e-6", "-7e-8", "9.0", "1.e2", "-3.e4", "5.e-6", "-7.e-8", "9.0e0",
+                     "1.2e-3", "-4.5e-6", "-23", "0.3", "-6.4", "1e6", "-3e4", "2e-4", "-1e-2", "1.5e2", "-3.4e2",
+                     "5.1e-4", "-3.6e-2"]
 
         for number in numbers:
             print("Number:", number)
