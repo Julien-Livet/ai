@@ -191,17 +191,7 @@ class Brain:
 
         return self.neuron_name(connection.neuron) + "(" + str(inputs) + ")"
 
-    def show2d(self,
-               title: str = "",
-               seed: int = None,
-               length: float = 100.0,
-               colorBy: str = "level", #level, module or weight
-               neuronColors: list = [str(x) for x in list(colour.Color("green").range_to(colour.Color("blue"), 16))],
-               connectionColors: list = (random.seed(0), ['#%06X' % random.randint(0, 0xFFFFFF) for _ in range(100)])[1]):
-        import brain_graph2d
-
-        graph = brain_graph2d.BrainGraph()
-
+    def minMaxValue(self, colorBy: str):
         minValue = 0
         maxValue = 0
 
@@ -215,10 +205,31 @@ class Brain:
             for id, neuron in self.neurons.items():
                 maxValue = max(maxValue, neuron.weight)
                 minValue = min(minValue, neuron.weight)
+        elif (colorBy == "timestamp"):
+            if (len(self.neurons)):
+                minValue = list(self.neurons.items())[0][1].datetime.timestamp() * 1000
+                maxValue = minValue
+                
+            for id, neuron in self.neurons.items():
+                maxValue = max(maxValue, neuron.datetime.timestamp() * 1000)
+                minValue = min(minValue, neuron.datetime.timestamp() * 1000)
 
         if (not minValue and not maxValue):
             maxValue = 1
+            
+        return minValue, maxValue
 
+    def show2d(self,
+               title: str = "",
+               seed: int = None,
+               length: float = 100.0,
+               colorBy: str = "level", #level, module, timestamp or weight
+               neuronColors: list = [str(x) for x in list(colour.Color("green").range_to(colour.Color("blue"), 16))],
+               connectionColors: list = (random.seed(0), ['#%06X' % random.randint(0, 0xFFFFFF) for _ in range(100)])[1]):
+        import brain_graph2d
+
+        graph = brain_graph2d.BrainGraph()
+        minValue, maxValue = self.minMaxValue(colorBy)
         positions = []
         colors = {}
         step = length ** (1 / 3)
@@ -239,6 +250,8 @@ class Brain:
                             value = list(self.modules.keys()).index(neuron.module)
                         elif (colorBy == "weight"):
                             value = neuron.weight
+                        elif (colorBy == "timestamp"):
+                            value = neuron.datetime.timestamp() * 1000
 
                         i = int((value - minValue) / (maxValue - minValue) * (len(neuronColors) - 1))
                         colors[self.neuron_name(neuron)] = neuronColors[i]
@@ -265,30 +278,13 @@ class Brain:
                title: str = "",
                seed: int = None,
                length: float = 100.0,
-               colorBy: str = "level", #level, module or weight
+               colorBy: str = "level", #level, module, timestamp or weight
                neuronColors: list = [str(x) for x in list(colour.Color("green").range_to(colour.Color("blue"), 16))],
                connectionColors: list = (random.seed(0), ['#%06X' % random.randint(0, 0xFFFFFF) for _ in range(100)])[1]):
         import brain_graph3d
 
         graph = brain_graph3d.BrainGraph()
-
-        minValue = 0
-        maxValue = 0
-
-        if (colorBy == "level"):
-            for id, neuron in self.neurons.items():
-                maxValue = max(maxValue, neuron.activationLevel)
-                minValue = min(minValue, neuron.activationLevel)
-        elif (colorBy == "module"):
-            maxValue = len(self.modules)
-        elif (colorBy == "weight"):
-            for id, neuron in self.neurons.items():
-                maxValue = max(maxValue, neuron.weight)
-                minValue = min(minValue, neuron.weight)
-
-        if (not minValue and not maxValue):
-            maxValue = 1
-
+        minValue, maxValue = self.minMaxValue(colorBy)
         positions = []
         colors = {}
         step = length ** (1 / 3)
@@ -309,6 +305,8 @@ class Brain:
                             value = list(self.modules.keys()).index(neuron.module)
                         elif (colorBy == "weight"):
                             value = neuron.weight
+                        elif (colorBy == "timestamp"):
+                            value = neuron.datetime.timestamp() * 1000
 
                         i = int((value - minValue) / (maxValue - minValue) * (len(neuronColors) - 1))
                         colors[self.neuron_name(neuron)] = neuronColors[i]
