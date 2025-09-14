@@ -261,6 +261,13 @@ class Window(QtWidgets.QWidget):
         self.modulesComboBox.clear()
         self.modulesComboBox.addItems(sorted([x for x in self.brain.modules]))
 
+        y, x = np.histogram([n.weight for id, n in self.brain.neurons.items()])
+        x = x[:-1]
+
+        self.bar_graph = pg.BarGraphItem(x = x, height = y, width = (x[1] - x[0]), brush = 'b')
+        self.plot_widget.clear()
+        self.plot_widget.addItem(self.bar_graph)
+
     @QtCore.Slot()
     def connect(self):
         self.brain.connect(self.depthSpinBox.value())
@@ -289,6 +296,13 @@ class Window(QtWidgets.QWidget):
 
         self.modulesComboBox.clear()
         self.modulesComboBox.addItems(sorted([x for x in self.brain.modules]))
+
+        y, x = np.histogram([n.weight for id, n in self.brain.neurons.items()])
+        x = x[:-1]
+
+        self.bar_graph = pg.BarGraphItem(x = x, height = y, width = (x[1] - x[0]), brush = 'b')
+        self.plot_widget.clear()
+        self.plot_widget.addItem(self.bar_graph)
 
 if (__name__ == "__main__"):
     app = QtWidgets.QApplication([])
