@@ -5,7 +5,7 @@ class Char:
     def __init__(self, value: str):
         assert(isinstance(value, str))
         assert(len(value) == 1)
-        assert('a' <= value <= 'z')
+        assert(value.isalpha())
 
         self.value = value
 
@@ -31,8 +31,7 @@ def add(brain: Brain):
         neuronIds[chr(ord('a') + i)] = brain.add(Neuron(number, chr(ord('a') + i), module = "chars.constants"))
 
     for c in ["à", "á", "â", "ä", "é", "è", "ê", "ë", "î", "ï", "ô", "ö", "ù", "ü", "ÿ", "ç"]:
-        neuronIds[c] = brain.add(Neuron(lambda c = c: c, c, module = "chars.constants"))
-        neuronIds[c.upper()] = brain.add(Neuron(lambda c = c: c.upper(), c.upper(), module = "chars.constants"))
+        neuronIds[c] = brain.add(Neuron(lambda c = c: Char(c), c, outputType = Char, module = "chars.constants"))
 
     neuronIds["char_to_str"] = brain.add(Neuron(char_to_str, "char_to_str", module = "chars.functions.conversion"))
     neuronIds["lower_char"] = brain.add(Neuron(lower_char, "lower_char", module = "chars.functions"))
