@@ -3,7 +3,6 @@ import chars
 from connection import Connection
 import digits
 from neuron import Neuron
-import numpy as np
 import os
 import random
 import strs

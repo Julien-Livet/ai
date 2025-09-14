@@ -31,7 +31,7 @@ def heuristic(val, target):
 
 def canonicalize_for_visit(val):
     if isinstance(val, np.ndarray):
-        if val.size == 1:
+        if (val.size == 1):
             return float(val.item())
         return ("ndarray", val.shape, hash(val.tobytes()))
     try:
@@ -464,7 +464,7 @@ class Brain:
                     break
 
             if (not added):
-                return None
+                return self.add(Neuron(lambda connection = connection: self.connection_output(connection), name, [], connection.neuron.outputType, module = module))
 
         def function(*args):
             def replace_inputs(connection, arg_iter):

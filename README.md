@@ -9,6 +9,7 @@ conda activate gt
 pip install colour
 pip install matplotlib
 pip install numpy
+pip install pandas
 pip install plotly
 pip install pyqtgraph
 pip install pyside6

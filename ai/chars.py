@@ -30,7 +30,7 @@ def add(brain: Brain):
 
         neuronIds[chr(ord('a') + i)] = brain.add(Neuron(number, chr(ord('a') + i), module = "chars.constants"))
 
-    for c in ["à", "á", "â", "ä", "é", "è", "ê", "ë", "î", "ï", "ô", "ö", "ù", "ü", "ÿ", "ç"]:
+    for c in ["à", "á", "â", "ä", "é", "è", "ê", "ë", "î", "ï", "ô", "ö", "ù", "ü", "û", "ÿ", "ç"]:
         neuronIds[c] = brain.add(Neuron(lambda c = c: Char(c), c, outputType = Char, module = "chars.constants"))
 
     neuronIds["char_to_str"] = brain.add(Neuron(char_to_str, "char_to_str", module = "chars.functions.conversion"))
