@@ -73,12 +73,7 @@ class Window(QtWidgets.QWidget):
 
         self.plot_widget = pg.PlotWidget()
 
-        y, x = np.histogram([n.weight for id, n in self.brain.neurons.items()])
-        x = x[:-1]
-
-        self.bar_graph = pg.BarGraphItem(x = x, height = y, width = (x[1] - x[0]), brush = 'b')
-        self.plot_widget.clear()
-        self.plot_widget.addItem(self.bar_graph)
+        self.updateHistrogram()
 
         self.connectPushButton = QtWidgets.QPushButton("Connect")
         self.clearConnectionsPushButton = QtWidgets.QPushButton("Clear connections")
@@ -151,12 +146,7 @@ class Window(QtWidgets.QWidget):
             self.neuronTotalNumberLabel.setText("Neuron total number: " + str(len(self.brain.neurons)))
             self.connectionTotalNumberLabel.setText("Connection total number: " + str(len(self.brain.connections)))
 
-            y, x = np.histogram([n.weight for id, n in self.brain.neurons.items()])
-            x = x[:-1]
-
-            self.bar_graph = pg.BarGraphItem(x = x, height = y, width = (x[1] - x[0]), brush = 'b')
-            self.plot_widget.clear()
-            self.plot_widget.addItem(self.bar_graph)
+            self.updateHistrogram()
 
     def neuronIdFromName(self, name: str):
         for id, n in self.brain.neurons.items():
@@ -261,12 +251,7 @@ class Window(QtWidgets.QWidget):
         self.modulesComboBox.clear()
         self.modulesComboBox.addItems(sorted([x for x in self.brain.modules]))
 
-        y, x = np.histogram([n.weight for id, n in self.brain.neurons.items()])
-        x = x[:-1]
-
-        self.bar_graph = pg.BarGraphItem(x = x, height = y, width = (x[1] - x[0]), brush = 'b')
-        self.plot_widget.clear()
-        self.plot_widget.addItem(self.bar_graph)
+        self.updateHistrogram()
 
     @QtCore.Slot()
     def connect(self):
@@ -297,6 +282,9 @@ class Window(QtWidgets.QWidget):
         self.modulesComboBox.clear()
         self.modulesComboBox.addItems(sorted([x for x in self.brain.modules]))
 
+        self.updateHistrogram()
+
+    def updateHistrogram(self):
         y, x = np.histogram([n.weight for id, n in self.brain.neurons.items()])
         x = x[:-1]
 
