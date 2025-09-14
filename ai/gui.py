@@ -73,7 +73,7 @@ class Window(QtWidgets.QWidget):
 
         self.plot_widget = pg.PlotWidget()
 
-        self.updateHistrogram()
+        self.updateHistogram()
 
         self.expressionLabel = QtWidgets.QLabel("Expression:")
         self.expressionLineEdit = QtWidgets.QLineEdit("x+y")
@@ -153,7 +153,7 @@ class Window(QtWidgets.QWidget):
             self.neuronTotalNumberLabel.setText("Neuron total number: " + str(len(self.brain.neurons)))
             self.connectionTotalNumberLabel.setText("Connection total number: " + str(len(self.brain.connections)))
 
-            self.updateHistrogram()
+            self.updateHistogram()
 
     def neuronIdFromName(self, name: str):
         for id, n in self.brain.neurons.items():
@@ -233,7 +233,7 @@ class Window(QtWidgets.QWidget):
     @QtCore.Slot()
     def neuronWeightChanged(self, value: float):
         self.brain.neurons[self.neuronIdFromName(self.neuronsComboBox.currentText())].weight = value
-        self.updateHistrogram()
+        self.updateHistogram()
 
     @QtCore.Slot()
     def learn(self):
@@ -261,7 +261,7 @@ class Window(QtWidgets.QWidget):
         self.modulesComboBox.clear()
         self.modulesComboBox.addItems(sorted([x for x in self.brain.modules]))
 
-        self.updateHistrogram()
+        self.updateHistogram()
 
     @QtCore.Slot()
     def connect(self):
@@ -292,9 +292,9 @@ class Window(QtWidgets.QWidget):
         self.modulesComboBox.clear()
         self.modulesComboBox.addItems(sorted([x for x in self.brain.modules]))
 
-        self.updateHistrogram()
+        self.updateHistogram()
 
-    def updateHistrogram(self):
+    def updateHistogram(self):
         y, x = np.histogram([n.weight for id, n in self.brain.neurons.items()])
         x = x[:-1]
 
