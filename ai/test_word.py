@@ -24,7 +24,7 @@ def process(brain: Brain, word: str, category: str):
 
     brain.activate_str(word)
 
-    connections = brain.learn(word, depth = 10, name = "word", module = "words." + category)
+    connections = brain.learn(word, depth = 10, name = word, module = "words." + category)
 
     print(brain.connection_str(connections[0]) + " -> " + str(brain.connection_output(connections[0])))
 
