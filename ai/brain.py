@@ -1,5 +1,6 @@
 import colour
 from connection import Connection
+import dill
 import heapq
 import itertools
 import math
@@ -502,9 +503,9 @@ class Brain:
         self.originNeuronIds = []
         self.typesToConnections = {}
 
-        for neuron in self.neurons:
-            self._add_neuron_input_types(neuron)
-            self._add_neuron_output_type(neuron)
+        for id, neuron in self.neurons.items():
+            self._add_neuron_input_types(id)
+            self._add_neuron_output_type(id)
 
             self.neuronToIds[neuron] = id
 
