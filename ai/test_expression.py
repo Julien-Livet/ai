@@ -56,6 +56,7 @@ if (with_pretraining):
 while (True):
     expression = input("What is you expression (for example: x + y * z)? ")
 
+    brain.clear_connections()
     brain.deactivate_all_modules()
     brain.activate_module("chars.functions.conversion")
     brain.activate_module("digits.functions.conversion")
