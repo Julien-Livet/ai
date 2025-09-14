@@ -16,8 +16,15 @@ class Window(QtWidgets.QWidget):
 
         self.loadPushButton = QtWidgets.QPushButton("Load")
         self.savePushButton = QtWidgets.QPushButton("Save")
+        
+        self.colorByLabel = QtWidgets.QLabel("Color by:")
         self.colorByComboBox = QtWidgets.QComboBox()
         self.colorByComboBox.addItems(["level", "weight", "module", "timestamp"])
+        
+        self.colorByLayout = QtWidgets.QHBoxLayout()
+        self.colorByLayout.addWidget(self.colorByLabel)
+        self.colorByLayout.addWidget(self.colorByComboBox)
+        
         self.show2dPushButton = QtWidgets.QPushButton("Show 2D")
         self.show3dPushButton = QtWidgets.QPushButton("Show 3D")
 
@@ -72,11 +79,20 @@ class Window(QtWidgets.QWidget):
         self.bar_graph = pg.BarGraphItem(x = x, height = y, width = (x[1] - x[0]), brush = 'b')
         self.plot_widget.clear()
         self.plot_widget.addItem(self.bar_graph)
-        
+
+        self.expressionLabel = QtWidgets.QLabel("Expression:")
+        self.learnPushButton = QtWidgets.QPushButton("Learn")
+        self.expressionLineEdit = QtWidgets.QLineEdit("x+y")
+
+        self.learnLayout = QtWidgets.QHBoxLayout()
+        self.learnLayout.addWidget(self.expressionLabel)
+        self.learnLayout.addWidget(self.expressionLineEdit)
+        self.learnLayout.addWidget(self.learnPushButton)
+
         self.layout = QtWidgets.QVBoxLayout(self)
         self.layout.addWidget(self.loadPushButton)
         self.layout.addWidget(self.savePushButton)
-        self.layout.addWidget(self.colorByComboBox)
+        self.layout.addLayout(self.colorByLayout)
         self.layout.addWidget(self.neuronTotalNumberLabel)
         self.layout.addLayout(self.neuronLayout)
         self.layout.addWidget(self.connectionTotalNumberLabel)
@@ -88,6 +104,7 @@ class Window(QtWidgets.QWidget):
         self.layout.addWidget(self.show2dPushButton)
         self.layout.addWidget(self.show3dPushButton)
         self.layout.addWidget(self.plot_widget)
+        self.layout.addLayout(self.learnLayout)
 
         self.loadPushButton.clicked.connect(self.load)
         self.savePushButton.clicked.connect(self.save)
@@ -97,7 +114,7 @@ class Window(QtWidgets.QWidget):
         self.deactivateAllModulesPushButton.clicked.connect(self.deactivateAllModules)
         self.activateAllNeuronsPushButton.clicked.connect(self.activateAllNeurons)
         self.deactivateAllNeuronsPushButton.clicked.connect(self.deactivateAllNeurons)
-
+        self.learnPushButton.clicked.connect(self.learn)
 
     @QtCore.Slot()
     def load(self):
@@ -111,10 +128,10 @@ class Window(QtWidgets.QWidget):
 
             self.modulesComboBox.clear()
             self.modulesComboBox.addItems(sorted([x for x in self.brain.modules]))
-            
+
             self.neuronTotalNumberLabel.setText("Neuron total number: " + str(len(self.brain.neurons)))
             self.connectionTotalNumberLabel.setText("Connection total number: " + str(len(self.brain.connections)))
-            
+
             y, x = np.histogram([n.weight for id, n in self.brain.neurons.items()])
             x = x[:-1]
 
@@ -126,7 +143,7 @@ class Window(QtWidgets.QWidget):
         for id, n in self.brain.neurons.items():
             if (self.brain.neuron_name(n) == name):
                 return id
-        
+
         return None
 
     @QtCore.Slot()
@@ -147,7 +164,7 @@ class Window(QtWidgets.QWidget):
     def neuronChanged(self, text: str):
         self.neuronCheckBox.setChecked(self.brain.neurons[self.neuronIdFromName(text)].activated)
         self.neuronWeightLabel.setValue(self.brain.neurons[self.neuronIdFromName(text)].weight)
-        
+
         dateTime = QtCore.QDateTime()
         dateTime.setMSecsSinceEpoch(int(self.brain.neurons[self.neuronIdFromName(text)].datetime.timestamp()))
 
@@ -198,6 +215,18 @@ class Window(QtWidgets.QWidget):
     @QtCore.Slot()
     def neuronWeightChanged(self, value: float):
         self.brain.neurons[self.neuronIdFromName(self.neuronsComboBox.currentText())].weight = value
+
+    @QtCore.Slot()
+    def learn(self):
+        self.brain.clear_connections()
+        self.brain.deactivate_all_modules()
+        
+        for module in self.brain.modules:
+            if (not "constants" in module):
+                self.brain.activate_module(module)
+        
+        self.brain.activate_str(self.expressionLineEdit.text())
+        self.brain.learn(self.expressionLineEdit.text())
 
 if (__name__ == "__main__"):
     app = QtWidgets.QApplication([])
