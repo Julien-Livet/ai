@@ -58,7 +58,12 @@ else:
         brain.save(filename)
 
 while (True):
-    number = input("What is you number (for example: 3.1)? ")
+    sp_number = None
+
+    while (not isinstance(sp_number, sympy.Number)):
+        number = input("What is you number (for example: 3.1)? ")
+        
+        sp_number = sympy.sympify(number)
 
     process(brain, number)
 
