@@ -1,5 +1,7 @@
 from brain import Brain
+import numpy as np
 import os
+import pyqtgraph as pg
 from PySide6 import QtCore, QtWidgets, QtGui
 import sys
 
@@ -62,6 +64,15 @@ class Window(QtWidgets.QWidget):
         self.activateAllModulesPushButton = QtWidgets.QPushButton("Activate all modules")
         self.deactivateAllModulesPushButton = QtWidgets.QPushButton("Deactivate all modules")
 
+        self.plot_widget = pg.PlotWidget()
+
+        y, x = np.histogram([n.weight for id, n in self.brain.neurons.items()])
+        x = x[:-1]
+
+        self.bar_graph = pg.BarGraphItem(x = x, height = y, width = (x[1] - x[0]), brush = 'b')
+        self.plot_widget.clear()
+        self.plot_widget.addItem(self.bar_graph)
+        
         self.layout = QtWidgets.QVBoxLayout(self)
         self.layout.addWidget(self.loadPushButton)
         self.layout.addWidget(self.savePushButton)
@@ -76,6 +87,7 @@ class Window(QtWidgets.QWidget):
         self.layout.addWidget(self.deactivateAllModulesPushButton)
         self.layout.addWidget(self.show2dPushButton)
         self.layout.addWidget(self.show3dPushButton)
+        self.layout.addWidget(self.plot_widget)
 
         self.loadPushButton.clicked.connect(self.load)
         self.savePushButton.clicked.connect(self.save)
@@ -85,6 +97,7 @@ class Window(QtWidgets.QWidget):
         self.deactivateAllModulesPushButton.clicked.connect(self.deactivateAllModules)
         self.activateAllNeuronsPushButton.clicked.connect(self.activateAllNeurons)
         self.deactivateAllNeuronsPushButton.clicked.connect(self.deactivateAllNeurons)
+
 
     @QtCore.Slot()
     def load(self):
@@ -101,6 +114,13 @@ class Window(QtWidgets.QWidget):
             
             self.neuronTotalNumberLabel.setText("Neuron total number: " + str(len(self.brain.neurons)))
             self.connectionTotalNumberLabel.setText("Connection total number: " + str(len(self.brain.connections)))
+            
+            y, x = np.histogram([n.weight for id, n in self.brain.neurons.items()])
+            x = x[:-1]
+
+            self.bar_graph = pg.BarGraphItem(x = x, height = y, width = (x[1] - x[0]), brush = 'b')
+            self.plot_widget.clear()
+            self.plot_widget.addItem(self.bar_graph)
 
     def neuronIdFromName(self, name: str):
         for id, n in self.brain.neurons.items():
