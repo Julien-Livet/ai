@@ -19,20 +19,34 @@ class Window(QtWidgets.QWidget):
         self.show2dPushButton = QtWidgets.QPushButton("Show 2D")
         self.show3dPushButton = QtWidgets.QPushButton("Show 3D")
 
+        self.neuronTotalNumberLabel = QtWidgets.QLabel("Neuron total number: " + str(len(self.brain.neurons)))
+
+        self.neuronLabel = QtWidgets.QLabel("Neuron :")
         self.neuronCheckBox = QtWidgets.QCheckBox("Activated")
         self.neuronCheckBox.checkStateChanged.connect(self.neuronCheckStateChanged)
+        self.neuronTimestampDateTimeEdit = QtWidgets.QDateTimeEdit()
+        self.neuronTimestampDateTimeEdit.setDisplayFormat("dd/MM/yyyy hh:ss:mm:zzz")
+        self.neuronTimestampDateTimeEdit.setDisabled(True)
+        self.neuronWeightLabel = QtWidgets.QDoubleSpinBox()
+        self.neuronWeightLabel.valueChanged.connect(self.neuronWeightChanged)
         self.neuronsComboBox = QtWidgets.QComboBox()
         self.neuronsComboBox.currentTextChanged.connect(self.neuronChanged)
         self.neuronsComboBox.clear()
         self.neuronsComboBox.addItems(sorted([self.brain.neuron_name(n) for id, n in self.brain.neurons.items()]))
 
         self.neuronLayout = QtWidgets.QHBoxLayout()
+        self.neuronLayout.addWidget(self.neuronLabel)
         self.neuronLayout.addWidget(self.neuronsComboBox)
         self.neuronLayout.addWidget(self.neuronCheckBox)
+        self.neuronLayout.addWidget(self.neuronWeightLabel)
+        self.neuronLayout.addWidget(self.neuronTimestampDateTimeEdit)
+
+        self.connectionTotalNumberLabel = QtWidgets.QLabel("Connection total number: " + str(len(self.brain.connections)))
 
         self.activateAllNeuronsPushButton = QtWidgets.QPushButton("Activate all neurons")
         self.deactivateAllNeuronsPushButton = QtWidgets.QPushButton("Deactivate all neurons")
 
+        self.moduleLabel = QtWidgets.QLabel("Module :")
         self.moduleCheckBox = QtWidgets.QCheckBox("Activated")
         self.moduleCheckBox.checkStateChanged.connect(self.moduleCheckStateChanged)
         self.modulesComboBox = QtWidgets.QComboBox()
@@ -41,6 +55,7 @@ class Window(QtWidgets.QWidget):
         self.modulesComboBox.addItems(sorted([x for x in self.brain.modules]))
 
         self.moduleLayout = QtWidgets.QHBoxLayout()
+        self.moduleLayout.addWidget(self.moduleLabel)
         self.moduleLayout.addWidget(self.modulesComboBox)
         self.moduleLayout.addWidget(self.moduleCheckBox)
 
@@ -51,7 +66,9 @@ class Window(QtWidgets.QWidget):
         self.layout.addWidget(self.loadPushButton)
         self.layout.addWidget(self.savePushButton)
         self.layout.addWidget(self.colorByComboBox)
+        self.layout.addWidget(self.neuronTotalNumberLabel)
         self.layout.addLayout(self.neuronLayout)
+        self.layout.addWidget(self.connectionTotalNumberLabel)
         self.layout.addWidget(self.activateAllNeuronsPushButton)
         self.layout.addWidget(self.deactivateAllNeuronsPushButton)
         self.layout.addLayout(self.moduleLayout)
@@ -81,6 +98,9 @@ class Window(QtWidgets.QWidget):
 
             self.modulesComboBox.clear()
             self.modulesComboBox.addItems(sorted([x for x in self.brain.modules]))
+            
+            self.neuronTotalNumberLabel.setText("Neuron total number: " + str(len(self.brain.neurons)))
+            self.connectionTotalNumberLabel.setText("Connection total number: " + str(len(self.brain.connections)))
 
     def neuronIdFromName(self, name: str):
         for id, n in self.brain.neurons.items():
@@ -106,6 +126,12 @@ class Window(QtWidgets.QWidget):
     @QtCore.Slot()
     def neuronChanged(self, text: str):
         self.neuronCheckBox.setChecked(self.brain.neurons[self.neuronIdFromName(text)].activated)
+        self.neuronWeightLabel.setValue(self.brain.neurons[self.neuronIdFromName(text)].weight)
+        
+        dateTime = QtCore.QDateTime()
+        dateTime.setMSecsSinceEpoch(int(self.brain.neurons[self.neuronIdFromName(text)].datetime.timestamp()))
+
+        self.neuronTimestampDateTimeEdit.setDateTime(dateTime)
 
     @QtCore.Slot()
     def moduleChanged(self, text: str):
@@ -149,11 +175,15 @@ class Window(QtWidgets.QWidget):
         self.moduleCheckBox.setChecked(False)
         self.neuronChanged(self.neuronsComboBox.currentText())
 
+    @QtCore.Slot()
+    def neuronWeightChanged(self, value: float):
+        self.brain.neurons[self.neuronIdFromName(self.neuronsComboBox.currentText())].weight = value
+
 if (__name__ == "__main__"):
     app = QtWidgets.QApplication([])
 
     widget = Window()
-    widget.resize(800, 600)
+    widget.setFixedWidth(1000)
     widget.show()
 
     sys.exit(app.exec())
