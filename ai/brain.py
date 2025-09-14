@@ -559,11 +559,13 @@ class Brain:
         return ids
 
     def learn(self, value, name: str = "", depth: int = 10, transform_best_into_neuron: bool = True, module: str = None, reinforcement_weight: float = 1.0):
-        neurons = {}
+        neuronIds = []
 
         for id, neuron in self.neurons.items():
             if (neuron.is_active() and neuron.activated):
-                neurons[id] = neuron
+                neuronIds.append(id)
+
+        neuronIds = sorted(neuronIds, key = lambda x: self.neurons[x].weight, reverse = True)
 
         connections = set()
 
@@ -580,7 +582,9 @@ class Brain:
 
         origin_neurons = []
 
-        for id, n in neurons.items():
+        for id in neuronIds:
+            n = self.neurons[id]
+
             if (len(n.inputTypes) == 0):
                 val = n.output()
                 start_available.append((val, type(val), n))
@@ -612,8 +616,11 @@ class Brain:
             visited.add(state_id)
 
             av = [(self.neurons[id].output(), self.neurons[id].outputType, self.neurons[id]) for id in origin_neurons] + [(self.connection_output(c), c.neuron.outputType, c) for c in set(conns) | connections]
+            av = sorted(av, key = lambda x: x[2].weight, reverse = True)
 
-            for id, neuron in neurons.items():
+            for id in neuronIds:
+                neuron = self.neurons[id]
+
                 if (len(solutions)):
                     break
 
