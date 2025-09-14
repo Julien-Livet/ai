@@ -16,15 +16,15 @@ class Window(QtWidgets.QWidget):
 
         self.loadPushButton = QtWidgets.QPushButton("Load")
         self.savePushButton = QtWidgets.QPushButton("Save")
-        
+
         self.colorByLabel = QtWidgets.QLabel("Color by:")
         self.colorByComboBox = QtWidgets.QComboBox()
         self.colorByComboBox.addItems(["level", "weight", "module", "timestamp"])
-        
+
         self.colorByLayout = QtWidgets.QHBoxLayout()
         self.colorByLayout.addWidget(self.colorByLabel)
         self.colorByLayout.addWidget(self.colorByComboBox)
-        
+
         self.show2dPushButton = QtWidgets.QPushButton("Show 2D")
         self.show3dPushButton = QtWidgets.QPushButton("Show 3D")
 
@@ -83,10 +83,15 @@ class Window(QtWidgets.QWidget):
         self.expressionLabel = QtWidgets.QLabel("Expression:")
         self.learnPushButton = QtWidgets.QPushButton("Learn")
         self.expressionLineEdit = QtWidgets.QLineEdit("x+y")
+        self.depthSpinBox = QtWidgets.QSpinBox()
+        self.depthSpinBox.setValue(5)
+        self.moduleLineEdit = QtWidgets.QLineEdit()
 
         self.learnLayout = QtWidgets.QHBoxLayout()
         self.learnLayout.addWidget(self.expressionLabel)
         self.learnLayout.addWidget(self.expressionLineEdit)
+        self.learnLayout.addWidget(self.depthSpinBox)
+        self.learnLayout.addWidget(self.moduleLineEdit)
         self.learnLayout.addWidget(self.learnPushButton)
 
         self.layout = QtWidgets.QVBoxLayout(self)
@@ -220,13 +225,27 @@ class Window(QtWidgets.QWidget):
     def learn(self):
         self.brain.clear_connections()
         self.brain.deactivate_all_modules()
-        
+
         for module in self.brain.modules:
             if (not "constants" in module):
                 self.brain.activate_module(module)
+
+        module = None
         
+        if (len(self.moduleLineEdit.text())):
+            module = self.moduleLineEdit.text()
+
         self.brain.activate_str(self.expressionLineEdit.text())
-        self.brain.learn(self.expressionLineEdit.text())
+        self.brain.learn(self.expressionLineEdit.text(), depth = self.depthSpinBox.value(), module = module)
+
+        self.neuronTotalNumberLabel.setText("Neuron total number: " + str(len(self.brain.neurons)))
+        self.connectionTotalNumberLabel.setText("Connection total number: " + str(len(self.brain.connections)))
+        
+        self.neuronsComboBox.clear()
+        self.neuronsComboBox.addItems(sorted([self.brain.neuron_name(n) for id, n in self.brain.neurons.items()]))
+
+        self.modulesComboBox.clear()
+        self.modulesComboBox.addItems(sorted([x for x in self.brain.modules]))
 
 if (__name__ == "__main__"):
     app = QtWidgets.QApplication([])
