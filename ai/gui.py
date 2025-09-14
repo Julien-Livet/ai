@@ -80,19 +80,29 @@ class Window(QtWidgets.QWidget):
         self.plot_widget.clear()
         self.plot_widget.addItem(self.bar_graph)
 
+        self.connectPushButton = QtWidgets.QPushButton("Connect")
+        self.clearConnectionsPushButton = QtWidgets.QPushButton("Clear connections")
+
         self.expressionLabel = QtWidgets.QLabel("Expression:")
         self.learnPushButton = QtWidgets.QPushButton("Learn")
+        self.associatePushButton = QtWidgets.QPushButton("Associate")
         self.expressionLineEdit = QtWidgets.QLineEdit("x+y")
         self.depthSpinBox = QtWidgets.QSpinBox()
+        self.depthLabel = QtWidgets.QLabel("Depth:")
         self.depthSpinBox.setValue(5)
+        self.learnModuleLabel = QtWidgets.QLabel("Module:")
         self.moduleLineEdit = QtWidgets.QLineEdit()
 
         self.learnLayout = QtWidgets.QHBoxLayout()
         self.learnLayout.addWidget(self.expressionLabel)
         self.learnLayout.addWidget(self.expressionLineEdit)
+        self.learnLayout.addWidget(self.depthLabel)
         self.learnLayout.addWidget(self.depthSpinBox)
+        self.learnLayout.addWidget(self.learnModuleLabel)
         self.learnLayout.addWidget(self.moduleLineEdit)
         self.learnLayout.addWidget(self.learnPushButton)
+        self.learnLayout.addWidget(self.connectPushButton)
+        self.learnLayout.addWidget(self.associatePushButton)
 
         self.layout = QtWidgets.QVBoxLayout(self)
         self.layout.addWidget(self.loadPushButton)
@@ -110,6 +120,7 @@ class Window(QtWidgets.QWidget):
         self.layout.addWidget(self.show3dPushButton)
         self.layout.addWidget(self.plot_widget)
         self.layout.addLayout(self.learnLayout)
+        self.layout.addWidget(self.clearConnectionsPushButton)
 
         self.loadPushButton.clicked.connect(self.load)
         self.savePushButton.clicked.connect(self.save)
@@ -119,7 +130,10 @@ class Window(QtWidgets.QWidget):
         self.deactivateAllModulesPushButton.clicked.connect(self.deactivateAllModules)
         self.activateAllNeuronsPushButton.clicked.connect(self.activateAllNeurons)
         self.deactivateAllNeuronsPushButton.clicked.connect(self.deactivateAllNeurons)
+        self.connectPushButton.clicked.connect(self.connect)
+        self.clearConnectionsPushButton.clicked.connect(self.clearConnections)
         self.learnPushButton.clicked.connect(self.learn)
+        self.associatePushButton.clicked.connect(self.associate)
 
     @QtCore.Slot()
     def load(self):
@@ -231,7 +245,7 @@ class Window(QtWidgets.QWidget):
                 self.brain.activate_module(module)
 
         module = None
-        
+
         if (len(self.moduleLineEdit.text())):
             module = self.moduleLineEdit.text()
 
@@ -240,7 +254,36 @@ class Window(QtWidgets.QWidget):
 
         self.neuronTotalNumberLabel.setText("Neuron total number: " + str(len(self.brain.neurons)))
         self.connectionTotalNumberLabel.setText("Connection total number: " + str(len(self.brain.connections)))
-        
+
+        self.neuronsComboBox.clear()
+        self.neuronsComboBox.addItems(sorted([self.brain.neuron_name(n) for id, n in self.brain.neurons.items()]))
+
+        self.modulesComboBox.clear()
+        self.modulesComboBox.addItems(sorted([x for x in self.brain.modules]))
+
+    @QtCore.Slot()
+    def connect(self):
+        self.brain.connect(self.depthSpinBox.value())
+
+        self.connectionTotalNumberLabel.setText("Connection total number: " + str(len(self.brain.connections)))
+
+    @QtCore.Slot()
+    def clearConnections(self):
+        self.brain.clear_connections()
+
+        self.connectionTotalNumberLabel.setText("Connection total number: " + str(len(self.brain.connections)))
+
+    @QtCore.Slot()
+    def associate(self):
+        module = None
+
+        if (len(self.moduleLineEdit.text())):
+            module = self.moduleLineEdit.text()
+
+        self.brain.associate(self.expressionLineEdit.text(), module = module)
+
+        self.neuronTotalNumberLabel.setText("Neuron total number: " + str(len(self.brain.neurons)))
+
         self.neuronsComboBox.clear()
         self.neuronsComboBox.addItems(sorted([self.brain.neuron_name(n) for id, n in self.brain.neurons.items()]))
 

@@ -387,14 +387,14 @@ class Brain:
                 l.append(connection)
                 originTypes[type] = l
 
-            for k, v in self.neurons.items():
-                if (not self.is_enabled(k)):
+            for id, n in self.neurons.items():
+                if (not n.is_active() or not n.activated):
                     continue
 
                 inputsList = []
                 add = True
 
-                for type in v.inputTypes:
+                for type in n.inputTypes:
                     neurons = originTypes.get(type, [])
 
                     if (not len(neurons)):
@@ -416,7 +416,7 @@ class Brain:
                     continue
 
                 for inputs in inputsList:
-                    newConnections.append(Connection(inputs, v))
+                    newConnections.append(Connection(inputs, n))
 
             newConnections = set(newConnections)
             new_connections |= newConnections - self.connections.intersection(newConnections)
