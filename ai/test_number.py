@@ -21,7 +21,7 @@ def process(brain: Brain, number: str):
     brain.activate_module("symbols.functions.conversion")
     brain.activate_str(number)
 
-    connections = brain.learn(number, depth = 10)
+    connections = brain.learn(number, depth = 10, module = "numbers.constants")
 
     print(brain.connection_str(connections[0]) + " -> " + str(brain.connection_output(connections[0])))
 
@@ -61,9 +61,8 @@ while (True):
 
     while (not isinstance(sp_number, sympy.Number)):
         number = input("What is you number (for example: 3.1)? ")
-        
+
         sp_number = sympy.sympify(number)
 
     process(brain, number)
-
     brain.save(filename)

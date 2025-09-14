@@ -15,14 +15,12 @@ def process(brain: Brain, expression: str):
     brain.deactivate_all_modules()
     brain.activate_module("chars.functions.conversion")
     brain.activate_module("digits.functions.conversion")
-    brain.activate_module("floats.operators.arithmetic")
-    brain.activate_module("floats.variables")
     brain.activate_module("strs.functions")
     brain.activate_module("strs.functions.conversion")
     brain.activate_module("symbols.functions.conversion")
     brain.activate_str(expression)
 
-    connections = brain.learn(expression, depth = 10)
+    connections = brain.learn(expression, depth = 10, module = "expressions.constants")
 
     print(brain.connection_str(connections[0]) + " -> " + str(brain.connection_output(connections[0])))
 
@@ -89,5 +87,4 @@ while (True):
             sp_ok = False
 
     process(brain, expression)
-
     brain.save(expression_filename)

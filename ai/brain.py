@@ -491,11 +491,13 @@ class Brain:
         with open(filename, "wb") as f:
             dill.dump(self.neurons, f)
             dill.dump(self.connections, f)
+            dill.dump(self.modules, f)
 
     def load(self, filename: str):
         with open(filename, "rb") as f:
             self.neurons = dill.load(f)
             self.connections = dill.load(f)
+            self.modules = dill.load(f)
 
         self.inputTypesToIds = {}
         self.outputTypesToIds = {}
@@ -583,7 +585,7 @@ class Brain:
 
         start_available = []
 
-        origin_neurons = []
+        origin_neuron_ids = []
 
         for id in neuronIds:
             n = self.neurons[id]
@@ -591,7 +593,9 @@ class Brain:
             if (len(n.inputTypes) == 0):
                 val = n.output()
                 start_available.append((val, type(val), n))
-                origin_neurons.append(id)
+                origin_neuron_ids.append(id)
+
+        origin_neuron_ids = sorted(origin_neuron_ids, key = lambda x: self.neurons[x].weight, reverse = True)
 
         if (not start_available):
             return []
@@ -618,7 +622,7 @@ class Brain:
 
             visited.add(state_id)
 
-            av = [(self.neurons[id].output(), self.neurons[id].outputType, self.neurons[id]) for id in origin_neurons] + [(self.connection_output(c), c.neuron.outputType, c) for c in set(conns) | connections]
+            av = [(self.neurons[id].output(), self.neurons[id].outputType, self.neurons[id]) for id in origin_neuron_ids] + [(self.connection_output(c), c.neuron.outputType, c) for c in set(conns) | connections]
             av = sorted(av, key = lambda x: x[2].weight, reverse = True)
 
             for id in neuronIds:
