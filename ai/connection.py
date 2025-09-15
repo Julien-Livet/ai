@@ -3,9 +3,9 @@ import math
 from neuron import Neuron
 
 class Connection:
-    def __init__(self, inputs, neuron: Neuron, activationDuration: float = math.inf, weight: float = 1.0):
+    def __init__(self, inputs, neuronId: id, activationDuration: float = math.inf, weight: float = 1.0):
         self.inputs = inputs
-        self.neuron = neuron
+        self.neuronId = neuronId
         self.datetime = datetime.datetime.now()
         self.activationDuration = activationDuration
         self.weight = weight
@@ -14,14 +14,14 @@ class Connection:
     def __eq__(self, other):
         return isinstance(other, Connection) \
                and self.inputs == other.inputs \
-               and self.neuron == other.neuron \
+               and self.neuronId == other.neuronId \
                and self.activationDuration == other.activationDuration \
                and self.weight == other.weight \
                and self.activated == other.activated
 
     def __hash__(self):
-        h = hash(self.neuron) + hash(self.activationDuration)
-        
+        h = hash(self.neuronId) + hash(self.activationDuration)
+
         for input in self.inputs:
             h += hash(input)
 

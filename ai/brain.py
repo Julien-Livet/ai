@@ -40,6 +40,14 @@ def canonicalize_for_visit(val):
     except TypeError:
         return repr(val)
 
+def compare(value, target):
+    if (isinstance(value, str) and isinstance(target, str)):
+        return textdistance.levenshtein.distance(value, target)
+    elif (is_iterable(value)):
+        return 1 - int(all(np.isclose(value, target)))
+    else:
+        return np.linalg.norm(np.subtract(val, target))
+
 class Brain:
     def __init__(self):
         self.neurons = {}
@@ -124,12 +132,12 @@ class Brain:
     def draw_connection(self, graph, pos: list, color, width: float, connection: Connection):
         for input in connection.inputs:
             if (type(input) is Neuron):
-                graph.add_edge(pos[self.neuron_name(input)], pos[self.neuron_name(connection.neuron)],
-                               self.neuron_name(input) + "→" + self.neuron_name(connection.neuron),
+                graph.add_edge(pos[self.neuron_name(input)], pos[self.neuron_name(self.neurons[connection.neuronId])],
+                               self.neuron_name(input) + "→" + self.neuron_name(self.neurons[connection.neuronId]),
                                color, width)
             elif (type(input) is Connection):
-                graph.add_edge(pos[self.neuron_name(input.neuron)], pos[self.neuron_name(connection.neuron)],
-                               self.neuron_name(input.neuron) + "→" + self.neuron_name(connection.neuron),
+                graph.add_edge(pos[self.neuron_name(self.neurons[input.neuronId])], pos[self.neuron_name(self.neurons[connection.neuronId])],
+                               self.neuron_name(self.neurons[input.neuronId]) + "→" + self.neuron_name(self.neurons[connection.neuronId]),
                                color, width)
 
                 self.draw_connection(graph, pos, color, width + 1, input)
@@ -144,7 +152,7 @@ class Brain:
                 elif (type(input) is Connection):
                     inputs.append(self.connection_output(input))
 
-            return connection.neuron.output(*inputs)
+            return self.neurons[connection.neuronId].output(*inputs)
         except:
             return None
 
@@ -172,7 +180,7 @@ class Brain:
 
     def reinforce_connection(self, connection: Connection, weight: float):
         connection.weight += weight
-        connection.neuron.weight += weight
+        self.neurons[connection.neuronId].weight += weight
 
         for input in connection.inputs:
             if (type(input) is Neuron):
@@ -189,7 +197,7 @@ class Brain:
             elif (type(input) is Connection):
                 inputs.append(self.connection_str(input))
 
-        return self.neuron_name(connection.neuron) + "(" + str(inputs) + ")"
+        return self.neuron_name(self.neurons[connection.neuronId]) + "(" + str(inputs) + ")"
 
     def minMaxValue(self, colorBy: str):
         minValue = 0
@@ -209,14 +217,14 @@ class Brain:
             if (len(self.neurons)):
                 minValue = list(self.neurons.items())[0][1].datetime.timestamp() * 1000
                 maxValue = minValue
-                
+
             for id, neuron in self.neurons.items():
                 maxValue = max(maxValue, neuron.datetime.timestamp() * 1000)
                 minValue = min(minValue, neuron.datetime.timestamp() * 1000)
 
         if (not minValue and not maxValue):
             maxValue = 1
-            
+
         return minValue, maxValue
 
     def show2d(self,
@@ -359,9 +367,9 @@ class Brain:
                     self.activate(id, activationLevel + 1)
 
     def _add_connection_type(self, connection):
-        l = self.typesToConnections.get(connection.neuron.outputType, [])
+        l = self.typesToConnections.get(self.neurons[connection.neuronId].outputType, [])
         l.append(connection)
-        self.typesToConnections[connection.neuron.outputType] = l
+        self.typesToConnections[self.neurons[connection.neuronId].outputType] = l
 
     def connect(self, depth: int = 1, number: int = math.inf):
         connections = set()
@@ -431,19 +439,22 @@ class Brain:
         return list(new_connections)
 
     def associate(self, value, name: str = "", transform_best_into_neuron: bool = True, module: str = None):
+        neurons = []
+
+        for id in self.originNeuronIds:
+            if (self.neurons[id].is_active() and self.neurons[id].activated):
+                try:
+                    if (not compare(value, self.neurons[id].output())):
+                        neurons.append(self.neurons[id])
+                except:
+                    pass
+
         connections = []
 
         for connection in self.typesToConnections.get(type(value), []):
             try:
-                if (isinstance(value, str)):
-                    if (value == self.connection_output(connection)):
-                        connections.append(connection)
-                elif (is_iterable(value)):
-                    if (all(np.isclose(value, self.connection_output(connection)))):
-                        connections.append(connection)
-                else:
-                    if (np.isclose(value, self.connection_output(connection))):
-                        connections.append(connection)
+                if (not compare(value, self.connection_output(connection))):
+                    connections.append(connection)
             except:
                 pass
 
@@ -452,9 +463,15 @@ class Brain:
         if (transform_best_into_neuron and len(connections)):
             self.transform_connection_into_neuron(connection, name, module)
 
-        return connections
+        return neurons + connections
 
-    def transform_connection_into_neuron(self, connection: Connection, name: str = "", module = None):
+    def transform_connection_into_neuron(self, connection: Connection, name: str = "", module: str = None, compact_name: str = "", compact_module: str = None):
+        if (compact_module == None):
+            compact_module = connection.neuron.module
+
+        value = self.connection_output(connection)
+        compact_id = self.add(Neuron(lambda value = value: value, compact_name, [], self.neurons[connection.neuronId].outputType, module = compact_module, weight = self.connection_weight(connection)))
+
         if (len(connection.origin_input_types()) == len(connection.inputs)):
             added = False
 
@@ -464,7 +481,9 @@ class Brain:
                     break
 
             if (not added):
-                return self.add(Neuron(lambda connection = connection: self.connection_output(connection), name, [], connection.neuron.outputType, module = module))
+                return connection.neuronId, compact_id
+
+        neurons = self.neurons
 
         def function(*args):
             def replace_inputs(connection, arg_iter):
@@ -476,14 +495,16 @@ class Brain:
                     elif (isinstance(input, Connection)):
                         vals.append(replace_inputs(input, arg_iter))
 
-                return connection.neuron.output(*vals)
+                return neurons[connection.neuronId].output(*vals)
 
             return replace_inputs(connection, iter(args))
 
         if (module == None):
             module = connection.neuron.module
 
-        return self.add(Neuron(function, name, connection.origin_input_types(), connection.neuron.outputType, module = module))
+        id = self.add(Neuron(function, name, connection.origin_input_types(), self.neurons[connection.neuronId].outputType, module = module, weight = self.connection_weight(connection)))
+
+        return id, compact_id
 
     def save(self, filename: str):
         with open(filename, "wb") as f:
@@ -565,7 +586,22 @@ class Brain:
 
         return ids
 
-    def learn(self, value, name: str = "", depth: int = 10, transform_best_into_neuron: bool = True, module: str = None, reinforcement_weight: float = 1.0):
+    def learn(self, value, name: str = "", depth: int = 10, transform_best_into_neuron: bool = True, module: str = None, compact_name: str = None, compact_module: str = None, reinforcement_weight: float = 1.0, answer_number: int = 1):
+        answers = []
+
+        for id in self.originNeuronIds:
+            if (self.neurons[id].is_active() and self.neurons[id].activated):
+                try:
+                    if (not compare(value, self.neurons[id].output())):
+                        self.neurons[id].weight += reinforcement_weight
+
+                        answers.append(self.neurons[id])
+
+                        if (len(answers) >= answer_number):
+                            return answers
+                except:
+                    pass
+
         neuronIds = []
 
         for id, neuron in self.neurons.items():
@@ -609,7 +645,7 @@ class Brain:
 
         conns = []
 
-        while (frontier and len(solutions) == 0):
+        while (frontier and len(solutions) < answer_number):
             f, _, g, available, path = heapq.heappop(frontier)
 
             if (g > depth):
@@ -624,13 +660,13 @@ class Brain:
 
             visited.add(state_id)
 
-            av = [(self.neurons[id].output(), self.neurons[id].outputType, self.neurons[id]) for id in origin_neuron_ids] + [(self.connection_output(c), c.neuron.outputType, c) for c in set(conns) | connections]
+            av = [(self.neurons[id].output(), self.neurons[id].outputType, self.neurons[id]) for id in origin_neuron_ids] + [(self.connection_output(c), self.neurons[c.neuronId].outputType, c) for c in set(conns) | connections]
             av = sorted(av, key = lambda x: x[2].weight, reverse = True)
 
             for id in neuronIds:
                 neuron = self.neurons[id]
 
-                if (len(solutions)):
+                if (len(solutions) >= answer_number):
                     break
 
                 k = len(neuron.inputTypes)
@@ -638,7 +674,13 @@ class Brain:
                 if (k == 0):
                     continue
 
-                for combo in itertools.permutations(av, k):
+                new_av = []
+
+                for t in av:
+                    if (t[1] in neuron.inputTypes):
+                        new_av.append(t)
+
+                for combo in itertools.permutations(new_av, k):
                     args = []
                     provs = []
                     ok = True
@@ -654,59 +696,55 @@ class Brain:
                     if (not ok):
                         continue
 
-                    try:
+                    if (value == "-7e-8"):
                         new_value = neuron.output(*args)
-                    except:
-                        continue
+                    else:
+                        try:
+                            new_value = neuron.output(*args)
+                        except:
+                            continue
 
-                    new_conn = Connection(provs, neuron)
+                    new_conn = Connection(provs, id)
                     conns.append(new_conn)
                     new_available = list(available) + [(new_value, neuron.outputType, new_conn)]
                     new_available = tuple(new_available)
                     new_path = path + [new_conn]
-                    new_g = g + 1 + 1 / neuron.weight #+ np.sum([p.weight for p in provs])
+                    new_g = g + 1 + 1 / neuron.weight #+ np.sum([1 / p.weight for p in provs])
                     h = heuristic(new_value, value)
                     new_f = new_g + h
 
                     found = False
 
                     try:
-                        if (isinstance(new_value, str) and isinstance(value, str)):
-                            if (np.isclose(textdistance.levenshtein.distance(new_value, value), 0)):
-                                found = True
-                        elif (isinstance(new_value, np.ndarray) and isinstance(value, np.ndarray)):
-                            if (np.isclose(np.linalg.norm(new_value - value), 0)):
-                                found = True
-                        else:
-                            if (np.isclose(abs(new_value - value), 0)):
-                                found = True
+                        if (not compare(new_value, value)):
+                            found = True
                     except:
                         pass
 
                     if (found):
                         solutions.append(new_path)
-                        break
+
+                        if (len(solutions) >= answer_number):
+                            break
 
                     heapq.heappush(frontier, (new_f, next(counter), new_g, new_available, new_path))
 
         solutions.sort(key = lambda p: (len(p), ))
 
-        connections = []
-
         for solution in solutions:
-            connections.append(solution[-1])
+            answers.append(solution[-1])
 
-        connections = sorted(connections, key = lambda x: self.connection_len(x))
+        answers = sorted(answers, key = lambda x: self.connection_len(x))
 
-        for connection in connections:
-            self.reinforce_connection(connection, reinforcement_weight)
+        for answer in answers:
+            self.reinforce_connection(answer, reinforcement_weight)
 
-        if (len(connections) and transform_best_into_neuron):
-            self.transform_connection_into_neuron(connections[0], name = name, module = module)
+        if (len(answers) and transform_best_into_neuron):
+            self.transform_connection_into_neuron(answers[0], name = name, module = module, compact_name = compact_name, compact_module = compact_module)
 
-        self.connections |= set(connections)
+        self.connections |= set(answers)
 
-        return connections
+        return answers
 
     def activate_all_neurons(self):
         for id in self.neurons:
@@ -735,6 +773,8 @@ class Brain:
 
                 if ((isinstance(v, Char) or isinstance(v, Digit) or isinstance(v, Symbol)) and str(v) in s):
                     self.activate_neuron(id)
+                elif (isinstance(v, str) and s in v):
+                    self.activate_neuron(id)
 
     def deactivate_str(self, s: str):
         from chars import Char
@@ -749,3 +789,5 @@ class Brain:
 
                 if ((isinstance(v, Char) or isinstance(v, Digit) or isinstance(v, Symbol)) and str(v) in s):
                     self.deactivate_neuron(id)
+                elif (isinstance(v, str) and s in v):
+                    self.activate_neuron(id)

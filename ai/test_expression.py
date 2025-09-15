@@ -14,14 +14,18 @@ def process(brain: Brain, expression: str):
     brain.deactivate_all_modules()
     brain.activate_module("chars.functions.conversion")
     brain.activate_module("digits.functions.conversion")
+    brain.activate_module("expressions.functions")
     brain.activate_module("strs.functions")
     brain.activate_module("strs.functions.conversion")
     brain.activate_module("symbols.functions.conversion")
     brain.activate_str(expression)
 
-    connections = brain.learn(expression, depth = 10, module = "expressions.constants")
+    answers = brain.learn(expression, depth = 10, module = "expressions.functions", compact_module = "expressions.constants", compact_name = expression)
 
-    print(brain.connection_str(connections[0]) + " -> " + str(brain.connection_output(connections[0])))
+    if (isinstance(answers[0], Connection)):
+        print(brain.connection_str(answers[0]), "->", brain.connection_output(answers[0]))
+    else:
+        print(brain.neuron_name(answers[0]), "->", answers[0].output())
 
     try:
         brain.show2d(seed = 0, title = expression, colorBy = "weight")

@@ -24,9 +24,12 @@ def process(brain: Brain, word: str, category: str):
 
     brain.activate_str(word)
 
-    connections = brain.learn(word, depth = 10, name = word, module = "words." + category)
+    answers = brain.learn(word, depth = 10, compact_name = word, compact_module = "words." + category, module = "words.functions")
 
-    print(brain.connection_str(connections[0]) + " -> " + str(brain.connection_output(connections[0])))
+    if (isinstance(answers[0], Connection)):
+        print(brain.connection_str(answers[0]), "->", brain.connection_output(answers[0]))
+    else:
+        print(brain.neuron_name(answers[0]), "->", answers[0].output())
 
     try:
         brain.show2d(seed = 0, title = word, colorBy = "weight")

@@ -30,6 +30,12 @@ class Window(QtWidgets.QWidget):
 
         self.neuronTotalNumberLabel = QtWidgets.QLabel("Neuron total number: " + str(len(self.brain.neurons)))
 
+        self.inputTypesLabel = QtWidgets.QLabel("Input types:")
+        self.inputTypesLineEdit = QtWidgets.QLineEdit()
+        self.inputTypesLineEdit.setReadOnly(True)
+        self.outputTypeLabel = QtWidgets.QLabel("Output type:")
+        self.outputTypeLineEdit = QtWidgets.QLineEdit()
+        self.outputTypeLineEdit.setReadOnly(True)
         self.neuronLabel = QtWidgets.QLabel("Neuron:")
         self.neuronCheckBox = QtWidgets.QCheckBox("Activated")
         self.neuronCheckBox.checkStateChanged.connect(self.neuronCheckStateChanged)
@@ -42,6 +48,7 @@ class Window(QtWidgets.QWidget):
         self.neuronsComboBox.currentTextChanged.connect(self.neuronChanged)
         self.neuronsComboBox.clear()
         self.neuronsComboBox.addItems(sorted([self.brain.neuron_name(n) for id, n in self.brain.neurons.items()]))
+        self.neuronsComboBox.setFixedWidth(500)
 
         self.neuronLayout = QtWidgets.QHBoxLayout()
         self.neuronLayout.addWidget(self.neuronLabel)
@@ -49,6 +56,10 @@ class Window(QtWidgets.QWidget):
         self.neuronLayout.addWidget(self.neuronCheckBox)
         self.neuronLayout.addWidget(self.neuronWeightLabel)
         self.neuronLayout.addWidget(self.neuronTimestampDateTimeEdit)
+        self.neuronLayout.addWidget(self.inputTypesLabel)
+        self.neuronLayout.addWidget(self.inputTypesLineEdit)
+        self.neuronLayout.addWidget(self.outputTypeLabel)
+        self.neuronLayout.addWidget(self.outputTypeLineEdit)
 
         self.connectionTotalNumberLabel = QtWidgets.QLabel("Connection total number: " + str(len(self.brain.connections)))
 
@@ -102,6 +113,14 @@ class Window(QtWidgets.QWidget):
         self.learnLayout.addWidget(self.connectPushButton)
         self.learnLayout.addWidget(self.associatePushButton)
 
+        self.outputLabel = QtWidgets.QLabel("Output:")
+        self.outputLineEdit = QtWidgets.QLineEdit()
+        self.outputLineEdit.setReadOnly(True)
+
+        self.outputLayout = QtWidgets.QHBoxLayout()
+        self.outputLayout.addWidget(self.outputLabel)
+        self.outputLayout.addWidget(self.outputLineEdit)
+
         self.layout = QtWidgets.QVBoxLayout(self)
         self.layout.addWidget(self.loadPushButton)
         self.layout.addWidget(self.savePushButton)
@@ -119,6 +138,7 @@ class Window(QtWidgets.QWidget):
         self.layout.addWidget(self.plot_widget)
         self.layout.addLayout(self.learnLayout)
         self.layout.addWidget(self.clearConnectionsPushButton)
+        self.layout.addLayout(self.outputLayout)
 
         self.loadPushButton.clicked.connect(self.load)
         self.savePushButton.clicked.connect(self.save)
@@ -180,13 +200,17 @@ class Window(QtWidgets.QWidget):
 
     @QtCore.Slot()
     def neuronChanged(self, text: str):
-        self.neuronCheckBox.setChecked(self.brain.neurons[self.neuronIdFromName(text)].activated)
-        self.neuronWeightLabel.setValue(self.brain.neurons[self.neuronIdFromName(text)].weight)
+        neuron = self.brain.neurons[self.neuronIdFromName(text)]
+
+        self.neuronCheckBox.setChecked(neuron.activated)
+        self.neuronWeightLabel.setValue(neuron.weight)
 
         dateTime = QtCore.QDateTime()
-        dateTime.setMSecsSinceEpoch(int(self.brain.neurons[self.neuronIdFromName(text)].datetime.timestamp()))
+        dateTime.setMSecsSinceEpoch(int(neuron.datetime.timestamp()))
 
         self.neuronTimestampDateTimeEdit.setDateTime(dateTime)
+        self.inputTypesLineEdit.setText(str(neuron.inputTypes))
+        self.outputTypeLineEdit.setText(str(neuron.outputType))
 
     @QtCore.Slot()
     def moduleChanged(self, text: str):
@@ -250,7 +274,13 @@ class Window(QtWidgets.QWidget):
             module = self.moduleLineEdit.text()
 
         self.brain.activate_str(self.expressionLineEdit.text())
-        self.brain.learn(self.expressionLineEdit.text(), depth = self.depthSpinBox.value(), module = module)
+        answers = self.brain.learn(self.expressionLineEdit.text(), depth = self.depthSpinBox.value(), module = module)
+
+        if (len(answers)):
+            if (isinstance(answers[0], Connection)):
+                self.outputLineEdit.setText(brain.connection_str(answers[0]), "->", self.brain.connection_output(answers[0]))
+            else:
+                self.outputLineEdit.setText(self.brain.neuron_name(answers[0]), "->", answers[0].output())
 
         self.neuronTotalNumberLabel.setText("Neuron total number: " + str(len(self.brain.neurons)))
         self.connectionTotalNumberLabel.setText("Connection total number: " + str(len(self.brain.connections)))
@@ -316,7 +346,6 @@ if (__name__ == "__main__"):
     app = QtWidgets.QApplication([])
 
     widget = Window()
-    widget.setFixedWidth(1000)
-    widget.show()
+    widget.showMaximized()
 
     sys.exit(app.exec())

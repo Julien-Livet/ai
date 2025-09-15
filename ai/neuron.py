@@ -3,7 +3,7 @@ import inspect
 import math
 
 class Neuron:
-    def __init__(self, function, name: str = "", inputTypes = None, outputType = None, activationDuration: float = math.inf, weight: float = 1.0, module: str = ""):
+    def __init__(self, function, name: str = "", inputTypes: list = None, outputType = None, activationDuration: float = math.inf, weight: float = 1.0, module: str = ""):
         self.function = function
         self.name = name
         self.datetime = datetime.datetime.now()
@@ -12,19 +12,19 @@ class Neuron:
         self.module = module
 
         sig = inspect.signature(function)
-        
+
         self.parameters = sig.parameters
         self.return_annotation = sig.return_annotation
 
         if (inputTypes is None):
             self.inputTypes = []
-            
+
             for k, v in self.parameters.items():
                 if (not v.annotation is inspect._empty):
                     self.inputTypes.append(v.annotation)
         else:
             self.inputTypes = inputTypes
-            
+
         if (outputType is None):
             self.outputType = self.return_annotation
         else:
@@ -48,7 +48,7 @@ class Neuron:
                and self.module == other.module
 
     def __hash__(self):
-        return hash(self.function) + hash(self.activationDuration) + hash(self.activationLevel) + hash(self.module)
+        return hash(self.function) + hash(self.name) + hash(self.activationDuration) + hash(self.activationLevel) + hash(self.module)
 
     def output(self, *input):
         return self.function(*input)

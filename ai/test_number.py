@@ -14,15 +14,18 @@ def process(brain: Brain, number: str):
     brain.deactivate_all_modules()
     brain.activate_module("chars.functions.conversion")
     brain.activate_module("digits.functions.conversion")
-    brain.activate_module("strs.variables")
+    brain.activate_module("numbers.functions")
     brain.activate_module("strs.functions")
     brain.activate_module("strs.functions.conversion")
     brain.activate_module("symbols.functions.conversion")
     brain.activate_str(number)
 
-    connections = brain.learn(number, depth = 10, module = "numbers.constants")
+    answers = brain.learn(number, depth = 10, compact_name = number, compact_module = "numbers.constants", module = "numbers.functions")
 
-    print(brain.connection_str(connections[0]) + " -> " + str(brain.connection_output(connections[0])))
+    if (isinstance(answers[0], Connection)):
+        print(brain.connection_str(answers[0]), "->", brain.connection_output(answers[0]))
+    else:
+        print(brain.neuron_name(answers[0]), "->", answers[0].output())
 
     try:
         brain.show2d(seed = 0, title = number, colorBy = "weight")
@@ -44,9 +47,8 @@ else:
     symbols.add(brain)
 
     if (with_pretraining):
-        numbers = ["10", "-2", "3e4", "5e-6", "-7e-8", "9.0", "1.e2", "-3.e4", "5.e-6", "-7.e-8", "9.0e0",
-                   "1.2e-3", "-4.5e-6", "-23", "0.3", "-6.4", "1e6", "-3e4", "2e-4", "-1e-2", "1.5e2", "-3.4e2",
-                   "5.1e-4", "-3.6e-2"]
+        numbers = ["10", "-2", "3e4", "5e-6", "-7e-8", "9.0", "1.e2", "-3.e4", "5.e-6", "-7.e-8", "9.0e0", "1.2e-3",
+                   "-4.5e-6", "-23", "0.3", "-6.4", "1e6", "-3e4", "2e-4", "-1e-2", "1.5e2", "-3.4e2", "5.1e-4", "-3.6e-2"]
 
         for number in numbers:
             print("Number:", number)
