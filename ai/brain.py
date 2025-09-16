@@ -665,8 +665,7 @@ class Brain:
 
             for id in neuronIds:
                 neuron = self.neurons[id]
-                if (value.startswith("3.1*x")):
-                    print(self.neuron_name(neuron), str(neuron.inputTypes))
+
                 if (len(solutions) >= answer_number):
                     break
 
@@ -680,7 +679,7 @@ class Brain:
                 for t in av:
                     if (t[1] in neuron.inputTypes):
                         new_av.append(t)
-                print(new_av)
+
                 for combo in itertools.permutations(new_av, k):
                     args = []
                     provs = []
@@ -710,8 +709,7 @@ class Brain:
                     new_g = g + 1 + 1 / neuron.weight #+ np.sum([1 / p.weight for p in provs])
                     h = heuristic(new_value, value)
                     new_f = new_g + h
-                    if (value.startswith("3.1*x")):
-                        print(new_value, new_f)
+
                     found = False
 
                     try:
