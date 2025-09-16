@@ -19,7 +19,7 @@ def is_iterable(x) -> bool:
 
 def heuristic(val, target):
     if (isinstance(val, str) and isinstance(target, str)):
-        return textdistance.levenshtein.distance(val, target)
+        return abs(len(val) - len(target)) + textdistance.levenshtein.distance(val, target)
 
     try:
         return np.linalg.norm(np.subtract(val, target))
@@ -665,7 +665,8 @@ class Brain:
 
             for id in neuronIds:
                 neuron = self.neurons[id]
-
+                if (value.startswith("3.1*x")):
+                    print(self.neuron_name(neuron), str(neuron.inputTypes))
                 if (len(solutions) >= answer_number):
                     break
 
@@ -679,7 +680,7 @@ class Brain:
                 for t in av:
                     if (t[1] in neuron.inputTypes):
                         new_av.append(t)
-
+                print(new_av)
                 for combo in itertools.permutations(new_av, k):
                     args = []
                     provs = []
@@ -696,13 +697,10 @@ class Brain:
                     if (not ok):
                         continue
 
-                    if (value == "-7e-8"):
+                    try:
                         new_value = neuron.output(*args)
-                    else:
-                        try:
-                            new_value = neuron.output(*args)
-                        except:
-                            continue
+                    except:
+                        continue
 
                     new_conn = Connection(provs, id)
                     conns.append(new_conn)
@@ -712,7 +710,8 @@ class Brain:
                     new_g = g + 1 + 1 / neuron.weight #+ np.sum([1 / p.weight for p in provs])
                     h = heuristic(new_value, value)
                     new_f = new_g + h
-
+                    if (value.startswith("3.1*x")):
+                        print(new_value, new_f)
                     found = False
 
                     try:
