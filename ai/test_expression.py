@@ -9,18 +9,19 @@ import strs
 import symbols
 import sympy
 
-def process(brain: Brain, expression: str):
+def process(brain: Brain, expression: str, module: str):
     brain.clear_connections()
     brain.deactivate_all_modules()
     brain.activate_module("chars.functions.conversion")
     brain.activate_module("digits.functions.conversion")
+    brain.activate_module("numbers.functions")
     brain.activate_module("expressions.functions")
     brain.activate_module("strs.functions")
     brain.activate_module("strs.functions.conversion")
     brain.activate_module("symbols.functions.conversion")
     brain.activate_str(expression)
 
-    answers = brain.learn(expression, depth = 10, module = "expressions.functions", compact_module = "expressions.constants", compact_name = expression)
+    answers = brain.learn(expression, depth = 10, module = module + ".functions", compact_module = module + ".constants", compact_name = expression)
 
     if (isinstance(answers[0], Connection)):
         print(brain.connection_str(answers[0]), "->", brain.connection_output(answers[0]))
@@ -53,7 +54,7 @@ elif (os.path.exists(number_filename)):
         for expression in expressions:
             print("Expression:", expression)
 
-            process(brain, expression)
+            process(brain, expression, "expressions")
 
         brain.save(expression_filename)
 else:
@@ -66,14 +67,14 @@ else:
         for number in numbers:
             print("Number:", number)
 
-            process(brain, number)
+            process(brain, number, "numbers")
 
         brain.save(number_filename)
 
         for expression in expressions:
             print("Expression:", expression)
 
-            process(brain, expression)
+            process(brain, expression, "expressions")
 
         brain.save(expression_filename)
 
@@ -89,5 +90,5 @@ while (True):
         except:
             sp_ok = False
 
-    process(brain, expression)
+    process(brain, expression, "expressions")
     brain.save(expression_filename)
