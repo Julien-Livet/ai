@@ -602,11 +602,18 @@ class Brain:
                 except:
                     pass
 
+        start_available = []
         neuronIds = []
+        origin_neuron_ids = []
 
         for id, neuron in self.neurons.items():
             if (neuron.is_active() and neuron.activated):
-                neuronIds.append(id)
+                if (len(neuron.inputTypes) != 0):
+                    neuronIds.append(id)
+                else:
+                    val = neuron.output()
+                    start_available.append((val, type(val), neuron))
+                    origin_neuron_ids.append(id)
 
         neuronIds = sorted(neuronIds, key = lambda x: self.neurons[x].weight, reverse = True)
 
@@ -620,18 +627,6 @@ class Brain:
         frontier = []
         visited = set()
         solutions = []
-
-        start_available = []
-
-        origin_neuron_ids = []
-
-        for id in neuronIds:
-            n = self.neurons[id]
-
-            if (len(n.inputTypes) == 0):
-                val = n.output()
-                start_available.append((val, type(val), n))
-                origin_neuron_ids.append(id)
 
         origin_neuron_ids = sorted(origin_neuron_ids, key = lambda x: self.neurons[x].weight, reverse = True)
 
