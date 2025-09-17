@@ -19,7 +19,29 @@ def is_iterable(x) -> bool:
 
 def heuristic(val, target):
     if (isinstance(val, str) and isinstance(target, str)):
-        return abs(len(val) - len(target)) + textdistance.levenshtein.distance(val, target)
+        if (val in target):
+            return 1 - 1 / target.count(val)
+
+        base_distance = textdistance.Levenshtein().distance(val, target)
+
+        if (val == target):
+            return 0
+        elif (val in target):
+            coverage = len(val) / len(target)
+
+            return max(0, base_distance - coverage * 8 - target.count(val))
+        elif (target.startswith(val)):
+            prefix_ratio = len(val) / len(target)
+
+            return max(0, base_distance - prefix_ratio * 6)
+
+        common_chars = sum(1 for c in val if c in target)
+        char_ratio = common_chars / len(target)
+
+        if (char_ratio > 0.7 and val not in target and not target.startswith(val)):
+            return base_distance + 1
+
+        return max(0, base_distance - char_ratio * 0.5)
 
     try:
         return np.linalg.norm(np.subtract(val, target))
@@ -33,9 +55,11 @@ def canonicalize_for_visit(val):
     if isinstance(val, np.ndarray):
         if (val.size == 1):
             return float(val.item())
+
         return ("ndarray", val.shape, hash(val.tobytes()))
     try:
         hash(val)
+
         return val
     except TypeError:
         return repr(val)
@@ -664,18 +688,15 @@ class Brain:
                 if (len(solutions) >= answer_number):
                     break
 
-                k = len(neuron.inputTypes)
-
-                if (k == 0):
-                    continue
-
                 new_av = []
 
                 for t in av:
                     if (t[1] in neuron.inputTypes):
                         new_av.append(t)
 
-                for combo in itertools.permutations(new_av, k):
+                new_av = sorted(new_av, key = lambda x: x[2].weight, reverse = True)
+
+                for combo in itertools.permutations(new_av, len(neuron.inputTypes)):
                     args = []
                     provs = []
                     ok = True
@@ -701,9 +722,10 @@ class Brain:
                     new_available = list(available) + [(new_value, neuron.outputType, new_conn)]
                     new_available = tuple(new_available)
                     new_path = path + [new_conn]
-                    new_g = g + 1 + 1 / neuron.weight #+ np.sum([1 / p.weight for p in provs])
+                    new_g = g + 1 + 1 / neuron.weight
                     h = heuristic(new_value, value)
                     new_f = new_g + h
+                    new_conn.weight = 1 + 1 / (1 + new_f)
 
                     found = False
 

@@ -1,6 +1,7 @@
 from brain import Brain
 from connection import Connection
 import chars
+import datetime
 import digits
 from neuron import Neuron
 import os
@@ -47,13 +48,17 @@ else:
     symbols.add(brain)
 
     if (with_pretraining):
-        numbers = ["10", "-2", "3e4", "5e-6", "-7e-8", "9.0", "1.e2", "-3.e4", "5.e-6", "-7.e-8", "9.0e0", "1.2e-3",
+        numbers = ["10", "-2", "3.", "-4.", "3e4", "5e-6", "-7e-8", "9.0", "1.e2", "-3.e4", "5.e-6", "-7.e-8", "9.0e0", "1.2e-3",
                    "-4.5e-6", "-23", "0.3", "-6.4", "1e6", "-3e4", "2e-4", "-1e-2", "1.5e2", "-3.4e2", "5.1e-4", "-3.6e-2"]
+
+        time = datetime.datetime.now()
 
         for number in numbers:
             print("Number:", number)
 
             process(brain, number)
+
+        print("Pretraining done in", datetime.datetime.now() - time)
 
         brain.save(filename)
 
