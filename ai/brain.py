@@ -19,29 +19,15 @@ def is_iterable(x) -> bool:
 
 def heuristic(val, target):
     if (isinstance(val, str) and isinstance(target, str)):
-        if (val in target):
-            return 1 - 1 / target.count(val)
+        a, b = val, target
 
-        base_distance = textdistance.Levenshtein().distance(val, target)
+        if (b in a):
+            a, b = b, a
 
-        if (val == target):
-            return 0
-        elif (val in target):
-            coverage = len(val) / len(target)
+        if (a in b):
+            return 1 - 1 / target.count(a) + 1 / (1 + len(a)) - 1 / (1 + len(b))
 
-            return max(0, base_distance - coverage * 8 - target.count(val))
-        elif (target.startswith(val)):
-            prefix_ratio = len(val) / len(target)
-
-            return max(0, base_distance - prefix_ratio * 6)
-
-        common_chars = sum(1 for c in val if c in target)
-        char_ratio = common_chars / len(target)
-
-        if (char_ratio > 0.7 and val not in target and not target.startswith(val)):
-            return base_distance + 1
-
-        return max(0, base_distance - char_ratio * 0.5)
+        return 1 / (1 + len(a)) - 1 / (1 + len(b)) + textdistance.Levenshtein().distance(a, b)
 
     try:
         return np.linalg.norm(np.subtract(val, target))
@@ -494,6 +480,7 @@ class Brain:
             compact_module = connection.neuron.module
 
         value = self.connection_output(connection)
+
         compact_id = self.add(Neuron(lambda value = value: value, compact_name, [], self.neurons[connection.neuronId].outputType, module = compact_module, weight = self.connection_weight(connection)))
 
         if (len(connection.origin_input_types()) == len(connection.inputs)):
@@ -610,7 +597,7 @@ class Brain:
 
         return ids
 
-    def learn(self, value, name: str = "", depth: int = 10, transform_best_into_neuron: bool = True, module: str = None, compact_name: str = None, compact_module: str = None, reinforcement_weight: float = 1.0, answer_number: int = 1):
+    def learn(self, value, name: str = "", depth: int = 10, transform_best_into_neuron: bool = True, module: str = None, compact_name: str = "", compact_module: str = None, reinforcement_weight: float = 1.0, answer_number: int = 1, max_conns: int = 100):
         answers = []
 
         for id in self.originNeuronIds:
@@ -663,6 +650,7 @@ class Brain:
         heapq.heappush(frontier, (g0 + h0, next(counter), g0, start_available, []))
 
         conns = []
+        explored_set = set()
 
         while (frontier and len(solutions) < answer_number):
             f, _, g, available, path = heapq.heappop(frontier)
@@ -681,6 +669,7 @@ class Brain:
 
             av = [(self.neurons[id].output(), self.neurons[id].outputType, self.neurons[id]) for id in origin_neuron_ids] + [(self.connection_output(c), self.neurons[c.neuronId].outputType, c) for c in set(conns) | connections]
             av = sorted(av, key = lambda x: x[2].weight, reverse = True)
+            av = av[:max_conns]
 
             for id in neuronIds:
                 neuron = self.neurons[id]
@@ -724,7 +713,7 @@ class Brain:
                     new_path = path + [new_conn]
                     new_g = g + 1 + 1 / neuron.weight
                     h = heuristic(new_value, value)
-                    new_f = new_g + h
+                    new_f = h
                     new_conn.weight = 1 + 1 / (1 + new_f)
 
                     found = False
@@ -745,20 +734,22 @@ class Brain:
 
         solutions.sort(key = lambda p: (len(p), ))
 
+        conns = []
+
         for solution in solutions:
-            answers.append(solution[-1])
+            conns.append(solution[-1])
 
-        answers = sorted(answers, key = lambda x: self.connection_len(x))
+        conns = sorted(conns, key = lambda x: self.connection_len(x))
 
-        for answer in answers:
-            self.reinforce_connection(answer, reinforcement_weight)
+        for c in conns:
+            self.reinforce_connection(c, reinforcement_weight)
 
-        if (len(answers) and transform_best_into_neuron):
-            self.transform_connection_into_neuron(answers[0], name = name, module = module, compact_name = compact_name, compact_module = compact_module)
+        if (len(conns) and transform_best_into_neuron):
+            self.transform_connection_into_neuron(conns[0], name = name, module = module, compact_name = compact_name, compact_module = compact_module)
 
-        self.connections |= set(answers)
+        self.connections |= set(conns)
 
-        return answers
+        return answers + conns
 
     def activate_all_neurons(self):
         for id in self.neurons:

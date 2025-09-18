@@ -37,6 +37,10 @@ class Window(QtWidgets.QWidget):
         self.outputTypeLineEdit = QtWidgets.QLineEdit()
         self.outputTypeLineEdit.setReadOnly(True)
         self.neuronLabel = QtWidgets.QLabel("Neuron:")
+        self.sortByLabel = QtWidgets.QLabel("Sort by:")
+        self.sortByComboBox = QtWidgets.QComboBox()
+        self.sortByComboBox.addItems(["name", "weight", "timestamp"])
+        self.sortByComboBox.currentTextChanged.connect(self.sortByChanged)
         self.neuronCheckBox = QtWidgets.QCheckBox("Activated")
         self.neuronCheckBox.checkStateChanged.connect(self.neuronCheckStateChanged)
         self.neuronTimestampDateTimeEdit = QtWidgets.QDateTimeEdit()
@@ -47,12 +51,14 @@ class Window(QtWidgets.QWidget):
         self.neuronsComboBox = QtWidgets.QComboBox()
         self.neuronsComboBox.currentTextChanged.connect(self.neuronChanged)
         self.neuronsComboBox.clear()
-        self.neuronsComboBox.addItems(sorted([self.brain.neuron_name(n) for id, n in self.brain.neurons.items()]))
+        self.neuronsComboBox.addItems(self.neuronItems())
         self.neuronsComboBox.setFixedWidth(500)
 
         self.neuronLayout = QtWidgets.QHBoxLayout()
         self.neuronLayout.addWidget(self.neuronLabel)
         self.neuronLayout.addWidget(self.neuronsComboBox)
+        self.neuronLayout.addWidget(self.sortByLabel)
+        self.neuronLayout.addWidget(self.sortByComboBox)
         self.neuronLayout.addWidget(self.neuronCheckBox)
         self.neuronLayout.addWidget(self.neuronWeightLabel)
         self.neuronLayout.addWidget(self.neuronTimestampDateTimeEdit)
@@ -165,7 +171,7 @@ class Window(QtWidgets.QWidget):
             self.brain.load(fileName)
 
             self.neuronsComboBox.clear()
-            self.neuronsComboBox.addItems(sorted([self.brain.neuron_name(n) for id, n in self.brain.neurons.items()]))
+            self.neuronsComboBox.addItems(self.neuronItems())
 
             self.modulesComboBox.clear()
             self.modulesComboBox.addItems(sorted([x for x in self.brain.modules]))
@@ -200,6 +206,9 @@ class Window(QtWidgets.QWidget):
 
     @QtCore.Slot()
     def neuronChanged(self, text: str):
+        if (len(text) == 0):
+            return
+
         neuron = self.brain.neurons[self.neuronIdFromName(text)]
 
         self.neuronCheckBox.setChecked(neuron.activated)
@@ -214,6 +223,9 @@ class Window(QtWidgets.QWidget):
 
     @QtCore.Slot()
     def moduleChanged(self, text: str):
+        if (len(text) == 0):
+            return
+
         self.moduleCheckBox.setChecked(self.brain.modules[text])
 
     @QtCore.Slot()
@@ -286,7 +298,7 @@ class Window(QtWidgets.QWidget):
         self.connectionTotalNumberLabel.setText("Connection total number: " + str(len(self.brain.connections)))
 
         self.neuronsComboBox.clear()
-        self.neuronsComboBox.addItems(sorted([self.brain.neuron_name(n) for id, n in self.brain.neurons.items()]))
+        self.neuronsComboBox.addItems(self.neuronItems())
 
         self.modulesComboBox.clear()
         self.modulesComboBox.addItems(sorted([x for x in self.brain.modules]))
@@ -317,7 +329,7 @@ class Window(QtWidgets.QWidget):
         self.neuronTotalNumberLabel.setText("Neuron total number: " + str(len(self.brain.neurons)))
 
         self.neuronsComboBox.clear()
-        self.neuronsComboBox.addItems(sorted([self.brain.neuron_name(n) for id, n in self.brain.neurons.items()]))
+        self.neuronsComboBox.addItems(self.neuronItems())
 
         self.modulesComboBox.clear()
         self.modulesComboBox.addItems(sorted([x for x in self.brain.modules]))
@@ -341,6 +353,23 @@ class Window(QtWidgets.QWidget):
     def deactivate(self):
         self.brain.deactivate_str(self.expressionLineEdit.text())
         self.neuronChanged(self.neuronsComboBox.currentText())
+
+    @QtCore.Slot()
+    def sortByChanged(self, text: str):
+        self.neuronsComboBox.clear()
+        self.neuronsComboBox.addItems(self.neuronItems())
+
+    def neuronItems(self):
+        if (self.sortByComboBox.currentText() == "name"):
+            return sorted([self.brain.neuron_name(n) for id, n in self.brain.neurons.items()])
+        elif (self.sortByComboBox.currentText() == "weight"):
+            l = ([(self.brain.neuron_name(n), n.weight) for id, n in self.brain.neurons.items()])
+
+            return [x[0] for x in sorted(l, key = lambda x: x[1])]
+        elif (self.sortByComboBox.currentText() == "timestamp"):
+            l = ([(self.brain.neuron_name(n), n.datetime) for id, n in self.brain.neurons.items()])
+
+            return [x[0] for x in sorted(l, key = lambda x: x[1])]
 
 if (__name__ == "__main__"):
     app = QtWidgets.QApplication([])
