@@ -56,7 +56,7 @@ def compare(value, target):
     elif (is_iterable(value)):
         return 1 - int(all(np.isclose(value, target)))
     else:
-        return np.linalg.norm(np.subtract(val, target))
+        return np.linalg.norm(np.subtract(value, target))
 
 class Brain:
     def __init__(self):
@@ -394,16 +394,16 @@ class Brain:
 
             for id in self.originNeuronIds:
                 if (self.neurons[id].is_active() and self.neurons[id].activated):
-                    type = self.neurons[id].outputType
-                    l = originTypes.get(type, [])
+                    t = self.neurons[id].outputType
+                    l = originTypes.get(t, [])
                     l.append(self.neurons[id])
-                    originTypes[type] = l
+                    originTypes[t] = l
 
             for connection in self.connections:
-                type = self.neurons[connection.neuronId].outputType
-                l = originTypes.get(type, [])
+                t = self.neurons[connection.neuronId].outputType
+                l = originTypes.get(t, [])
                 l.append(connection)
-                originTypes[type] = l
+                originTypes[t] = l
 
             for id, n in self.neurons.items():
                 if (not n.is_active() or not n.activated):
@@ -412,8 +412,8 @@ class Brain:
                 inputsList = []
                 add = True
 
-                for type in n.inputTypes:
-                    neurons = originTypes.get(type, [])
+                for t in n.inputTypes:
+                    neurons = originTypes.get(t, [])
 
                     if (not len(neurons)):
                         add = False
@@ -451,7 +451,7 @@ class Brain:
     def associate(self, value, name: str = "", transform_best_into_neuron: bool = True, module: str = None):
         neurons = []
 
-        for id in self.originNeuronIds:
+        for id in self.neurons:
             if (self.neurons[id].is_active() and self.neurons[id].activated):
                 try:
                     if (not compare(value, self.neurons[id].output())):
@@ -471,7 +471,7 @@ class Brain:
         connections = sorted(connections, key = lambda x: self.connection_len(x))
 
         if (transform_best_into_neuron and len(connections)):
-            self.transform_connection_into_neuron(connection, name, module)
+            id, id_compact = self.transform_connection_into_neuron(connections[0], name, module)
 
         return neurons + connections
 

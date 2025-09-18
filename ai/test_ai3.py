@@ -46,6 +46,10 @@ print(len(brain.connections))
 #for connection in brain.connections:
 #    print(brain.connection_str(connection) + " -> " + str(brain.connection_output(connection)))
 
+x = 7
+y = 6
+z = 5
+
 connections = brain.associate(x * y + z)
 
 print(brain.connection_str(connections[0]) + " -> " + str(brain.connection_output(connections[0])))
