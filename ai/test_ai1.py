@@ -21,14 +21,14 @@ brain.activate(neuronIds["1"])
 brain.activate(neuronIds["0"])
 #brain.activate_type(digits.Digit, 0, False, False)
 
-connection0 = Connection([brain.neurons[neuronIds["0"]]], brain.neurons[neuronIds["digit_to_str"]])
-connection1 = Connection([brain.neurons[neuronIds["1"]]], brain.neurons[neuronIds["digit_to_str"]])
-connection3 = Connection([brain.neurons[neuronIds["3"]]], brain.neurons[neuronIds["digit_to_str"]])
+connection0 = Connection([brain.neurons[neuronIds["0"]]], neuronIds["digit_to_str"])
+connection1 = Connection([brain.neurons[neuronIds["1"]]], neuronIds["digit_to_str"])
+connection3 = Connection([brain.neurons[neuronIds["3"]]], neuronIds["digit_to_str"])
 
-connectionAdd1 = Connection([connection1, connection0], brain.neurons[neuronIds["add_str"]])
-connectionAdd2 = Connection([connectionAdd1, connection3], brain.neurons[neuronIds["add_str"]])
+connectionAdd1 = Connection([connection1, connection0], neuronIds["add_str"])
+connectionAdd2 = Connection([connectionAdd1, connection3], neuronIds["add_str"])
 
-connectionInt = Connection([connectionAdd2], brain.neurons[neuronIds["str_to_int"]])
+connectionInt = Connection([connectionAdd2], neuronIds["str_to_int"])
 
 brain.connections.add(connectionInt)
 
