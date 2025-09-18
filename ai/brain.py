@@ -400,7 +400,7 @@ class Brain:
                     originTypes[type] = l
 
             for connection in self.connections:
-                type = connection.neuron.outputType
+                type = self.neurons[connection.neuronId].outputType
                 l = originTypes.get(type, [])
                 l.append(connection)
                 originTypes[type] = l
@@ -434,7 +434,7 @@ class Brain:
                     continue
 
                 for inputs in inputsList:
-                    newConnections.append(Connection(inputs, n))
+                    newConnections.append(Connection(inputs, id))
 
             newConnections = set(newConnections)
             new_connections |= newConnections - self.connections.intersection(newConnections)
@@ -477,7 +477,7 @@ class Brain:
 
     def transform_connection_into_neuron(self, connection: Connection, name: str = "", module: str = None, compact_name: str = "", compact_module: str = None):
         if (compact_module == None):
-            compact_module = connection.neuron.module
+            compact_module = self.neurons[connection.neuronId].module
 
         value = self.connection_output(connection)
 
@@ -511,7 +511,7 @@ class Brain:
             return replace_inputs(connection, iter(args))
 
         if (module == None):
-            module = connection.neuron.module
+            module = self.neurons[connection.neuronId].module
 
         id = self.add(Neuron(function, name, connection.origin_input_types(), self.neurons[connection.neuronId].outputType, module = module, weight = self.connection_weight(connection)))
 
