@@ -17,6 +17,9 @@ Here are some test files for example:
 
 A basic GUI (**gui.py**) is available to manipulate a model. It is possible to visualize neurons graph in 2D or 3D, with colors.
 
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/2e62da84-a2a3-4431-96fa-c5e5c6a33c21" />
+<img width="1853" height="903" alt="newplot" src="https://github.com/user-attachments/assets/8516ad6b-7c4f-4d6a-8f77-fcdd060d8bd4" />
+
 # conda
 ```
 conda create --name gt -c conda-forge graph-tool
