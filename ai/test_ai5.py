@@ -37,13 +37,18 @@ print(brain.connection_str(connections[0]) + " -> " + str(brain.connection_outpu
 print(connections[0].origin_input_types())
 
 try:
-    brain.show2d(seed = 0, colorBy = "module", levelColors = ["red", "green", "blue", "yellow", "cyan", "magenta", "purple", "brown", "orange", "gold", "indigo", "black", "white"])
+    brain.show2d(seed = 0, colorBy = "module", neuronColors = ["red", "green", "blue", "yellow", "cyan", "magenta", "purple", "brown", "orange", "gold", "indigo", "black", "white"])
 except:
     pass
 
-brain.show3d(seed = 0, colorBy = "module", levelColors = ["red", "green", "blue", "yellow", "cyan", "magenta", "purple", "brown", "orange", "gold", "indigo", "black", "white"])
+brain.show3d(seed = 0, colorBy = "module", neuronColors = ["red", "green", "blue", "yellow", "cyan", "magenta", "purple", "brown", "orange", "gold", "indigo", "black", "white"])
 
 brain.clear_connections()
+
+w += 1
+x += 1
+y += 1
+z += 1
 
 match (example):
     case 0:
@@ -56,11 +61,11 @@ print(brain.connection_str(connections[0]) + " -> " + str(brain.connection_outpu
 print(connections[0].origin_input_types())
 
 try:
-    brain.show2d(seed = 0, colorBy = "module", levelColors = ["red", "green", "blue", "yellow", "cyan", "magenta", "purple", "brown", "orange", "gold", "indigo", "black", "white"])
+    brain.show2d(seed = 0, colorBy = "module", neuronColors = ["red", "green", "blue", "yellow", "cyan", "magenta", "purple", "brown", "orange", "gold", "indigo", "black", "white"])
 except:
     pass
 
-brain.show3d(seed = 0, colorBy = "module", levelColors = ["red", "green", "blue", "yellow", "cyan", "magenta", "purple", "brown", "orange", "gold", "indigo", "black", "white"])
+brain.show3d(seed = 0, colorBy = "module", neuronColors = ["red", "green", "blue", "yellow", "cyan", "magenta", "purple", "brown", "orange", "gold", "indigo", "black", "white"])
 
 brain.neurons[neuronIds["w"]].function = lambda: int(input("w? "))
 brain.neurons[neuronIds["x"]].function = lambda: int(input("x? "))
