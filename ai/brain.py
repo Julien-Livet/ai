@@ -1,5 +1,6 @@
 import colour
 from connection import Connection
+import datetime
 import dill
 import heapq
 import itertools
@@ -597,7 +598,9 @@ class Brain:
 
         return ids
 
-    def learn(self, value, name: str = "", depth: int = 10, transform_best_into_neuron: bool = True, module: str = None, compact_name: str = "", compact_module: str = None, reinforcement_weight: float = 1.0, answer_number: int = 1, max_conns: int = 100):
+    def learn(self, value, name: str = "", depth: int = 10, transform_best_into_neuron: bool = True, module: str = None,
+              compact_name: str = "", compact_module: str = None, reinforcement_weight: float = 1.0, answer_number: int = 1,
+              max_conns: int = 100, timeout = 10 * 1000):
         answers = []
 
         for id in self.originNeuronIds:
@@ -650,9 +653,12 @@ class Brain:
         heapq.heappush(frontier, (g0 + h0, next(counter), g0, start_available, []))
 
         conns = []
-        explored_set = set()
+        time = datetime.datetime.now()
 
         while (frontier and len(solutions) < answer_number):
+            if (datetime.datetime.now() - time > datetime.timedelta(milliseconds = timeout)):
+                break
+                
             f, _, g, available, path = heapq.heappop(frontier)
 
             if (g > depth):
@@ -672,6 +678,9 @@ class Brain:
             av = av[:max_conns]
 
             for id in neuronIds:
+                if (datetime.datetime.now() - time > datetime.timedelta(milliseconds = timeout)):
+                    break
+                    
                 neuron = self.neurons[id]
 
                 if (len(solutions) >= answer_number):
@@ -686,6 +695,9 @@ class Brain:
                 new_av = sorted(new_av, key = lambda x: x[2].weight, reverse = True)
 
                 for combo in itertools.permutations(new_av, len(neuron.inputTypes)):
+                    if (datetime.datetime.now() - time > datetime.timedelta(milliseconds = timeout)):
+                        break
+                        
                     args = []
                     provs = []
                     ok = True
@@ -715,7 +727,7 @@ class Brain:
                     h = heuristic(new_value, value)
                     new_f = h
                     new_conn.weight = 1 + 1 / (1 + new_f)
-
+                    #print(new_value, new_f)
                     found = False
 
                     try:
