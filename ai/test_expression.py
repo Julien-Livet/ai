@@ -95,7 +95,7 @@ while (True):
     sp_ok = False
 
     while (not sp_ok):
-        expression = input("What is you expression (for example: x + y * z)? ")
+        expression = input("What is your expression (for example: x + y * z)? ")
 
         try:
             sympy.sympify(expression)

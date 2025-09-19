@@ -63,8 +63,8 @@ else:
     function_word_neuron_ids = words.add(brain)
 
     if (with_pretraining):
-        lex = pd.read_csv('http://www.lexique.org/databases/Lexique383/Lexique383.tsv', sep = '\t')
-        #lex = pd.read_csv('Lexique383.tsv', sep = '\t')
+        #lex = pd.read_csv('http://www.lexique.org/databases/Lexique383/Lexique383.tsv', sep = '\t')
+        lex = pd.read_csv('Lexique383.tsv', sep = '\t')
         lex = lex.sort_values(by = ['freqlivres', 'nblettres'], ascending = [False, True])
 
         s = set()
