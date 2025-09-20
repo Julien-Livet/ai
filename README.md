@@ -4,6 +4,7 @@
 Each neuron is a function with inputs and an output.
 Connections between compatible types can be allowed, i.e., a neuron with an int output can connect to another with an int input.
 `learn` function uses an A* algorithm to target a value.
+To run, `ai` requires a maximum of 500MB of RAM, runs on a CPU rather than a GPU, is deterministic, and is explainable. A model can fit on a few MB.
 
 Here are some test files for example:
 - **hello_world.py**: This adds functions related to str and searches for connections translating the relationship x + y + z from input values, and shows the generalization with a user value.
