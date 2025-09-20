@@ -34,19 +34,14 @@ while (True):
             sp_output_expression = sympy.sympify(output_expression)
         except:
             sp_output_expression = None
-    
+
     brain.neurons[neuronIds["input_expression"]].function = lambda sp_input_expression = sp_input_expression: sp_input_expression
 
     brain.clear_connections()
     brain.deactivate_all_modules()
-    brain.activate_module("chars.functions.conversion")
-    brain.activate_module("digits.functions.conversion")
-    brain.activate_module("strs.functions")
-    brain.activate_module("strs.functions.conversion")
-    brain.activate_module("symbols.functions.conversion")
-    
+
     for module in brain.modules:
-        if ("sympy" in module):
+        if ("sympy" in module or "chars" in module or "digits" in module or "symbols" in module):
             brain.activate_module(module)
 
     answers = brain.learn(sp_output_expression, depth = 10, compact_name = str(sp_output_expression), compact_module = "sympy.constants", module = "sympy.functions")

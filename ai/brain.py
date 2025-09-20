@@ -30,9 +30,12 @@ def heuristic(val, target):
             return 1 - 1 / target.count(a) + 1 / (1 + len(a)) - 1 / (1 + len(b))
 
         return 1 / (1 + len(a)) - 1 / (1 + len(b)) + textdistance.Levenshtein().distance(a, b)
-    elif (isinstance(val, sympy.Expr) and isinstance(target, sympy.Expr)):
-        if (val == target):
-            return 0
+    elif (isinstance(target, sympy.Expr)):
+        if (isinstance(val, sympy.Expr)):
+            if (val == target):
+                return 0
+            else:
+                return heuristic(str(val), str(target))
         else:
             return heuristic(str(val), str(target))
 
@@ -68,9 +71,12 @@ def compare(val, target):
             return 1 - 1 / target.count(a) + 1 / (1 + len(a)) - 1 / (1 + len(b))
 
         return 1 / (1 + len(a)) - 1 / (1 + len(b)) + textdistance.Levenshtein().distance(a, b)
-    elif (isinstance(val, sympy.Expr) and isinstance(target, sympy.Expr)):
-        if (val == target):
-            return 0
+    elif (isinstance(target, sympy.Expr)):
+        if (isinstance(val, sympy.Expr)):
+            if (val == target):
+                return 0
+            else:
+                return compare(str(val), str(target))
         else:
             return compare(str(val), str(target))
     elif (is_iterable(val)):
