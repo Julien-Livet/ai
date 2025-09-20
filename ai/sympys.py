@@ -53,6 +53,9 @@ def diff_sympy(expr: sympy.Expr) -> sympy.Expr:
 def integrate_sympy(expr: sympy.Expr) -> sympy.Expr:
     return sympy.integrate(expr)
 
+def solve_sympy(expr: sympy.Expr) -> sympy.Expr:
+    return sympy.solve(expr)
+
 def add(brain: Brain):
     neuronIds = {}
 
@@ -73,6 +76,7 @@ def add(brain: Brain):
     neuronIds["expand_log_sympy"] = brain.add(Neuron(expand_log_sympy, "expand_log_sympy", module = "sympy.simplifaction.functions"))
     neuronIds["diff_sympy"] = brain.add(Neuron(diff_sympy, "diff_sympy", module = "sympy.functions"))
     neuronIds["integrate_sympy"] = brain.add(Neuron(integrate_sympy, "integrate_sympy", module = "sympy.functions"))
+    neuronIds["solve_sympy"] = brain.add(Neuron(solve_sympy, "solve_sympy", module = "sympy.functions"))
 
     return neuronIds
 

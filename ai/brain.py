@@ -756,7 +756,7 @@ class Brain:
                     found = False
 
                     try:
-                        if (not compare(new_value, value)):# and type(new_value) == type(value)):
+                        if (not compare(new_value, value)):
                             found = True
                     except:
                         pass
