@@ -37,7 +37,7 @@ def heuristic(val, target):
             else:
                 return heuristic(str(val), str(target))
         else:
-            return heuristic(str(val), str(target))
+            return 1 + heuristic(str(val), str(target))
 
     try:
         return np.linalg.norm(np.subtract(val, target))
@@ -78,7 +78,7 @@ def compare(val, target):
             else:
                 return compare(str(val), str(target))
         else:
-            return compare(str(val), str(target))
+            return 1 + compare(str(val), str(target))
     elif (is_iterable(val)):
         return 1 - int(all(np.isclose(val, target)))
     else:
@@ -756,7 +756,7 @@ class Brain:
                     found = False
 
                     try:
-                        if (not compare(new_value, value)):
+                        if (not compare(new_value, value)):# and type(new_value) == type(value)):
                             found = True
                     except:
                         pass
