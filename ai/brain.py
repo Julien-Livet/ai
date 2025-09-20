@@ -79,6 +79,8 @@ def compare(val, target):
                 return compare(str(val), str(target))
         else:
             return 1 + compare(str(val), str(target))
+    elif (isinstance(val, np.ndarray) and isinstance(target, np.ndarray)):
+        return np.linalg.norm(np.subtract(val, target))
     elif (is_iterable(val)):
         return 1 - int(all(np.isclose(val, target)))
     else:
@@ -752,6 +754,7 @@ class Brain:
                     h = heuristic(new_value, value)
                     new_f = h
                     new_conn.weight = 1 + 1 / (1 + new_f)
+                    s = self.neuron_name(neuron)
 
                     found = False
 

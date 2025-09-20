@@ -17,6 +17,9 @@ class Digit:
 def digit_to_str(x: Digit) -> str:
     return str(x)
 
+def digit_to_int(x: Digit) -> int:
+    return int(x)
+
 def add(brain: Brain):
     neuronIds = {}
 
@@ -27,6 +30,7 @@ def add(brain: Brain):
         neuronIds[str(i)] = brain.add(Neuron(number, str(i), module = "digits.constants"))
     
     neuronIds["digit_to_str"] = brain.add(Neuron(digit_to_str, "digit_to_str", module = "digits.functions.conversion"))
+    neuronIds["digit_to_int"] = brain.add(Neuron(digit_to_int, "digit_to_int", module = "digits.functions.conversion"))
     
     return neuronIds
 
