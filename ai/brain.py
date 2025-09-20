@@ -8,6 +8,7 @@ import math
 from neuron import Neuron
 import numpy as np
 import random
+import sympy
 import textdistance
 
 def is_iterable(x) -> bool:
@@ -29,6 +30,11 @@ def heuristic(val, target):
             return 1 - 1 / target.count(a) + 1 / (1 + len(a)) - 1 / (1 + len(b))
 
         return 1 / (1 + len(a)) - 1 / (1 + len(b)) + textdistance.Levenshtein().distance(a, b)
+    elif (isinstance(val, sympy.Expr) and isinstance(target, sympy.Expr)):
+        if (val == target):
+            return 0
+        else:
+            return heuristic(str(val), str(target))
 
     try:
         return np.linalg.norm(np.subtract(val, target))
@@ -51,13 +57,26 @@ def canonicalize_for_visit(val):
     except TypeError:
         return repr(val)
 
-def compare(value, target):
-    if (isinstance(value, str) and isinstance(target, str)):
-        return textdistance.levenshtein.distance(value, target)
-    elif (is_iterable(value)):
-        return 1 - int(all(np.isclose(value, target)))
+def compare(val, target):
+    if (isinstance(val, str) and isinstance(target, str)):
+        a, b = val, target
+
+        if (b in a):
+            a, b = b, a
+
+        if (a in b):
+            return 1 - 1 / target.count(a) + 1 / (1 + len(a)) - 1 / (1 + len(b))
+
+        return 1 / (1 + len(a)) - 1 / (1 + len(b)) + textdistance.Levenshtein().distance(a, b)
+    elif (isinstance(val, sympy.Expr) and isinstance(target, sympy.Expr)):
+        if (val == target):
+            return 0
+        else:
+            return compare(str(val), str(target))
+    elif (is_iterable(val)):
+        return 1 - int(all(np.isclose(val, target)))
     else:
-        return np.linalg.norm(np.subtract(value, target))
+        return np.linalg.norm(np.subtract(val, target))
 
 class Brain:
     def __init__(self):
@@ -727,7 +746,7 @@ class Brain:
                     h = heuristic(new_value, value)
                     new_f = h
                     new_conn.weight = 1 + 1 / (1 + new_f)
-                    #print(new_value, new_f)
+
                     found = False
 
                     try:
