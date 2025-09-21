@@ -68,10 +68,9 @@ brain.activate_module("ndarrays.operators.logical")
 print("----")
 answers = brain.learn(numbers[1:], compact_name = "syracuse", compact_module = "syracuse.constants", module = "syracuse.functions")
 
-if (isinstance(answers[0], Connection)):
-    print(brain.connection_str(answers[0]), "->", brain.connection_output(answers[0]))
-else:
-    print(brain.neuron_name(answers[0]), "->", answers[0].output())
+print(brain.connection_str(answers[0]), "->", brain.connection_output(answers[0]))
+
+brain.connections = answers
 
 try:
     brain.show2d(seed = 0, title = "Syracuse suite", colorBy = "weight")
