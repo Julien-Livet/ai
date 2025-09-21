@@ -11,8 +11,11 @@ def sub_float(x: float, y: float) -> float:
 def mul_float(x: float, y: float) -> float:
     return x * y
 
-def div_float(x: float, y: float) -> float:
+def truediv_float(x: float, y: float) -> float:
     return x / y
+
+def floordiv_float(x: float, y: float) -> float:
+    return x // y
 
 def abs_float(x: float) -> float:
     return abs(x)
@@ -113,7 +116,8 @@ def add(brain: Brain):
     neuronIds["add_float"] = brain.add(Neuron(add_float, "add_float", module = "floats.operators.arithmetic"))
     neuronIds["sub_float"] = brain.add(Neuron(sub_float, "sub_float", module = "floats.operators.arithmetic"))
     neuronIds["mul_float"] = brain.add(Neuron(mul_float, "mul_float", module = "floats.operators.arithmetic"))
-    neuronIds["div_float"] = brain.add(Neuron(div_float, "div_float", module = "floats.operators.arithmetic"))
+    neuronIds["truediv_float"] = brain.add(Neuron(truediv_float, "truediv_float", module = "floats.operators.arithmetic"))
+    neuronIds["floordiv_float"] = brain.add(Neuron(floordiv_float, "floordiv_float", module = "floats.operators.arithmetic"))
     neuronIds["abs_float"] = brain.add(Neuron(abs_float, "abs_float", module = "floats.operators.functions"))
     neuronIds["neg_float"] = brain.add(Neuron(neg_float, "neg_float", module = "floats.operators.functions"))
     neuronIds["sqrt_float"] = brain.add(Neuron(sqrt_float, "sqrt_float", module = "floats.functions"))

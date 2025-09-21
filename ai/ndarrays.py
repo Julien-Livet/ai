@@ -4,19 +4,25 @@ from neuron import Neuron
 import numpy as np
 import random
 
-def add_ndarray(x: np.ndarray, y: np.ndarray) -> np.ndarray:
+def add_ndarray(x: np.ndarray, y: tuple[np.ndarray, int, float]) -> np.ndarray:
     return x + y
 
-def sub_ndarray(x: np.ndarray, y: np.ndarray) -> np.ndarray:
+def sub_ndarray(x: np.ndarray, y: tuple[np.ndarray, int, float]) -> np.ndarray:
     return x - y
 
-def mul_ndarray(x: np.ndarray, y: np.ndarray) -> np.ndarray:
+def mul_ndarray(x: np.ndarray, y: tuple[np.ndarray, int, float]) -> np.ndarray:
     return x * y
 
-def div_ndarray(x: np.ndarray, y: np.ndarray) -> np.ndarray:
+def truediv_ndarray(x: np.ndarray, y: tuple[np.ndarray, int, float]) -> np.ndarray:
     return x / y
 
-def pow_ndarray(x: np.ndarray, y: np.ndarray) -> np.ndarray:
+def floordiv_ndarray(x: np.ndarray, y: tuple[np.ndarray, int, float]) -> np.ndarray:
+    return x // y
+
+def mod_ndarray(x: np.ndarray, y: tuple[np.ndarray, int, float]) -> np.ndarray:
+    return x % y
+
+def pow_ndarray(x: np.ndarray, y: tuple[np.ndarray, int, float]) -> np.ndarray:
     return x ** y
 
 def mulmat_ndarray(x: np.ndarray, y: np.ndarray) -> np.ndarray:
@@ -143,13 +149,24 @@ def eye_ndarray(x: int) -> np.ndarray:
 def trace_ndarray(x: np.ndarray) -> float:
     return np.trace(x)
 
+def any_ndarray(x: np.ndarray) -> bool:
+    return np.any(x)
+
+def all_ndarray(x: np.ndarray) -> bool:
+    return np.all(x)
+
+def where_ndarray(condition: np.ndarray, x: np.ndarray, y: np.ndarray) -> np.ndarray:
+    return np.where(condition, x, y)
+
 def add(brain: Brain):
     neuronIds = {}
 
     neuronIds["add_ndarray"] = brain.add(Neuron(add_ndarray, "add_ndarray", module = "ndarrays.operators.arithmetic"))
     neuronIds["sub_ndarray"] = brain.add(Neuron(sub_ndarray, "sub_ndarray", module = "ndarrays.operators.arithmetic"))
     neuronIds["mul_ndarray"] = brain.add(Neuron(mul_ndarray, "mul_ndarray", module = "ndarrays.operators.arithmetic"))
-    neuronIds["div_ndarray"] = brain.add(Neuron(div_ndarray, "div_ndarray", module = "ndarrays.operators.arithmetic"))
+    neuronIds["mod_ndarray"] = brain.add(Neuron(mod_ndarray, "mod_ndarray", module = "ndarrays.operators.arithmetic"))
+    neuronIds["truediv_ndarray"] = brain.add(Neuron(truediv_ndarray, "truediv_ndarray", module = "ndarrays.operators.arithmetic"))
+    neuronIds["floordiv_ndarray"] = brain.add(Neuron(floordiv_ndarray, "floordiv_ndarray", module = "ndarrays.operators.arithmetic"))
     neuronIds["pow_ndarray"] = brain.add(Neuron(pow_ndarray, "pow_ndarray", module = "ndarrays.operators.arithmetic"))
     neuronIds["mulmat_ndarray"] = brain.add(Neuron(mulmat_ndarray, "mulmat_ndarray", module = "ndarrays.operators.linearalgebra"))
     neuronIds["abs_ndarray"] = brain.add(Neuron(abs_ndarray, "abs_ndarray", module = "ndarrays.functions.conversion"))
@@ -191,6 +208,9 @@ def add(brain: Brain):
     neuronIds["inv_ndarray"] = brain.add(Neuron(inv_ndarray, "inv_ndarray", module = "ndarrays.functions.linearalgebra"))
     neuronIds["trace_ndarray"] = brain.add(Neuron(trace_ndarray, "trace_ndarray", module = "ndarrays.functions.linearalgebra"))
     neuronIds["eye_ndarray"] = brain.add(Neuron(eye_ndarray, "eye_ndarray", module = "ndarrays.functions.linearalgebra"))
+    neuronIds["any_ndarray"] = brain.add(Neuron(any_ndarray, "any_ndarray", module = "ndarrays.operators.logical"))
+    neuronIds["all_ndarray"] = brain.add(Neuron(all_ndarray, "all_ndarray", module = "ndarrays.operators.logical"))
+    neuronIds["where_ndarray"] = brain.add(Neuron(where_ndarray, "where_ndarray", module = "ndarrays.operators.logical"))
 
     return neuronIds
 

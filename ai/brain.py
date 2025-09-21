@@ -10,6 +10,21 @@ import numpy as np
 import random
 import sympy
 import textdistance
+import typing
+
+def check_type(value, expected_type) -> bool:
+    origin = typing.get_origin(expected_type)
+    args = typing.get_args(expected_type)
+
+    if (origin is None):
+        return isinstance(value, expected_type)
+
+    if (origin is tuple):
+        for t in args:
+            if (isinstance(value, t) or value is t):
+                return True
+
+    return False
 
 def is_iterable(x) -> bool:
     try:
@@ -441,7 +456,16 @@ class Brain:
                 add = True
 
                 for t in n.inputTypes:
-                    neurons = originTypes.get(t, [])
+                    origin = typing.get_origin(t)
+                    args = typing.get_args(t)
+                    
+                    if (origin is None):
+                        neurons = originTypes.get(t, [])
+                    else:
+                        neurons = []
+                        
+                        for arg in args:
+                            neurons += originTypes.get(arg, [])
 
                     if (not len(neurons)):
                         add = False
@@ -685,7 +709,7 @@ class Brain:
         while (frontier and len(solutions) < answer_number):
             if (datetime.datetime.now() - time > datetime.timedelta(milliseconds = timeout)):
                 break
-                
+
             f, _, g, available, path = heapq.heappop(frontier)
 
             if (g > depth):
@@ -702,35 +726,39 @@ class Brain:
 
             av = [(self.neurons[id].output(), self.neurons[id].outputType, self.neurons[id]) for id in origin_neuron_ids] + [(self.connection_output(c), self.neurons[c.neuronId].outputType, c) for c in set(conns) | connections]
             av = sorted(av, key = lambda x: x[2].weight, reverse = True)
-            av = av[:max_conns]
+
+            if (max_conns != None):
+                av = av[:max_conns]
 
             for id in neuronIds:
                 if (datetime.datetime.now() - time > datetime.timedelta(milliseconds = timeout)):
                     break
-                    
+
                 neuron = self.neurons[id]
 
                 if (len(solutions) >= answer_number):
                     break
 
                 new_av = []
+                s = set(neuron.inputTypes)
 
                 for t in av:
-                    if (t[1] in neuron.inputTypes):
-                        new_av.append(t)
+                    for tt in s:
+                        if (check_type(t[1], tt) or t[1] == tt):
+                            new_av.append(t)
 
                 new_av = sorted(new_av, key = lambda x: x[2].weight, reverse = True)
 
                 for combo in itertools.permutations(new_av, len(neuron.inputTypes)):
                     if (datetime.datetime.now() - time > datetime.timedelta(milliseconds = timeout)):
                         break
-                        
+
                     args = []
                     provs = []
                     ok = True
 
                     for (val, t, prov), expected_type in zip(combo, neuron.inputTypes):
-                        if (t != expected_type):
+                        if (not (check_type(t, expected_type) or t == expected_type)):
                             ok = False
                             break
 

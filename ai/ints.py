@@ -10,7 +10,10 @@ def sub_int(x: int, y: int) -> int:
 def mul_int(x: int, y: int) -> int:
     return x * y
 
-def div_int(x: int, y: int) -> int:
+def truediv_int(x: int, y: int) -> float:
+    return x / y
+
+def floordiv_int(x: int, y: int) -> int:
     return x // y
 
 def mod_int(x: int, y: int) -> int:
@@ -88,7 +91,8 @@ def add(brain: Brain):
     neuronIds["add_int"] = brain.add(Neuron(add_int, "add_int", module = "ints.operators.arithmetic"))
     neuronIds["sub_int"] = brain.add(Neuron(sub_int, "sub_int", module = "ints.operators.arithmetic"))
     neuronIds["mul_int"] = brain.add(Neuron(mul_int, "mul_int", module = "ints.operators.arithmetic"))
-    neuronIds["div_int"] = brain.add(Neuron(div_int, "div_int", module = "ints.operators.arithmetic"))
+    neuronIds["truediv_int"] = brain.add(Neuron(truediv_int, "truediv_int", module = "ints.operators.arithmetic"))
+    neuronIds["floordiv_int"] = brain.add(Neuron(floordiv_int, "floordiv_int", module = "ints.operators.arithmetic"))
     neuronIds["mod_int"] = brain.add(Neuron(mod_int, "mod_int", module = "ints.operators.arithmetic"))
     neuronIds["pow_int"] = brain.add(Neuron(pow_int, "pow_int", module = "ints.operators.arithmetic"))
     neuronIds["and_int"] = brain.add(Neuron(and_int, "and_int", module = "ints.operators.bitwise"))

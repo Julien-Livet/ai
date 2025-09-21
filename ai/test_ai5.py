@@ -7,15 +7,15 @@ import numpy as np
 brain = Brain()
 neuronIds = {}
 
-w = np.array((-2, -1, 0))
-x = np.array((1, 2, 3))
-y = np.array((4, 5, 6))
-z = np.array((7, 8, 9))
+w = np.array((-2, 0, -1))
+x = np.array((-1, 2, 3))
+y = np.array((4, -6, 5))
+z = np.array((9, 8, -7))
 
 neuronIds |= ndarrays.add(brain)
 
-#brain.deactivate_all_modules()
-#brain.activate_module("ndarrays.operators.arithmetic")
+brain.deactivate_all_modules()
+brain.activate_module("ndarrays.operators.arithmetic")
 
 example = 0
 
