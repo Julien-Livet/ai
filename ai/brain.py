@@ -659,7 +659,7 @@ class Brain:
 
     def learn(self, value, name: str = "", depth: int = 10, transform_best_into_neuron: bool = True, module: str = None,
               compact_name: str = "", compact_module: str = None, reinforcement_weight: float = 1.0, answer_number: int = 1,
-              max_conns: int = 100, timeout = 10 * 1000):
+              max_conns: int = 100, timeout = 20 * 1000):
         answers = []
 
         for id in self.originNeuronIds:
@@ -790,7 +790,7 @@ class Brain:
                     new_path = path + [new_conn]
                     new_g = g + 1 + 1 / neuron.weight
                     h = heuristic(new_value, value)
-                    new_f = h
+                    new_f = new_g + h
                     new_conn.weight = 1 + 1 / (1 + new_f)
 
                     found = False
