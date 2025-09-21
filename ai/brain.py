@@ -19,7 +19,7 @@ def check_type(value, expected_type) -> bool:
     if (origin is None):
         return isinstance(value, expected_type)
 
-    if (origin is tuple):
+    if (origin is typing.Union):
         for t in args:
             if (isinstance(value, t) or value is t):
                 return True
@@ -613,6 +613,10 @@ class Brain:
     def add_connection(self, connection: Connection):
         self.connections.add(connection)
         self._add_connection_type(connection)
+
+    def add_connections(self, connections: list):
+        for connection in connections:
+            self.add_connection(connection)
 
     def activate_all_modules(self):
         for module in self.modules:

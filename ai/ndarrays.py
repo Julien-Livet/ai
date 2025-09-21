@@ -3,26 +3,27 @@ import copy
 from neuron import Neuron
 import numpy as np
 import random
+import typing
 
-def add_ndarray(x: np.ndarray, y: tuple[np.ndarray, int, float]) -> np.ndarray:
+def add_ndarray(x: np.ndarray, y: typing.Union[np.ndarray, int, float]) -> np.ndarray:
     return x + y
 
-def sub_ndarray(x: np.ndarray, y: tuple[np.ndarray, int, float]) -> np.ndarray:
+def sub_ndarray(x: np.ndarray, y: typing.Union[np.ndarray, int, float]) -> np.ndarray:
     return x - y
 
-def mul_ndarray(x: np.ndarray, y: tuple[np.ndarray, int, float]) -> np.ndarray:
+def mul_ndarray(x: np.ndarray, y: typing.Union[np.ndarray, int, float]) -> np.ndarray:
     return x * y
 
-def truediv_ndarray(x: np.ndarray, y: tuple[np.ndarray, int, float]) -> np.ndarray:
+def truediv_ndarray(x: np.ndarray, y: typing.Union[np.ndarray, int, float]) -> np.ndarray:
     return x / y
 
-def floordiv_ndarray(x: np.ndarray, y: tuple[np.ndarray, int, float]) -> np.ndarray:
+def floordiv_ndarray(x: np.ndarray, y: typing.Union[np.ndarray, int, float]) -> np.ndarray:
     return x // y
 
-def mod_ndarray(x: np.ndarray, y: tuple[np.ndarray, int, float]) -> np.ndarray:
+def mod_ndarray(x: np.ndarray, y: typing.Union[np.ndarray, int, float]) -> np.ndarray:
     return x % y
 
-def pow_ndarray(x: np.ndarray, y: tuple[np.ndarray, int, float]) -> np.ndarray:
+def pow_ndarray(x: np.ndarray, y: typing.Union[np.ndarray, int, float]) -> np.ndarray:
     return x ** y
 
 def mulmat_ndarray(x: np.ndarray, y: np.ndarray) -> np.ndarray:

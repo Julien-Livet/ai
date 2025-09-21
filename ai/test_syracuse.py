@@ -31,46 +31,37 @@ for module in brain.modules:
         brain.activate_module(module)
 
 brain.neurons[neuronIds["numbers"]].activated = True
-brain.neurons[neuronIds["digit_to_int"]].weight = 10.0
 
 connections = list()
 
-conns = brain.learn(numbers[:-1] % 2, compact_name = "f1", compact_module = "syracuse.constants", module = "syracuse.functions")
+conns = brain.learn(numbers[:-1] % 2, compact_name = "f1", compact_module = "syracuse.constants", module = "syracuse.functions", transform_best_into_neuron = False)
 assert(len(conns))
 connections += conns
 
 brain.clear_connections()
-brain.deactivate_module("syracuse.constants")
-brain.deactivate_module("syracuse.functions")
-conns = brain.learn(numbers[:-1] // 2, compact_name = "f2", compact_module = "syracuse.constants", module = "syracuse.functions")
+conns = brain.learn(numbers[:-1] // 2, compact_name = "f2", compact_module = "syracuse.constants", module = "syracuse.functions", transform_best_into_neuron = False)
 assert(len(conns))
 connections += conns
 
 brain.clear_connections()
-brain.deactivate_module("syracuse.constants")
-brain.deactivate_module("syracuse.functions")
-conns = brain.learn(3 * numbers[:-1], compact_name = "f3", compact_module = "syracuse.constants", module = "syracuse.functions")
+conns = brain.learn(3 * numbers[:-1], compact_name = "f3", compact_module = "syracuse.constants", module = "syracuse.functions", transform_best_into_neuron = False)
 assert(len(conns))
 connections += conns
 
-brain.clear_connections()
-brain.deactivate_module("syracuse.constants")
-brain.activate_module("syracuse.functions")
-conns = brain.learn(3 * numbers[:-1] + 1, compact_name = "f4", compact_module = "syracuse.constants", module = "syracuse.functions")
+conns = brain.learn(3 * numbers[:-1] + 1, compact_name = "f4", compact_module = "syracuse.constants", module = "syracuse.functions", transform_best_into_neuron = False)
 assert(len(conns))
 connections += conns
 
 brain.clear_connections()
 brain.connections = set(connections)
 brain.deactivate_all_modules()
-brain.activate_module("syracuse.functions")
 brain.activate_module("ndarrays.operators.logical")
-print("----")
+
 answers = brain.learn(numbers[1:], compact_name = "syracuse", compact_module = "syracuse.constants", module = "syracuse.functions")
 
 print(brain.connection_str(answers[0]), "->", brain.connection_output(answers[0]))
 
-brain.connections = answers
+brain.set_connections(answers)
 
 try:
     brain.show2d(seed = 0, title = "Syracuse suite", colorBy = "weight")
