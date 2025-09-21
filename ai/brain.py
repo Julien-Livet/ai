@@ -458,12 +458,12 @@ class Brain:
                 for t in n.inputTypes:
                     origin = typing.get_origin(t)
                     args = typing.get_args(t)
-                    
+
                     if (origin is None):
                         neurons = originTypes.get(t, [])
                     else:
                         neurons = []
-                        
+
                         for arg in args:
                             neurons += originTypes.get(arg, [])
 
@@ -640,6 +640,10 @@ class Brain:
             if (self.neurons[id].module == module):
                 self.neurons[id].activated = True
 
+    def activate_modules(self, modules: list):
+        for module in modules:
+            self.activate_module(module)
+
     def module_neuron_ids(self, module: str):
         ids = []
 
@@ -687,6 +691,8 @@ class Brain:
         for connection in self.connections:
             if (connection.activated):
                 connections.add(connection)
+                val = self.connection_output(connection)
+                start_available.append((val, type(val), connection))
 
         counter = itertools.count()
         frontier = []
@@ -782,7 +788,6 @@ class Brain:
                     h = heuristic(new_value, value)
                     new_f = h
                     new_conn.weight = 1 + 1 / (1 + new_f)
-                    s = self.neuron_name(neuron)
 
                     found = False
 
