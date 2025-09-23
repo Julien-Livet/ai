@@ -35,16 +35,26 @@ def is_iterable(x) -> bool:
     return True
 
 def heuristic(val, target):
-    if (isinstance(val, str) and isinstance(target, str)):
-        a, b = val, target
+    if (isinstance(target, str)):
+        s = val
 
-        if (b in a):
-            a, b = b, a
+        try:
+            s = str(val)
+        except:
+            pass
 
-        if (a in b):
-            return 1 - 1 / target.count(a) + 1 / (1 + len(a)) - 1 / (1 + len(b))
+        if (isinstance(s, str)):
+            a, b = s, target
 
-        return 1 / (1 + len(a)) - 1 / (1 + len(b)) + textdistance.Levenshtein().distance(a, b)
+            if (b in a):
+                a, b = b, a
+
+            if (a in b):
+                return 1 - 1 / target.count(a) + 1 / (1 + len(a)) - 1 / (1 + len(b))
+
+            return 1 / (1 + len(a)) - 1 / (1 + len(b)) + textdistance.Levenshtein().distance(a, b)
+        else:
+            return abs(hash(val) - hash(target))
     elif (isinstance(target, sympy.Expr)):
         if (isinstance(val, sympy.Expr)):
             if (val == target):
@@ -706,7 +716,7 @@ class Brain:
         origin_neuron_ids = sorted(origin_neuron_ids, key = lambda x: self.neurons[x].weight, reverse = True)
 
         if (not start_available):
-            return []
+            return answers
 
         start_available = tuple(start_available)
         g0 = 0.0
@@ -735,7 +745,26 @@ class Brain:
             visited.add(state_id)
 
             av = [(self.neurons[id].output(), self.neurons[id].outputType, self.neurons[id]) for id in origin_neuron_ids] + [(self.connection_output(c), self.neurons[c.neuronId].outputType, c) for c in set(conns) | connections]
+
             av = sorted(av, key = lambda x: x[2].weight, reverse = True)
+            """
+            s = set()
+            av_ = []
+
+            for x in av:
+                if (isinstance(value, str)):
+                    if (not str(x[0]) in s):
+                        av_.append(x)
+                        s.add(str(x[0]))
+                else:
+                    if (not x[0] in s):
+                        av_.append(x)
+                        s.add(x[0])
+
+            av = av_
+
+            av = sorted(av, key = lambda x: heuristic(x[0], value))
+            """
 
             if (max_conns != None):
                 av = av[:max_conns]
@@ -843,33 +872,35 @@ class Brain:
         self.neurons[id].activated = True
 
     def activate_str(self, s: str):
-        from chars import Char
-        from digits import Digit
-        from symbols import Symbol
+        for id, neuron in self.neurons.items():
+            if (len(neuron.inputTypes) == 0):
+                try:
+                    v = str(neuron.output())
 
-        for id in self.neurons:
-            n = self.neurons[id]
-
-            if (len(n.inputTypes) == 0):
-                v = n.output()
-
-                if ((isinstance(v, Char) or isinstance(v, Digit) or isinstance(v, Symbol)) and str(v) in s):
-                    self.activate_neuron(id)
-                elif (isinstance(v, str) and s in v):
-                    self.activate_neuron(id)
+                    """
+                    if (len(v) <= len(s)):
+                        for c in s:
+                            if (c in v):
+                                self.activate_neuron(id)
+                    """
+                    if (v in s):
+                        self.activate_neuron(id)
+                except:
+                    pass
 
     def deactivate_str(self, s: str):
-        from chars import Char
-        from digits import Digit
-        from symbols import Symbol
+        for id, neuron in self.neurons.items():
+            if (len(neuron.inputTypes) == 0):
+                try:
+                    v = str(neuron.output())
 
-        for id in self.neurons:
-            n = self.neurons[id]
-
-            if (len(n.inputTypes) == 0):
-                v = n.output()
-
-                if ((isinstance(v, Char) or isinstance(v, Digit) or isinstance(v, Symbol)) and str(v) in s):
-                    self.deactivate_neuron(id)
-                elif (isinstance(v, str) and s in v):
-                    self.activate_neuron(id)
+                    """
+                    if (len(v) <= len(s)):
+                        for c in s:
+                            if (c in v):
+                                self.deactivate_neuron(id)
+                    """
+                    if (v in s):
+                        self.deactivate_neuron(id)
+                except:
+                    pass
