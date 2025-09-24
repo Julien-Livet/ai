@@ -214,6 +214,8 @@ class Brain:
                     inputs.append(input.output())
                 elif (type(input) is Connection):
                     inputs.append(self.connection_output(input))
+                else:
+                    inputs.append(input)
 
             return self.neurons[connection.neuronId].output(*inputs)
         except:
@@ -549,9 +551,12 @@ class Brain:
             added = False
 
             for input in connection.inputs:
-                if (not (isinstance(input, Neuron) and len(input.inputTypes) == 0)):
-                    added = True
-                    break
+                try:
+                    if (not (isinstance(input, Neuron) and len(input.inputTypes) == 0)):
+                        added = True
+                        break
+                except:
+                    pass
 
             if (not added):
                 return connection.neuronId, compact_id
@@ -567,6 +572,8 @@ class Brain:
                         vals.append(next(arg_iter))
                     elif (isinstance(input, Connection)):
                         vals.append(replace_inputs(input, arg_iter))
+                    else:
+                        vals.append(next(arg_iter))
 
                 return neurons[connection.neuronId].output(*vals)
 
@@ -725,6 +732,8 @@ class Brain:
 
         conns = []
         time = datetime.datetime.now()
+        best_conn = None
+        best_cost = math.inf
 
         while (frontier and len(solutions) < answer_number):
             if (datetime.datetime.now() - time > datetime.timedelta(milliseconds = timeout)):
@@ -746,8 +755,8 @@ class Brain:
 
             av = [(self.neurons[id].output(), self.neurons[id].outputType, self.neurons[id]) for id in origin_neuron_ids] + [(self.connection_output(c), self.neurons[c.neuronId].outputType, c) for c in set(conns) | connections]
 
-            av = sorted(av, key = lambda x: x[2].weight, reverse = True)
-            """
+            #av = sorted(av, key = lambda x: x[2].weight, reverse = True)
+            #"""
             s = set()
             av_ = []
 
@@ -755,16 +764,17 @@ class Brain:
                 if (isinstance(value, str)):
                     if (not str(x[0]) in s):
                         av_.append(x)
-                        s.add(str(x[0]))
+                        #s.add(str(x[0]))
                 else:
                     if (not x[0] in s):
                         av_.append(x)
-                        s.add(x[0])
+                        #s.add(x[0])
 
             av = av_
 
             av = sorted(av, key = lambda x: heuristic(x[0], value))
-            """
+            #"""
+            #print([str(x[0]) for x in av])
 
             if (max_conns != None):
                 av = av[:max_conns]
@@ -783,8 +793,12 @@ class Brain:
 
                 for t in av:
                     for tt in s:
-                        if (check_type(t[1], tt) or t[1] == tt):
-                            new_av.append(t)
+                        if (isinstance(tt, type)):
+                            if (check_type(t[1], tt) or t[1] == tt):
+                                new_av.append(t)
+                        else:
+                            if (check_type(t[1], type(tt)) or t[1] == type(tt)):
+                                new_av.append(t)
 
                 new_av = sorted(new_av, key = lambda x: x[2].weight, reverse = True)
 
@@ -797,6 +811,7 @@ class Brain:
                     ok = True
 
                     for (val, t, prov), expected_type in zip(combo, neuron.inputTypes):
+
                         if (not (check_type(t, expected_type) or t == expected_type)):
                             ok = False
                             break
@@ -825,7 +840,13 @@ class Brain:
                     found = False
 
                     try:
-                        if (not compare(new_value, value)):
+                        cost = compare(new_value, value)
+
+                        if (cost < best_cost):
+                            best_cost = cost
+                            best_conn = new_conn
+
+                        if (not cost):
                             found = True
                     except:
                         pass
@@ -837,6 +858,9 @@ class Brain:
                             break
 
                     heapq.heappush(frontier, (new_f, next(counter), new_g, new_available, new_path))
+
+        if (len(solutions) == 0 and best_conn):
+            solutions.append([best_conn])
 
         solutions.sort(key = lambda p: (len(p), ))
 
@@ -850,7 +874,7 @@ class Brain:
         for c in conns:
             self.reinforce_connection(c, reinforcement_weight)
 
-        if (len(conns) and transform_best_into_neuron):
+        if (len(conns) and transform_best_into_neuron and self.connection_output(conns[0]) == value):
             self.transform_connection_into_neuron(conns[0], name = name, module = module, compact_name = compact_name, compact_module = compact_module)
 
         self.connections |= set(conns)
@@ -871,9 +895,12 @@ class Brain:
     def activate_neuron(self, id :int):
         self.neurons[id].activated = True
 
-    def activate_str(self, s: str):
+    def activate_str(self, s: str, types: list = []):
         for id, neuron in self.neurons.items():
             if (len(neuron.inputTypes) == 0):
+                if (len(types) and not neuron.outputType in types):
+                    continue
+
                 try:
                     v = str(neuron.output())
 
@@ -883,14 +910,17 @@ class Brain:
                             if (c in v):
                                 self.activate_neuron(id)
                     """
-                    if (v in s):
+                    if (v.lower() in s.lower()):
                         self.activate_neuron(id)
                 except:
                     pass
 
-    def deactivate_str(self, s: str):
+    def deactivate_str(self, s: str, types: list = []):
         for id, neuron in self.neurons.items():
             if (len(neuron.inputTypes) == 0):
+                if (len(types) and not neuron.outputType in types):
+                    continue
+
                 try:
                     v = str(neuron.output())
 
@@ -900,7 +930,7 @@ class Brain:
                             if (c in v):
                                 self.deactivate_neuron(id)
                     """
-                    if (v in s):
+                    if (v.lower() in s.lower()):
                         self.deactivate_neuron(id)
                 except:
                     pass

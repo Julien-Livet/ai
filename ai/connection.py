@@ -35,6 +35,8 @@ class Connection:
                 types.append(input.outputType)
             elif (isinstance(input, Connection)):
                 types.extend(input.origin_input_types())
+            else:
+                types.append(type(input))
 
         return types
 

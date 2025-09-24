@@ -1,6 +1,7 @@
 from brain import Brain
 from connection import Connection
 import datetime
+import math
 from neuron import Neuron
 import pandas as pd
 import os
@@ -9,7 +10,7 @@ import strs
 import symbols
 import words
 
-def process(brain: Brain, function_word_neuron_ids: dict, word: str, cgram: str, cgramortho: str, max_conns: int = None, timeout: int = 10 * 1000, given_answers = []):
+def process(brain: Brain, function_word_neuron_ids: dict, word: str, row, max_conns: int = None, timeout: int = 10 * 1000, given_answers = []):
     brain.clear_connections()
     brain.deactivate_all_modules()
 
@@ -40,6 +41,20 @@ def process(brain: Brain, function_word_neuron_ids: dict, word: str, cgram: str,
 
         brain.activate_str(word)
 
+    cgram = row["cgram"]
+    cgramortho = row["cgramortho"]
+    genre = row["genre"]
+    nombre = row["nombre"]
+
+    if (type(cgram) != str):
+        cgram = ""
+    if (type(cgramortho) != str):
+        cgramortho = ""
+    if (type(genre) != str):
+        genre = ""
+    if (type(nombre) != str):
+        nombre = ""
+
     answers = brain.learn(word, answer_number = 1, depth = 10, transform_best_into_neuron = True, max_conns = max_conns, compact_name = word if cgram == "subword" else "", compact_module = "languages.french.words." + cgramortho, module = "languages.french.words.functions", timeout = timeout)
 
     if (len(answers) == 0):
@@ -47,7 +62,16 @@ def process(brain: Brain, function_word_neuron_ids: dict, word: str, cgram: str,
 
     if (isinstance(answers[0], Connection)):
         if (cgram != "subword"):
-            answers[0] = Connection([answers[0]], function_word_neuron_ids[words.french_word_function_name(cgram)])
+            inputs = [answers[0]]
+
+            names = ["str_to_adjective", "str_to_article", "str_to_noun"]
+
+            if (words.french_word_function_name(cgram) in names):
+                inputs.append(genre)
+                inputs.append(nombre)
+
+            answers[0] = Connection(inputs, function_word_neuron_ids[words.french_word_function_name(cgram)])
+
             brain.transform_connection_into_neuron(answers[0], compact_name = word, compact_module = "languages.french.words." + cgramortho, module = "languages.french.words.functions")
 
         print(brain.connection_str(answers[0]), "->", brain.connection_output(answers[0]))
@@ -91,7 +115,15 @@ else:
         max_conns = 100
         timeout = 30 * 1000
 
+        subword_row = {"cgram": "subword", "cgramortho": "subword", "genre": "", "nombre": ""}
+
+        number = lex.shape[0]
+        number = 500
+
         for i, (index, row) in enumerate(lex.iterrows()):
+            if (i > number):
+                break
+
             if (not (row["ortho"], row["cgram"]) in s):
                 word = row["ortho"]
 
@@ -121,17 +153,17 @@ else:
                     for w in all_words:
                         print("Split word:", w)
 
-                        answers += process(brain, function_word_neuron_ids, w, "subword", "subword", max_conns, 30 * 1000)
+                        answers += process(brain, function_word_neuron_ids, w, subword_row, max_conns, 30 * 1000)
 
                     print("Word:", word)
 
-                    if (not len(process(brain, function_word_neuron_ids, word, row["cgram"], row["cgramortho"], max_conns, timeout, answers))):
+                    if (not len(process(brain, function_word_neuron_ids, word, row, max_conns, timeout, answers))):
                         skippedRows.append(row)
 
                         print("Word skipped because not found")
                     else:
                         brain.save("word_brain_tmp.bin")
-                elif (not len(process(brain, function_word_neuron_ids, word, row["cgram"], row["cgramortho"], max_conns, 30 * 1000))):
+                elif (not len(process(brain, function_word_neuron_ids, word, row, max_conns, 30 * 1000))):
                     n = len(word) // 2
                     found = False
 
@@ -147,15 +179,15 @@ else:
 
                         print("Split word:", w1)
 
-                        answers += process(brain, function_word_neuron_ids, w1, "subword", "subword", max_conns, 30 * 1000)
+                        answers += process(brain, function_word_neuron_ids, w1, subword_row, max_conns, 30 * 1000)
 
                         print("Split word:", w2)
 
-                        answers += process(brain, function_word_neuron_ids, w2, "subword", "subword", max_conns, 30 * 1000)
+                        answers += process(brain, function_word_neuron_ids, w2, subword_row, max_conns, 30 * 1000)
 
                         print("Word:", word)
 
-                        if (len(process(brain, function_word_neuron_ids, word, row["cgram"], row["cgramortho"], max_conns, timeout, answers))):
+                        if (len(process(brain, function_word_neuron_ids, word, row, max_conns, timeout, answers))):
                             found = True
                             break
 

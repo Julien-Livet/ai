@@ -38,11 +38,25 @@ exceptionVerbs = {"avoir": {"present": {0: "ai", 1: "as", 2: "a", 3: "avons", 4:
                              "present subjunctive": {0: "dois", 1: "dois", 2: "doit", 3: "devons", 4: "devez", 5: "doivent"},
                              "imperfect subjunctive": {0: "dusse", 1: "dusses", 2: "dût", 3: "dussions", 4: "dussiez", 5: "dussent"},
                              "present conditional": {0: "devrais", 1: "devrais", 2: "devrait", 3: "devrions", 4: "devriez", 5: "devraient"},
-                             "present imperative": {0: "dois", 3: "devons", 4: "devez"}}}
+                             "present imperative": {0: "dois", 3: "devons", 4: "devez"}},
+                  "savoir": {"present": {0: "sais", 1: "sais", 2: "sait", 3: "savons", 4: "savez", 5: "savent"},
+                             "future": {0: "saurai", 1: "sauras", 2: "saura", 3: "saurons", 4: "saurez", 5: "sauront"},
+                             "present participle": {-1: "savant"},
+                             "past participle": {-1: "su"},
+                             "simple past": {0: "sus", 1: "sus", 2: "sut", 3: "sûmes", 4: "sûtes", 5: "surent"},
+                             "present subjunctive": {0: "sache", 1: "saches", 2: "sache", 3: "sachions", 4: "sachiez", 5: "sachent"},
+                             "imperfect subjunctive": {0: "susse", 1: "susses", 2: "sût", 3: "sussions", 4: "sussiez", 5: "sussent"},
+                             "present conditional": {0: "saurais", 1: "saurais", 2: "saurait", 3: "saurions", 4: "sauriez", 5: "sauraient"},
+                             "present imperative": {0: "sache", 3: "sachons", 4: "sachez"}}}
 
 class Adjective:
-    def __init__(self, word: str):
+    def __init__(self, word: str, gender: str, number: str):
+        if (number == "p" and gender == ""):
+            gender = "m"
+
         self.word = word
+        self.gender = gender
+        self.number = number
 
     def female(self) -> str:
         if (self.word.endswith("x") or self.word.endswith("s")):
@@ -79,8 +93,13 @@ class Adverb:
         return self.word
 
 class Article:
-    def __init__(self, word: str):
+    def __init__(self, word: str, gender: str, number: str):
+        if (number == "p" and gender == ""):
+            gender = "m"
+
         self.word = word
+        self.gender = gender
+        self.number = number
 
     def __str__(self) -> str:
         return self.word
@@ -107,8 +126,13 @@ class Liaison:
         return self.word
 
 class Noun:
-    def __init__(self, word: str):
+    def __init__(self, word: str, gender: str, number: str):
+        if (number == "p" and gender == ""):
+            gender = "m"
+
         self.word = word
+        self.gender = gender
+        self.number = number
 
     def plural(self) -> str:
         if (self.word.endswith("x") or self.word.endswith("s") or self.word.endswith("z")):
@@ -152,13 +176,14 @@ class Syllable:
 class Verb:
     def __init__(self, infinitive: str):
         self.infinitive = infinitive
-        self.exceptions = {}
-
-        if (infinitive in exceptionVerbs.keys()):
-            self.exceptions = exceptionVerbs[infinitive]
 
     def conjugate(self, time: str, personalPronoun: int = -1):
-        d = self.exceptions.get(time, {})
+        exceptions = {}
+
+        if (self.infinitive in exceptionVerbs.keys()):
+            exceptions = exceptionVerbs[self.infinitive]
+
+        d = exceptions.get(time, {})
         w = d.get(personalPronoun, None)
 
         if (w != None):
@@ -169,24 +194,44 @@ class Verb:
                 d = {0: "e", 1: "es", 2: "e", 3: "eons", 4: "ez", 5: "ent"}
 
                 return self.infinitive[:-2] + d[personalPronoun]
+            elif (self.infinitive.endswith("mettre")):
+                d = {0: "s", 1: "s", 2: "", 3: "tons", 4: "tez", 5: "tent"}
+
+                return self.infinitive[:-3] + d[personalPronoun]
+            elif (self.infinitive.endswith("prendre")):
+                d = {0: "ds", 1: "ds", 2: "d", 3: "ons", 4: "ez", 5: "ent"}
+
+                return self.infinitive[:-3] + d[personalPronoun]
+            elif (self.infinitive.endswith("ivre")):
+                d = {0: "s", 1: "s", 2: "t", 3: "vons", 4: "vez", 5: "vent"}
+
+                return self.infinitive[:-3] + d[personalPronoun]
+            elif (self.infinitive.endswith("tendre")):
+                d = {0: "s", 1: "s", 2: "", 3: "ons", 4: "ez", 5: "ent"}
+
+                return self.infinitive[:-2] + d[personalPronoun]
             elif (self.infinitive.endswith("dre")):
-                d = {0: "s", 1: "s", 2: "t", 3: "nons", 4: "nez", 5: "nent"}
+                d = {0: "s", 1: "s", 2: "t", 3: "dons", 4: "dez", 5: "dent"}
 
                 return self.infinitive[:-3] + d[personalPronoun]
             elif (self.infinitive.endswith("oir")):
-                d = {0: "ois", 1: "ois", 2: "oit", 3: "oyons", 4: "oyez", 5: "oyent"}
+                d = {0: "ois", 1: "ois", 2: "oit", 3: "oyons", 4: "oyez", 5: "oient"}
 
                 return self.infinitive[:-3] + d[personalPronoun]
             elif (self.infinitive.endswith("oire")):
                 d = {0: "ois", 1: "ois", 2: "oit", 3: "uvons", 4: "uvez", 5: "oivent"}
 
                 return self.infinitive[:-4] + d[personalPronoun]
+            elif (self.infinitive.endswith("tir")):
+                d = {0: "s", 1: "s", 2: "t", 3: "tons", 4: "tez", 5: "tent"}
+
+                return self.infinitive[:-3] + d[personalPronoun]
             elif (self.infinitive.endswith("ir")):
                 d = {0: "is", 1: "is", 2: "it", 3: "issons", 4: "issez", 5: "issent"}
 
                 return self.infinitive[:-2] + d[personalPronoun]
-            elif (self.infinitive.endswith("dre")):
-                d = {0: "ds", 1: "ds", 2: "d", 3: "ons", 4: "ez", 5: "ent"}
+            elif (self.infinitive.endswith("ire")):
+                d = {0: "is", 1: "is", 2: "it", 3: "isons", 4: "ites", 5: "isent"}
 
                 return self.infinitive[:-3] + d[personalPronoun]
             elif (self.infinitive.endswith("raire")):
@@ -202,16 +247,14 @@ class Verb:
 
             if (self.infinitive.endswith("oir")):
                 return self.infinitive[:-3] + "err" + d[personalPronoun]
-            elif (self.infinitive.endswith("oire")):
+            elif (self.infinitive.endswith("oire") or self.infinitive.endswith("re")):
                 return self.infinitive[:-1] + d[personalPronoun]
             elif (self.infinitive.endswith("er") or self.infinitive.endswith("ir")):
                 return self.infinitive + d[personalPronoun]
-            elif (self.infinitive.endswith("dre")):
-                return self.infinitive[:-1] + d[personalPronoun]
             elif (self.infinitive.endswith("aire")):
                 return self.infinitive[:-4] + "er" + d[personalPronoun]
         elif (time == "present participle"):
-            if (self.infinitive.endswith("er") or self.infinitive.endswith("re")):
+            if (self.infinitive.endswith("er") or self.infinitive.endswith("re") or self.infinitive.endswith("tir")):
                 return self.infinitive[:-2] + "ant"
             elif (self.infinitive.endswith("oir")):
                 return self.infinitive[:-3] + "oyant"
@@ -219,17 +262,23 @@ class Verb:
                 return self.infinitive[:-4] + "uvant"
             elif (self.infinitive.endswith("ir")):
                 return self.infinitive[:-3] + "issant"
+            elif (self.infinitive.endswith("ire")):
+                return self.infinitive[:-3] + "isant"
             elif (self.infinitive.endswith("aire")):
                 return self.infinitive[:-2] + "sant"
         elif (time == "past participle"):
             if (self.infinitive.endswith("er")):
                 return self.infinitive[:-2] + "é"
+            elif (self.infinitive.endswith("ivre")):
+                return self.infinitive[:-4] + "écu"
             elif (self.infinitive.endswith("oir")):
                 return self.infinitive[:-3] + "u"
             elif (self.infinitive.endswith("oire")):
                 return self.infinitive[:-4] + "u"
             elif (self.infinitive.endswith("ir")):
-                return self.infinitive[:-2] + "i"
+                return self.infinitive[:-1]
+            elif (self.infinitive.endswith("ire")):
+                return self.infinitive[:-3] + "it"
             elif (self.infinitive.endswith("aire")):
                 return self.infinitive[:-2] + "t"
             elif (self.infinitive.endswith("re")):
@@ -237,8 +286,10 @@ class Verb:
         elif (time == "imperfect"):
             d = {0: "ais", 1: "ais", 2: "ait", 3: "ions", 4: "iez", 5: "aient"}
 
-            if (self.infinitive.endswith("er")):
+            if (self.infinitive.endswith("er") or self.infinitive.endswith("tir")):
                 return self.infinitive[:-2] + d[personalPronoun]
+            elif (self.infinitive.endswith("ire")):
+                return self.infinitive[:-2] + "s" + d[personalPronoun]
             elif (self.infinitive.endswith("oir")):
                 d = {0: "ais", 1: "ais", 2: "ait", 3: "ons", 4: "ez", 5: "aient"}
 
@@ -270,8 +321,16 @@ class Verb:
                 d = {0: "is", 1: "is", 2: "it", 3: "îmes", 4: "îtes", 5: "irent"}
 
                 return self.infinitive[:-2] + d[personalPronoun]
+            elif (self.infinitive.endswith("ire")):
+                d = {0: "is", 1: "is", 2: "it", 3: "îmes", 4: "îtes", 5: "irent"}
+
+                return self.infinitive[:-3] + d[personalPronoun]
             elif (self.infinitive.endswith("aire")):
                 d = {0: "is", 1: "is", 2: "it", 3: "îmes", 4: "îtes", 5: "irent"}
+
+                return self.infinitive[:-4] + d[personalPronoun]
+            elif (self.infinitive.endswith("ivre")):
+                d = {0: "écus", 1: "écus", 2: "écut", 3: "écûmes", 4: "écûtes", 5: "écurent"}
 
                 return self.infinitive[:-4] + d[personalPronoun]
             elif (self.infinitive.endswith("re")):
@@ -283,7 +342,7 @@ class Verb:
         elif (time == "pluperfect"):
             return avoir().conjugate("imperfect", personalPronoun) + " " + self.conjugate("past participle")
         elif (time == "present subjunctive"):
-            if (self.infinitive.endswith("er")):
+            if (self.infinitive.endswith("er") or self.infinitive.endswith("tir")):
                 d = {0: "e", 1: "es", 2: "e", 3: "ions", 4: "iez", 5: "ent"}
             elif (self.infinitive.endswith("oir")):
                 d = {0: "oie", 1: "oies", 2: "oie", 3: "oyions", 4: "oyiez", 5: "oient"}
@@ -295,6 +354,10 @@ class Verb:
                 return self.infinitive[:-4] + d[personalPronoun]
             elif (self.infinitive.endswith("ir")):
                 d = {0: "isse", 1: "isses", 2: "isse", 3: "issions", 4: "issiez", 5: "issent"}
+            elif (self.infinitive.endswith("ire")):
+                d = {0: "ise", 1: "ises", 2: "ise", 3: "isions", 4: "isiez", 5: "isent"}
+
+                return self.infinitive[:-3] + d[personalPronoun]
             elif (self.infinitive.endswith("aire")):
                 d = {0: "e", 1: "es", 2: "e", 3: "ions", 4: "iez", 5: "ent"}
 
@@ -308,12 +371,16 @@ class Verb:
         elif (time == "imperfect subjunctive"):
             if (self.infinitive.endswith("er")):
                 d = {0: "asse", 1: "asses", 2: "ât", 3: "assions", 4: "assiez", 5: "assent"}
-            elif (self.infinitive.endswith("oir")):
+            elif (self.infinitive.endswith("oir") or self.infinitive.endswith("ire")):
                 d = {0: "isse", 1: "isses", 2: "ît", 3: "issions", 4: "issiez", 5: "issent"}
 
                 return self.infinitive[:-3] + d[personalPronoun]
             elif (self.infinitive.endswith("oire")):
                 d = {0: "usse", 1: "usses", 2: "ût", 3: "ussions", 4: "ussiez", 5: "ussent"}
+
+                return self.infinitive[:-4] + d[personalPronoun]
+            elif (self.infinitive.endswith("ivre")):
+                d = {0: "écusse", 1: "écusses", 2: "écût", 3: "écussions", 4: "écussiez", 5: "écussent"}
 
                 return self.infinitive[:-4] + d[personalPronoun]
             elif (self.infinitive.endswith("ir") or self.infinitive.endswith("re")):
@@ -330,30 +397,18 @@ class Verb:
         elif (time == "future perfect"):
             return avoir().conjugate("future", personalPronoun) + " " + self.conjugate("past participle")
         elif (time == "present conditional"):
-            if (self.infinitive.endswith("er")):
-                d = {0: "ais", 1: "ais", 2: "ait", 3: "ions", 4: "iez", 5: "aient"}
+            d = {0: "ais", 1: "ais", 2: "ait", 3: "ions", 4: "iez", 5: "aient"}
 
+            if (self.infinitive.endswith("er")):
                 return self.infinitive + d[personalPronoun]
             elif (self.infinitive.endswith("oir")):
-                d = {0: "ais", 1: "ais", 2: "ait", 3: "ions", 4: "iez", 5: "aient"}
-
                 return self.infinitive[:-3] + "err" + d[personalPronoun]
-            elif (self.infinitive.endswith("oire")):
-                d = {0: "ais", 1: "ais", 2: "ait", 3: "ions", 4: "iez", 5: "aient"}
-
+            elif (self.infinitive.endswith("oire") or self.infinitive.endswith("re")):
                 return self.infinitive[:-1] + d[personalPronoun]
             elif (self.infinitive.endswith("ir")):
-                d = {0: "irais", 1: "irais", 2: "irait", 3: "irions", 4: "iriez", 5: "iraient"}
-
-                return self.infinitive[:-2] + d[personalPronoun]
+                return self.infinitive + d[personalPronoun]
             elif (self.infinitive.endswith("aire")):
-                d = {0: "ais", 1: "ais", 2: "ait", 3: "ions", 4: "iez", 5: "aient"}
-
                 return self.infinitive[:-4] + "er" + d[personalPronoun]
-            elif (self.infinitive.endswith("re")):
-                d = {0: "ais", 1: "ais", 2: "ait", 3: "ions", 4: "iez", 5: "aient"}
-
-                return self.infinitive[:-1] + d[personalPronoun]
         elif (time == "past conditional"):
             return avoir().conjugate("present conditional", personalPronoun) + " " + self.conjugate("past participle")
         elif (time == "present imperative"):
@@ -369,6 +424,10 @@ class Verb:
                 d = {0: "ois", 3: "uvons", 4: "uvez"}
 
                 return self.infinitive[:-4] + d[personalPronoun]
+            elif (self.infinitive.endswith("tir")):
+                d = {0: "s", 3: "tons", 4: "tez"}
+
+                return self.infinitive[:-3] + d[personalPronoun]
             elif (self.infinitive.endswith("ir")):
                 d = {0: "s", 3: "ssons", 4: "ssez"}
 
@@ -377,6 +436,10 @@ class Verb:
                 d = {0: "ais", 3: "aisons", 4: "aites"}
 
                 return self.infinitive[:-4] + d[personalPronoun]
+            elif (self.infinitive.endswith("ire")):
+                d = {0: "s", 3: "sons", 4: "tes"}
+
+                return self.infinitive[:-2] + d[personalPronoun]
             elif (self.infinitive.endswith("re")):
                 d = {0: "s", 3: "ons", 4: "ez"}
 
@@ -405,14 +468,14 @@ class Verb:
     def __str__(self) -> str:
         return self.infinitive
 
-def str_to_adjective(s: str) -> Adjective:
-    return Adjective(s)
+def str_to_adjective(s: str, gender: str, number: str) -> Adjective:
+    return Adjective(s, gender, number)
 
 def str_to_adverb(s: str) -> Adverb:
     return Adverb(s)
 
-def str_to_article(s: str) -> Article:
-    return Article(s)
+def str_to_article(s: str, gender: str, number: str) -> Article:
+    return Article(s, gender, number)
 
 def str_to_auxiliary(s: str) -> Auxiliary:
     return Auxiliary(s)
@@ -423,8 +486,8 @@ def str_to_conjunction(s: str) -> Conjunction:
 def str_to_liaison(s: str) -> Liaison:
     return Liaison(s)
 
-def str_to_noun(s: str) -> Noun:
-    return Noun(s)
+def str_to_noun(s: str, gender: str, number: str) -> Noun:
+    return Noun(s, gender, number)
 
 def str_to_onomatopoeia(s: str) -> Onomatopoeia:
     return Onomatopoeia(s)
@@ -522,7 +585,7 @@ def add(brain: Brain):
           "ects", "ée", "ées", "ef", "efs", "eh", "és", "è", "ès", "etc", "ë", "ël", "ê", "ed", "eds", "ei", "eil", "ein", "eins", "el", "els", "em", "emps", "en", "end",
           "ends", "ens", "ent", "ents", "eo", "eoir", "ept", "epts", "er", "ert", "erts", "ers", "es", "est", "et", "ets", "êt", "êts", "eu", "euf", "eufs", "eul",
           "euls", "eun", "euns", "eur", "eus", "eurs", "eut", "eût", "eux", "ew", "ex", "ez", "i", "ï", "î", "ic", "iez", "if", "ifs", "il", "ilm",
-          "ilms", "ils", "im", "in", "inct", "incts", "ingt", "ingts", "inq", "ins", "int", "ip", "ir", "irs", "is", "it", "its", "ix", "o", "ô", "ob", "obs",
+          "ilms", "ils", "im", "in", "inct", "incts", "ing", "ings", "ingt", "ingts", "inq", "ins", "int", "ip", "ir", "irs", "is", "it", "its", "ix", "o", "ô", "ob", "obs",
           "oc", "oeil", "œil", "oeuf", "oeufs", "oeur", "oeurs", "œuf", "œufs", "œur", "œurs", "of", "oh", "oi", "oî", "oid", "oids", "oigt", "oigts", "oin", "oins", "oing", "oings", "oins", "oint", "oints",
           "oir", "oirs", "ois", "oix", "ol", "ols", "on", "onc", "ond", "onds", "ong", "ongs", "ons", "ont", "om", "omp", "oms", "op",
           "or", "ord", "ords", "orp", "orps", "ors", "ort", "orts", "os", "ot", "ôt", "ots", "ou", "oû", "ouf", "oup", "oups", "our", "ourd", "ourds", "ourt", "ourts",
@@ -551,6 +614,10 @@ def add(brain: Brain):
     syllables.add("s")
     syllables.add("t")
     syllables.add("qu")
+    syllables.add("c")
+    syllables.add("m")
+    syllables.add("n")
+    syllables.add("j")
 
     for syllable in syllables:
         neuronIds[syllable] = brain.add(Neuron(lambda syllable = syllable: Syllable(syllable), syllable, outputType = Syllable, module = "languages.french.words.syllables"))
