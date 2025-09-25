@@ -87,7 +87,7 @@ def add_value(brain: Brain, x: sympy.Expr, name: str = None):
         name = str(x)
 
     def value(x = x) -> sympy.Expr:
-        return x if type(x) is sympy.Expr else x()
+        return x if isinstance(x, sympy.Expr) else x()
 
     neuronIds[name] = brain.add(Neuron(value, name, module = "sympy.variables"))
 

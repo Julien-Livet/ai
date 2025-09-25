@@ -47,7 +47,8 @@ exceptionVerbs = {"avoir": {"present": {0: "ai", 1: "as", 2: "a", 3: "avons", 4:
                              "present subjunctive": {0: "sache", 1: "saches", 2: "sache", 3: "sachions", 4: "sachiez", 5: "sachent"},
                              "imperfect subjunctive": {0: "susse", 1: "susses", 2: "sût", 3: "sussions", 4: "sussiez", 5: "sussent"},
                              "present conditional": {0: "saurais", 1: "saurais", 2: "saurait", 3: "saurions", 4: "sauriez", 5: "sauraient"},
-                             "present imperative": {0: "sache", 3: "sachons", 4: "sachez"}}}
+                             "present imperative": {0: "sache", 3: "sachons", 4: "sachez"}},
+                  "faire": {"present": {0: "fais", 1: "fais", 2: "fait", 3: "faisons", 4: "faites", 5: "font"}}}
 
 class Adjective:
     def __init__(self, word: str, gender: str, number: str):
@@ -137,6 +138,10 @@ class Noun:
     def plural(self) -> str:
         if (self.word.endswith("x") or self.word.endswith("s") or self.word.endswith("z")):
             return self.word
+        elif (self.word.endswith("al")):
+            return self.word[:-1] + "ux"
+        elif (self.word.endswith("vail")):
+            return self.word[:-2] + "ux"
         elif (self.word.endswith("au") or self.word.endswith("eu") or self.word.endswith("eau")):
             return self.word + "x"
 
@@ -199,7 +204,7 @@ class Verb:
 
                 return self.infinitive[:-3] + d[personalPronoun]
             elif (self.infinitive.endswith("prendre")):
-                d = {0: "ds", 1: "ds", 2: "d", 3: "ons", 4: "ez", 5: "ent"}
+                d = {0: "ds", 1: "ds", 2: "d", 3: "ons", 4: "ez", 5: "nent"}
 
                 return self.infinitive[:-3] + d[personalPronoun]
             elif (self.infinitive.endswith("ivre")):
@@ -218,8 +223,12 @@ class Verb:
                 d = {0: "ois", 1: "ois", 2: "oit", 3: "oyons", 4: "oyez", 5: "oient"}
 
                 return self.infinitive[:-3] + d[personalPronoun]
-            elif (self.infinitive.endswith("oire")):
+            elif (self.infinitive.endswith("boire")):
                 d = {0: "ois", 1: "ois", 2: "oit", 3: "uvons", 4: "uvez", 5: "oivent"}
+
+                return self.infinitive[:-4] + d[personalPronoun]
+            elif (self.infinitive.endswith("oire")):
+                d = {0: "ois", 1: "ois", 2: "oit", 3: "oyons", 4: "oyez", 5: "oient"}
 
                 return self.infinitive[:-4] + d[personalPronoun]
             elif (self.infinitive.endswith("tir")):

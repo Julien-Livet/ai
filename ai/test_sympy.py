@@ -41,7 +41,7 @@ while (True):
     brain.deactivate_all_modules()
 
     for module in brain.modules:
-        if ("sympy" in module or "chars" in module or "digits" in module or "symbols" in module):
+        if ("sympy" in module or "chars" in module or "digits" in module or "symbols" in module or "strs" in module):
             brain.activate_module(module)
 
     answers = brain.learn(sp_output_expression, depth = 10, compact_name = str(sp_output_expression), compact_module = "sympy.constants", module = "sympy.functions")

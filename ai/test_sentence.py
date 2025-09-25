@@ -31,6 +31,7 @@ for id, neuron in brain.neurons.items():
             articles.append(neuron)
 
 #random.seed(datetime.datetime.now().timestamp())
+random.seed(11)
 
 sentences = []
 
@@ -93,7 +94,7 @@ for i in range(0, 10):
         while ("'" in a2 or "du" in a2 or "au" in a2):
             a2 = random.choice(a)
     else:
-        if (not n1[0] in words.consonants):
+        if (not n2[0] in words.consonants):
             a2 = "l'"
         else:
             for article in articles:
@@ -153,12 +154,13 @@ for sentence in sentences:
 
     answers = []
 
-    answers += brain.learn(sentence, answer_number = 1, depth = 10, transform_best_into_neuron = True, compact_name = sentence, compact_module = "languages.french.sentences", module = "languages.french.sentences.functions", timeout = 10 * 1000)
+    answers += brain.learn(sentence, answer_number = 1, depth = 10, transform_best_into_neuron = True, compact_name = sentence, compact_module = "languages.french.sentences", module = "languages.french.sentences.functions", timeout = 20 * 1000)
 
     while (brain.connection_output(answers[-1]) != sentence):
+        #print(brain.connection_output(answers[-1]))
         brain.clear_connections()
         brain.set_connections(answers)
-        answers += brain.learn(sentence, answer_number = 1, depth = 10, transform_best_into_neuron = True, compact_name = sentence, compact_module = "languages.french.sentences", module = "languages.french.sentences.functions", timeout = 10 * 1000)
+        answers += brain.learn(sentence, answer_number = 1, depth = 10, transform_best_into_neuron = True, compact_name = sentence, compact_module = "languages.french.sentences", module = "languages.french.sentences.functions", timeout = 20 * 1000)
 
     brain.save("sentence_brain.bin")
 

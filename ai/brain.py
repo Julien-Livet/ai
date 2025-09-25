@@ -539,11 +539,62 @@ class Brain:
 
         return neurons + connections
 
-    def transform_connection_into_neuron(self, connection: Connection, name: str = "", module: str = None, compact_name: str = "", compact_module: str = None):
+    def transform_connection_into_neuron(self, connection: Connection, name: str = "", module: str = None, compact_name: str = "", compact_module: str = None, ultra_compact: bool = True, ultra_compact_name: str = ""):
         if (compact_module == None):
             compact_module = self.neurons[connection.neuronId].module
 
         value = self.connection_output(connection)
+
+        ultra_compact_id = connection.neuronId
+
+        if (ultra_compact):
+            types = connection.origin_input_types()
+            values = connection.origin_input_values()
+
+            for i in range(0, len(values)):
+                try:
+                    values[i] = str(values[i])
+                except:
+                    pass
+
+            value_to_index = {}
+            new_types = []
+            indices = []
+
+            for i, val in enumerate(values):
+                if (val not in value_to_index):
+                    value_to_index[val] = len(new_types)
+                    new_types.append(types[i])
+
+                indices.append(value_to_index[val])
+
+            if (len(new_types) != len(types)):
+                def make_f_quick(connection, indices):
+                    def f(*args_new):
+                        def arg_iter_gen():
+                            for idx in indices:
+                                yield args_new[idx]
+
+                        def replace_inputs(conn, arg_iter):
+                            vals = []
+
+                            for inp in conn.inputs:
+                                if (isinstance(inp, Neuron) and len(inp.inputTypes) == 0):
+                                    vals.append(next(arg_iter))
+                                elif isinstance(inp, Connection):
+                                    vals.append(replace_inputs(inp, arg_iter))
+                                else:
+                                    vals.append(next(arg_iter))
+
+                            return self.neurons[conn.neuronId].output(*vals)
+
+                        return replace_inputs(connection, arg_iter_gen())
+
+                    return f
+
+                f = make_f_quick(connection, indices)
+
+                ultra_compact_id = self.add(Neuron(f, ultra_compact_name, new_types, self.neurons[connection.neuronId].outputType, module = module, weight = self.connection_weight(connection)))
 
         compact_id = self.add(Neuron(lambda value = value: value, compact_name, [], self.neurons[connection.neuronId].outputType, module = compact_module, weight = self.connection_weight(connection)))
 
@@ -559,7 +610,7 @@ class Brain:
                     pass
 
             if (not added):
-                return connection.neuronId, compact_id
+                return connection.neuronId, compact_id, ultra_compact_id
 
         neurons = self.neurons
 
@@ -584,7 +635,7 @@ class Brain:
 
         id = self.add(Neuron(function, name, connection.origin_input_types(), self.neurons[connection.neuronId].outputType, module = module, weight = self.connection_weight(connection)))
 
-        return id, compact_id
+        return id, compact_id, ultra_compact_id
 
     def save(self, filename: str):
         with open(filename, "wb") as f:
@@ -802,7 +853,7 @@ class Brain:
 
                 new_av = sorted(new_av, key = lambda x: x[2].weight, reverse = True)
 
-                for combo in itertools.permutations(new_av, len(neuron.inputTypes)):
+                for combo in itertools.product(new_av, repeat = len(neuron.inputTypes)):
                     if (datetime.datetime.now() - time > datetime.timedelta(milliseconds = timeout)):
                         break
 
@@ -811,7 +862,6 @@ class Brain:
                     ok = True
 
                     for (val, t, prov), expected_type in zip(combo, neuron.inputTypes):
-
                         if (not (check_type(t, expected_type) or t == expected_type)):
                             ok = False
                             break

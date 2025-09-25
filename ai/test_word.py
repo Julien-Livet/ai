@@ -57,8 +57,8 @@ def process(brain: Brain, function_word_neuron_ids: dict, word: str, row, max_co
 
     answers = brain.learn(word, answer_number = 1, depth = 10, transform_best_into_neuron = True, max_conns = max_conns, compact_name = word if cgram == "subword" else "", compact_module = "languages.french.words." + cgramortho, module = "languages.french.words.functions", timeout = timeout)
 
-    if (len(answers) == 0):
-        return answers
+    if (isinstance(answers[0], Connection) and brain.connection_output(answers[0]) != word):
+        return []
 
     if (isinstance(answers[0], Connection)):
         if (cgram != "subword"):
@@ -93,13 +93,15 @@ brain = Brain()
 with_pretraining = True
 filename = "word_brain.bin"
 
+strs.add(brain)
+symbols.add(brain)
+function_word_neuron_ids = words.add(brain)
+
+subword_row = {"cgram": "subword", "cgramortho": "subword", "genre": "", "nombre": ""}
+
 if (os.path.exists(filename)):
     brain.load(filename)
 else:
-    strs.add(brain)
-    symbols.add(brain)
-    function_word_neuron_ids = words.add(brain)
-
     if (os.path.exists("word_brain_tmp.bin")):
         brain.load("word_brain_tmp.bin")
 
@@ -114,8 +116,6 @@ else:
         skippedRows = []
         max_conns = 100
         timeout = 30 * 1000
-
-        subword_row = {"cgram": "subword", "cgramortho": "subword", "genre": "", "nombre": ""}
 
         number = lex.shape[0]
         number = 500
@@ -211,5 +211,5 @@ else:
 while (True):
     word = input("What is your word (for example: bonjour)? ")
 
-    process(brain, word)
+    process(brain, function_word_neuron_ids, word, subword_row)
     brain.save(filename)
