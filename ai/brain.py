@@ -807,24 +807,22 @@ class Brain:
             av = [(self.neurons[id].output(), self.neurons[id].outputType, self.neurons[id]) for id in origin_neuron_ids] + [(self.connection_output(c), self.neurons[c.neuronId].outputType, c) for c in set(conns) | connections]
 
             #av = sorted(av, key = lambda x: x[2].weight, reverse = True)
-            """
+            #"""
             s = set()
             av_ = []
 
             for x in av:
-                if (isinstance(value, str)):
-                    if (not str(x[0]) in s):
-                        av_.append(x)
-                        #s.add(str(x[0]))
-                else:
-                    if (not x[0] in s):
-                        av_.append(x)
-                        #s.add(x[0])
+                try:
+                    key = hash(x[0])
+                except:
+                    key = str(x[0])
+
+                if (not key in s):
+                    av_.append(x)
+                    s.add(key)
 
             av = av_
-
-            av = sorted(av, key = lambda x: heuristic(x[0], value))
-            """
+            #"""
             av = sorted(av, key = lambda x: heuristic(x[0], value))
             #print([str(x[0]) for x in av])
 
@@ -845,14 +843,14 @@ class Brain:
 
                 for t in av:
                     for tt in s:
-                        if (isinstance(tt, type)):
+                        if (isinstance(tt, type) or typing.get_origin(tt) != None):
                             if (check_type(t[1], tt) or t[1] == tt):
                                 new_av.append(t)
                         else:
                             if (check_type(t[1], type(tt)) or t[1] == type(tt)):
                                 new_av.append(t)
 
-                new_av = sorted(new_av, key = lambda x: x[2].weight, reverse = True)
+                #new_av = sorted(new_av, key = lambda x: x[2].weight, reverse = True)
 
                 for combo in itertools.product(new_av, repeat = len(neuron.inputTypes)):
                     if (datetime.datetime.now() - time > datetime.timedelta(milliseconds = timeout)):
@@ -925,7 +923,7 @@ class Brain:
         for c in conns:
             self.reinforce_connection(c, reinforcement_weight)
 
-        if (len(conns) and transform_best_into_neuron and self.connection_output(conns[0]) == value):
+        if (len(conns) and transform_best_into_neuron and not compare(self.connection_output(conns[0]), value)):
             self.transform_connection_into_neuron(conns[0], name = name, module = module, compact_name = compact_name, compact_module = compact_module)
 
         self.connections |= set(conns)

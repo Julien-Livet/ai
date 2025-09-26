@@ -162,7 +162,7 @@ def where_ndarray(condition: np.ndarray, x: np.ndarray, y: np.ndarray) -> np.nda
 def shape_ndarray(x: np.ndarray) -> tuple:
     return x.shape
 
-def tile_ndarray(a: np.ndarray, reps: typing.Union[np.ndarray, int]) -> np.ndarray:
+def tile_ndarray(a: np.ndarray, reps: typing.Union[np.ndarray, tuple, list, int]) -> np.ndarray:
     return np.tile(a, reps)
 
 def flip_ndarray(a: np.ndarray) -> np.ndarray:
@@ -170,6 +170,18 @@ def flip_ndarray(a: np.ndarray) -> np.ndarray:
 
 def rot90_ndarray(a: np.ndarray) -> np.ndarray:
     return np.rot90(a)
+
+def fliplr_ndarray(a: np.ndarray) -> np.ndarray:
+    return np.fliplr(a)
+
+def put_ndarray(at: typing.Union[np.ndarray, tuple, list], src: np.ndarray, dst: np.ndarray) -> np.ndarray:
+    begin = np.array(at)
+    end = np.array(at) + np.array(src.shape)
+    slices = tuple(slice(b, e) for b, e in zip(begin, end))
+    m = copy.deepcopy(dst)
+    m[slices] = src
+
+    return m
 
 def add(brain: Brain):
     neuronIds = {}
@@ -225,9 +237,11 @@ def add(brain: Brain):
     neuronIds["all_ndarray"] = brain.add(Neuron(all_ndarray, "all_ndarray", module = "ndarrays.operators.logical"))
     neuronIds["where_ndarray"] = brain.add(Neuron(where_ndarray, "where_ndarray", module = "ndarrays.operators.logical"))
     neuronIds["shape_ndarray"] = brain.add(Neuron(shape_ndarray, "shape_ndarray", module = "ndarrays.functions"))
-    neuronIds["tile_ndarray"] = brain.add(Neuron(shape_ndarray, "shape_ndarray", module = "ndarrays.functions.array"))
+    neuronIds["tile_ndarray"] = brain.add(Neuron(tile_ndarray, "tile_ndarray", module = "ndarrays.functions.array"))
     neuronIds["flip_ndarray"] = brain.add(Neuron(flip_ndarray, "flip_ndarray", module = "ndarrays.functions.array"))
     neuronIds["rot90_ndarray"] = brain.add(Neuron(rot90_ndarray, "rot90_ndarray", module = "ndarrays.functions.array"))
+    neuronIds["fliplr_ndarray"] = brain.add(Neuron(fliplr_ndarray, "fliplr_ndarray", module = "ndarrays.functions.array"))
+    neuronIds["put_ndarray"] = brain.add(Neuron(put_ndarray, "put_ndarray", module = "ndarrays.functions.array"))
 
     return neuronIds
 
