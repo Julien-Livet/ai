@@ -159,6 +159,18 @@ def all_ndarray(x: np.ndarray) -> bool:
 def where_ndarray(condition: np.ndarray, x: np.ndarray, y: np.ndarray) -> np.ndarray:
     return np.where(condition, x, y)
 
+def shape_ndarray(x: np.ndarray) -> tuple:
+    return x.shape
+
+def tile_ndarray(a: np.ndarray, reps: typing.Union[np.ndarray, int]) -> np.ndarray:
+    return np.tile(a, reps)
+
+def flip_ndarray(a: np.ndarray) -> np.ndarray:
+    return np.flip(a)
+
+def rot90_ndarray(a: np.ndarray) -> np.ndarray:
+    return np.rot90(a)
+
 def add(brain: Brain):
     neuronIds = {}
 
@@ -212,6 +224,10 @@ def add(brain: Brain):
     neuronIds["any_ndarray"] = brain.add(Neuron(any_ndarray, "any_ndarray", module = "ndarrays.operators.logical"))
     neuronIds["all_ndarray"] = brain.add(Neuron(all_ndarray, "all_ndarray", module = "ndarrays.operators.logical"))
     neuronIds["where_ndarray"] = brain.add(Neuron(where_ndarray, "where_ndarray", module = "ndarrays.operators.logical"))
+    neuronIds["shape_ndarray"] = brain.add(Neuron(shape_ndarray, "shape_ndarray", module = "ndarrays.functions"))
+    neuronIds["tile_ndarray"] = brain.add(Neuron(shape_ndarray, "shape_ndarray", module = "ndarrays.functions.array"))
+    neuronIds["flip_ndarray"] = brain.add(Neuron(flip_ndarray, "flip_ndarray", module = "ndarrays.functions.array"))
+    neuronIds["rot90_ndarray"] = brain.add(Neuron(rot90_ndarray, "rot90_ndarray", module = "ndarrays.functions.array"))
 
     return neuronIds
 

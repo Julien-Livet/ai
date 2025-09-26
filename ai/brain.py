@@ -807,7 +807,7 @@ class Brain:
             av = [(self.neurons[id].output(), self.neurons[id].outputType, self.neurons[id]) for id in origin_neuron_ids] + [(self.connection_output(c), self.neurons[c.neuronId].outputType, c) for c in set(conns) | connections]
 
             #av = sorted(av, key = lambda x: x[2].weight, reverse = True)
-            #"""
+            """
             s = set()
             av_ = []
 
@@ -824,7 +824,8 @@ class Brain:
             av = av_
 
             av = sorted(av, key = lambda x: heuristic(x[0], value))
-            #"""
+            """
+            av = sorted(av, key = lambda x: heuristic(x[0], value))
             #print([str(x[0]) for x in av])
 
             if (max_conns != None):
