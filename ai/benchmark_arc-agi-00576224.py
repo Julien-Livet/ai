@@ -17,23 +17,13 @@ neuronIds |= ints.add(brain)
 neuronIds |= ndarrays.add(brain)
 neuronIds |= tuples.add(brain)
 
-"""
-for module in brain.modules:
-    if ("ndarrays" in module):
-        brain.deactivate_module(module)
-
-brain.activate_module("ndarrays.functions")
-brain.activate_module("ndarrays.functions.array")
-"""
-
 brain.deactivate_all_modules()
 brain.neurons[neuronIds["tile_ndarray"]].activated = True
 brain.neurons[neuronIds["fliplr_ndarray"]].activated = True
 brain.neurons[neuronIds["floordiv_ndarray"]].activated = True
 brain.neurons[neuronIds["put_ndarray"]].activated = True
 
-#url = urllib.request.urlopen("https://raw.githubusercontent.com/arcprize/ARC-AGI-2/refs/heads/main/data/training/00576224.json")
-url = urllib.request.urlopen("file:///C:/Users/julie/Documents/GitHub/ai/ai/00576224.json")
+url = urllib.request.urlopen("https://raw.githubusercontent.com/arcprize/ARC-AGI-2/refs/heads/main/data/training/00576224.json")
 data = json.loads(url.read().decode())
 
 train = data["train"]
