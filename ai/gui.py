@@ -1,4 +1,6 @@
 from brain import Brain
+from connection import Connection
+from neuron import Neuron
 import numpy as np
 import os
 import pyqtgraph as pg
@@ -103,6 +105,18 @@ class Window(QtWidgets.QWidget):
         self.moduleLineEdit = QtWidgets.QLineEdit()
         self.learnPushButton = QtWidgets.QPushButton("Learn")
         self.connectPushButton = QtWidgets.QPushButton("Connect")
+        
+        self.connectionLabel = QtWidgets.QLabel("Connection")
+        self.connectionsComboBox = QtWidgets.QComboBox()
+        self.connectionsComboBox.currentTextChanged.connect(self.connectionChanged)
+        self.connectionsComboBox.clear()
+        self.connectionsComboBox.addItems([str(i) for i in range(0, len(self.brain.connections))])
+        self.connectionTreeWidget = QtWidgets.QTreeWidget()
+        self.connectionTreeWidget.setHeaderLabels(["Connection"])
+        self.connectionLayout = QtWidgets.QHBoxLayout()
+        self.connectionLayout.addWidget(self.connectionLabel)
+        self.connectionLayout.addWidget(self.connectionsComboBox)
+        
         self.clearConnectionsPushButton = QtWidgets.QPushButton("Clear connections")
         self.associatePushButton = QtWidgets.QPushButton("Associate")
 
@@ -143,6 +157,8 @@ class Window(QtWidgets.QWidget):
         self.layout.addWidget(self.show3dPushButton)
         self.layout.addWidget(self.plot_widget)
         self.layout.addLayout(self.learnLayout)
+        self.layout.addLayout(self.connectionLayout)
+        self.layout.addWidget(self.connectionTreeWidget)
         self.layout.addWidget(self.clearConnectionsPushButton)
         self.layout.addLayout(self.outputLayout)
 
@@ -172,6 +188,9 @@ class Window(QtWidgets.QWidget):
 
             self.neuronsComboBox.clear()
             self.neuronsComboBox.addItems(self.neuronItems())
+            
+            self.connectionsComboBox.clear()
+            self.connectionsComboBox.addItems([str(i) for i in range(0, len(self.brain.connections))])
 
             self.modulesComboBox.clear()
             self.modulesComboBox.addItems(sorted([x for x in self.brain.modules]))
@@ -227,6 +246,39 @@ class Window(QtWidgets.QWidget):
             return
 
         self.moduleCheckBox.setChecked(self.brain.modules[text])
+
+    def addItems(self, parent, connection: Connection):
+        connectionItem = QtWidgets.QTreeWidgetItem(["connection"])
+        
+        if (parent == None):
+            self.connectionTreeWidget.addTopLevelItem(connectionItem)
+        else:
+            parent.addChild(connectionItem)
+        
+        item = QtWidgets.QTreeWidgetItem(["inputs"])
+        connectionItem.addChild(item)
+        
+        for input in connection.inputs:
+            if (isinstance(input, Connection)):
+                self.addItems(item, input)
+            elif (isinstance(input, Neuron)):
+                it = QtWidgets.QTreeWidgetItem([self.brain.neuron_name(input)])
+                item.addChild(it)
+            else:
+                it = QtWidgets.QTreeWidgetItem([str(input)])
+                item.addChild(it)
+
+        item = QtWidgets.QTreeWidgetItem([self.brain.neuron_name(self.brain.neurons[connection.neuronId])])
+        connectionItem.addChild(item)
+
+    @QtCore.Slot()
+    def connectionChanged(self, text: str):
+        if (len(text) == 0):
+            return
+
+        self.addItems(None, list(self.brain.connections)[int(text)])
+        
+        self.connectionTreeWidget.expandAll()
 
     @QtCore.Slot()
     def neuronCheckStateChanged(self, state: QtCore.Qt.CheckState):
