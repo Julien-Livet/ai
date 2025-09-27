@@ -274,9 +274,9 @@ class Window(QtWidgets.QWidget):
 
     @QtCore.Slot()
     def connectionChanged(self, text: str):
-        if (len(text) == 0):
-            self.connectionTreeWidget.clear()
+        self.connectionTreeWidget.clear()
 
+        if (len(text) == 0):
             return
 
         self.addItems(None, list(self.brain.connections)[int(text)])
