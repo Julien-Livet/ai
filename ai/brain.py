@@ -65,6 +65,12 @@ def heuristic(val, target):
             return 1 + heuristic(str(val), str(target))
 
     try:
+        v = np.array(val)
+        t = np.array(target)
+
+        if (v.shape != t.shape):
+            return 100 + abs(np.sum(v) - np.sum(t))
+
         return np.linalg.norm(np.subtract(val, target))
     except:
         try:
@@ -105,6 +111,12 @@ def compare(val, target):
         else:
             return 1 + compare(str(val), str(target))
     elif (isinstance(val, np.ndarray) and isinstance(target, np.ndarray)):
+        v = np.array(val)
+        t = np.array(target)
+
+        if (v.shape != t.shape):
+            return 100 + abs(np.sum(v) - np.sum(t))
+
         return np.linalg.norm(np.subtract(val, target))
     elif (is_iterable(val)):
         return 1 - int(all(np.isclose(val, target)))
