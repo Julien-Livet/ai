@@ -274,6 +274,8 @@ class Window(QtWidgets.QWidget):
     @QtCore.Slot()
     def connectionChanged(self, text: str):
         if (len(text) == 0):
+            self.connectionTreeWidget.clear()
+            
             return
 
         self.addItems(None, list(self.brain.connections)[int(text)])
@@ -351,6 +353,9 @@ class Window(QtWidgets.QWidget):
 
         self.neuronsComboBox.clear()
         self.neuronsComboBox.addItems(self.neuronItems())
+        
+        self.connectionsComboBox.clear()
+        self.connectionsComboBox.addItems([str(i) for i in range(0, len(self.brain.connections))])
 
         self.modulesComboBox.clear()
         self.modulesComboBox.addItems(sorted([x for x in self.brain.modules]))
@@ -362,12 +367,18 @@ class Window(QtWidgets.QWidget):
         self.brain.connect(self.depthSpinBox.value())
 
         self.connectionTotalNumberLabel.setText("Connection total number: " + str(len(self.brain.connections)))
+        
+        self.connectionsComboBox.clear()
+        self.connectionsComboBox.addItems([str(i) for i in range(0, len(self.brain.connections))])
 
     @QtCore.Slot()
     def clearConnections(self):
         self.brain.clear_connections()
 
         self.connectionTotalNumberLabel.setText("Connection total number: " + str(len(self.brain.connections)))
+        
+        self.connectionsComboBox.clear()
+        self.connectionsComboBox.addItems([str(i) for i in range(0, len(self.brain.connections))])
 
     @QtCore.Slot()
     def associate(self):
