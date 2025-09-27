@@ -816,7 +816,7 @@ class Brain:
 
             visited.add(state_id)
 
-            av = [(self.neurons[id].output(), self.neurons[id].outputType, self.neurons[id]) for id in origin_neuron_ids] + [(self.connection_output(c), self.neurons[c.neuronId].outputType, c) for c in set(conns) | connections]
+            av = [(self.neurons[id].output(), self.neurons[id].outputType, self.neurons[id]) for id in origin_neuron_ids] + [(self.connection_output(c), self.neurons[c.neuronId].outputType, c) for c in connections | set(conns)]
 
             #av = sorted(av, key = lambda x: x[2].weight, reverse = True)
             #"""
