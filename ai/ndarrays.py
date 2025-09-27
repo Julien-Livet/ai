@@ -183,6 +183,15 @@ def put_ndarray(at: typing.Union[np.ndarray, tuple, list], src: np.ndarray, dst:
 
     return m
 
+def transpose_ndarray(a: np.ndarray) -> np.ndarray:
+    return np.transpose(a)
+
+def zeros_ndarray(shape: typing.Union[int, tuple]) -> np.ndarray:
+    return np.zeros(shape)
+
+def ones_ndarray(shape: typing.Union[int, tuple]) -> np.ndarray:
+    return np.ones(shape)
+
 def add(brain: Brain):
     neuronIds = {}
 
@@ -242,6 +251,9 @@ def add(brain: Brain):
     neuronIds["rot90_ndarray"] = brain.add(Neuron(rot90_ndarray, "rot90_ndarray", module = "ndarrays.functions.array"))
     neuronIds["fliplr_ndarray"] = brain.add(Neuron(fliplr_ndarray, "fliplr_ndarray", module = "ndarrays.functions.array"))
     neuronIds["put_ndarray"] = brain.add(Neuron(put_ndarray, "put_ndarray", module = "ndarrays.functions.array"))
+    neuronIds["transpose_ndarray"] = brain.add(Neuron(transpose_ndarray, "transpose_ndarray", module = "ndarrays.functions.array"))
+    neuronIds["zeros_ndarray"] = brain.add(Neuron(zeros_ndarray, "zeros_ndarray", module = "ndarrays.functions.array"))
+    neuronIds["ones_ndarray"] = brain.add(Neuron(ones_ndarray, "ones_ndarray", module = "ndarrays.functions.array"))
 
     return neuronIds
 

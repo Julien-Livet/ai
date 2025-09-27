@@ -58,6 +58,8 @@ while (not np.all(np.isclose(brain.connection_output(answers[0]), output))):
     brain.set_connections(answers)
     answers = brain.learn(output, timeout = 10 * 1000)
 
+brain.set_connections(answers)
+
 print(brain.connection_str(answers[0]), "->", brain.connection_output(answers[0]))
 
 print(brain.connection_output(answers[0]) - output)
