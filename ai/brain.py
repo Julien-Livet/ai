@@ -559,6 +559,11 @@ class Brain:
 
         ultra_compact_id = connection.neuronId
 
+        neurons = self.neurons
+
+        if (module == None):
+            module = self.neurons[connection.neuronId].module
+
         if (ultra_compact):
             types = connection.origin_input_types()
             values = connection.origin_input_values()
@@ -598,7 +603,7 @@ class Brain:
                                 else:
                                     vals.append(next(arg_iter))
 
-                            return self.neurons[conn.neuronId].output(*vals)
+                            return neurons[conn.neuronId].output(*vals)
 
                         return replace_inputs(connection, arg_iter_gen())
 
@@ -624,8 +629,6 @@ class Brain:
             if (not added):
                 return connection.neuronId, compact_id, ultra_compact_id
 
-        neurons = self.neurons
-
         def function(*args):
             def replace_inputs(connection, arg_iter):
                 vals = []
@@ -641,9 +644,6 @@ class Brain:
                 return neurons[connection.neuronId].output(*vals)
 
             return replace_inputs(connection, iter(args))
-
-        if (module == None):
-            module = self.neurons[connection.neuronId].module
 
         id = self.add(Neuron(function, name, connection.origin_input_types(), self.neurons[connection.neuronId].outputType, module = module, weight = self.connection_weight(connection)))
 

@@ -62,6 +62,8 @@ print(brain.connection_str(answers[0]), "->", brain.connection_output(answers[0]
 
 print(brain.connection_output(answers[0]) - output)
 
+brain.save("benchmark_arc-agi-00576224_brain.bin")
+
 for i in range(1, len(train)):
     input = np.array(train[i]["input"])
     output = np.array(train[i]["output"])

@@ -105,7 +105,7 @@ class Window(QtWidgets.QWidget):
         self.moduleLineEdit = QtWidgets.QLineEdit()
         self.learnPushButton = QtWidgets.QPushButton("Learn")
         self.connectPushButton = QtWidgets.QPushButton("Connect")
-        
+
         self.connectionLabel = QtWidgets.QLabel("Connection")
         self.connectionsComboBox = QtWidgets.QComboBox()
         self.connectionsComboBox.currentTextChanged.connect(self.connectionChanged)
@@ -113,10 +113,11 @@ class Window(QtWidgets.QWidget):
         self.connectionsComboBox.addItems([str(i) for i in range(0, len(self.brain.connections))])
         self.connectionTreeWidget = QtWidgets.QTreeWidget()
         self.connectionTreeWidget.setHeaderLabels(["Connection"])
+        self.connectionTreeWidget.setMinimumHeight(250)
         self.connectionLayout = QtWidgets.QHBoxLayout()
         self.connectionLayout.addWidget(self.connectionLabel)
         self.connectionLayout.addWidget(self.connectionsComboBox)
-        
+
         self.clearConnectionsPushButton = QtWidgets.QPushButton("Clear connections")
         self.associatePushButton = QtWidgets.QPushButton("Associate")
 
@@ -188,7 +189,7 @@ class Window(QtWidgets.QWidget):
 
             self.neuronsComboBox.clear()
             self.neuronsComboBox.addItems(self.neuronItems())
-            
+
             self.connectionsComboBox.clear()
             self.connectionsComboBox.addItems([str(i) for i in range(0, len(self.brain.connections))])
 
@@ -249,15 +250,15 @@ class Window(QtWidgets.QWidget):
 
     def addItems(self, parent, connection: Connection):
         connectionItem = QtWidgets.QTreeWidgetItem(["connection"])
-        
+
         if (parent == None):
             self.connectionTreeWidget.addTopLevelItem(connectionItem)
         else:
             parent.addChild(connectionItem)
-        
+
         item = QtWidgets.QTreeWidgetItem(["inputs"])
         connectionItem.addChild(item)
-        
+
         for input in connection.inputs:
             if (isinstance(input, Connection)):
                 self.addItems(item, input)
@@ -275,11 +276,11 @@ class Window(QtWidgets.QWidget):
     def connectionChanged(self, text: str):
         if (len(text) == 0):
             self.connectionTreeWidget.clear()
-            
+
             return
 
         self.addItems(None, list(self.brain.connections)[int(text)])
-        
+
         self.connectionTreeWidget.expandAll()
 
     @QtCore.Slot()
@@ -353,7 +354,7 @@ class Window(QtWidgets.QWidget):
 
         self.neuronsComboBox.clear()
         self.neuronsComboBox.addItems(self.neuronItems())
-        
+
         self.connectionsComboBox.clear()
         self.connectionsComboBox.addItems([str(i) for i in range(0, len(self.brain.connections))])
 
@@ -367,7 +368,7 @@ class Window(QtWidgets.QWidget):
         self.brain.connect(self.depthSpinBox.value())
 
         self.connectionTotalNumberLabel.setText("Connection total number: " + str(len(self.brain.connections)))
-        
+
         self.connectionsComboBox.clear()
         self.connectionsComboBox.addItems([str(i) for i in range(0, len(self.brain.connections))])
 
@@ -376,7 +377,7 @@ class Window(QtWidgets.QWidget):
         self.brain.clear_connections()
 
         self.connectionTotalNumberLabel.setText("Connection total number: " + str(len(self.brain.connections)))
-        
+
         self.connectionsComboBox.clear()
         self.connectionsComboBox.addItems([str(i) for i in range(0, len(self.brain.connections))])
 
