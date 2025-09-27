@@ -67,5 +67,7 @@ for i in range(1, len(train)):
     output = np.array(train[i]["output"])
 
     brain.neurons[neuronIds["input"]].function = lambda input = input: input
+    brain.neurons[neuronIds["shape_input"]].function = lambda input = input: np.array(input.shape)
+    brain.neurons[neuronIds["shape_output"]].function = lambda output = output: np.array(output.shape)
 
     print(brain.connection_output(answers[0]) - output)
