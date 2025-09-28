@@ -41,7 +41,6 @@ for n in range(0, len(train)):
 
     s = set(input.flatten())
     submatrices = []
-    pos = []
 
     for i in s:
         if (not i):
@@ -55,7 +54,6 @@ for n in range(0, len(train)):
         cmin, cmax = np.where(cols)[0][[0, -1]]
 
         submatrices.append(input[rmin:rmax + 1, cmin:cmax + 1])
-        pos.append((rmin, cmin))
 
     brain.neurons[neuronIds["shape_output"]].function = lambda output = output: output.shape
 
@@ -69,13 +67,9 @@ for n in range(0, len(train)):
 
     ids = {}
 
-    for p in pos:
-        ids |= tuples.add_value(brain, p)
-
     indices = set()
 
     for s in shapes:
-        ids |= tuples.add_value(brain, s)
         ids |= ndarrays.add_value(brain, np.zeros(s))
 
         for i in range(0, input.shape[0] - s[0] + 1):
