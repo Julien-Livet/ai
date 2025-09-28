@@ -1,5 +1,6 @@
 from brain import Brain
 import copy
+import itertools
 from neuron import Neuron
 import numpy as np
 import random
@@ -229,6 +230,41 @@ def fill_ndarray(x: typing.Union[int, float], a: np.ndarray) -> np.ndarray:
 
     return b.fill(x)
 
+def neighbors(idx, exclude_self = True):
+    dims = len(idx)
+    deltas = [-1, 0, 1]
+
+    for delta in itertools.product(deltas, repeat=dims):
+        if (exclude_self and all(d == 0 for d in delta)):
+            continue
+
+        yield tuple(i + d for i, d in zip(idx, delta))
+
+def fill_region_ndarray(at: tuple, x: typing.Union[int, float], a: np.ndarray) -> np.ndarray:
+    b = copy.deepcopy(a)
+
+    s = set()
+    stack = set()
+    stack.add(at)
+    v = a[at]
+
+    while (len(stack)):
+        loc = stack.pop()
+
+        if (not loc in s):
+            s.add(loc)
+
+            try:
+                if (b[loc] == v):
+                    b[loc] = x
+
+                    for n in neighbors(loc):
+                        stack.add(n)
+            except:
+                pass
+
+    return b
+
 def min_ndarray(a: np.ndarray) -> float:
     return a.min()
 
@@ -314,6 +350,7 @@ def add(brain: Brain):
     neuronIds["mean_ndarray"] = brain.add(Neuron(mean_ndarray, "mean_ndarray", module = "ndarrays.functions.array"))
     neuronIds["cumsum_ndarray"] = brain.add(Neuron(cumsum_ndarray, "cumsum_ndarray", module = "ndarrays.functions.array"))
     neuronIds["put_value_ndarray"] = brain.add(Neuron(put_value_ndarray, "put_value_ndarray", module = "ndarrays.functions.array"))
+    neuronIds["fill_region_ndarray"] = brain.add(Neuron(fill_region_ndarray, "fill_region_ndarray", module = "ndarrays.functions.array"))
 
     return neuronIds
 
