@@ -110,7 +110,7 @@ def logical_and_ndarray(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     return np.logical_and(x, y)
 
 def logical_or_ndarray(x: np.ndarray, y: np.ndarray) -> np.ndarray:
-    return np.bitwise_or(x, y)
+    return np.logical_or(x, y)
 
 def logical_xor_ndarray(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     return np.logical_xor(x, y)
