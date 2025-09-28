@@ -209,6 +209,9 @@ def move_ndarray(from_: tuple, shape: tuple, to: tuple, a: np.ndarray) -> np.nda
     
     return put_ndarray(to, b, a)
 
+def copy_ndarray(a: np.ndarray) -> np.ndarray:
+    return np.copy(a)
+
 def add(brain: Brain):
     neuronIds = {}
 
@@ -273,6 +276,7 @@ def add(brain: Brain):
     neuronIds["ones_ndarray"] = brain.add(Neuron(ones_ndarray, "ones_ndarray", module = "ndarrays.functions.array"))
     neuronIds["replace_ndarray"] = brain.add(Neuron(replace_ndarray, "replace_ndarray", module = "ndarrays.functions.array"))
     neuronIds["move_ndarray"] = brain.add(Neuron(move_ndarray, "move_ndarray", module = "ndarrays.functions.array"))
+    neuronIds["copy_ndarray"] = brain.add(Neuron(copy_ndarray, "copy_ndarray", module = "ndarrays.functions.array"))
 
     return neuronIds
 
