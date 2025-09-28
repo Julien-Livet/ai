@@ -793,10 +793,18 @@ class Brain:
         h0 = heuristic(start_available[0][0], value)
         heapq.heappush(frontier, (g0 + h0, next(counter), g0, start_available, []))
 
+        conns = [(compare(self.connection_output(c), value), c) for c in connections]
+        conns = sorted(conns, key = lambda x: x[0])
+
+        if (len(conns)):
+            best_conn = conns[0][1]
+            best_cost = conns[0][0]
+        else:
+            best_conn = None
+            best_cost = math.inf
+
         conns = []
         time = datetime.datetime.now()
-        best_conn = None
-        best_cost = math.inf
 
         while (frontier and len(solutions) < answer_number):
             if (datetime.datetime.now() - time > datetime.timedelta(milliseconds = timeout)):

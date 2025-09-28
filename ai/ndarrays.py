@@ -165,11 +165,14 @@ def shape_ndarray(x: np.ndarray) -> tuple:
 def tile_ndarray(a: np.ndarray, reps: typing.Union[np.ndarray, tuple, list, int]) -> np.ndarray:
     return np.tile(a, reps)
 
-def flip_ndarray(a: np.ndarray) -> np.ndarray:
-    return np.flip(a)
+def flip_ndarray(a: np.ndarray, axis: typing.Union[int, tuple]) -> np.ndarray:
+    return np.flip(a, axis)
 
 def rot90_ndarray(a: np.ndarray) -> np.ndarray:
     return np.rot90(a)
+
+def flipud_ndarray(a: np.ndarray) -> np.ndarray:
+    return np.flipud(a)
 
 def fliplr_ndarray(a: np.ndarray) -> np.ndarray:
     return np.fliplr(a)
@@ -183,6 +186,12 @@ def put_ndarray(at: typing.Union[np.ndarray, tuple, list], src: np.ndarray, dst:
 
     return m
 
+def put_value_ndarray(at: typing.Union[np.ndarray, tuple, list], value: typing.Union[int, float], dst: np.ndarray) -> np.ndarray:
+    m = copy.deepcopy(dst)
+    m[at] = value
+
+    return m
+
 def transpose_ndarray(a: np.ndarray) -> np.ndarray:
     return np.transpose(a)
 
@@ -191,6 +200,9 @@ def zeros_ndarray(shape: typing.Union[int, tuple]) -> np.ndarray:
 
 def ones_ndarray(shape: typing.Union[int, tuple]) -> np.ndarray:
     return np.ones(shape)
+
+def empty_ndarray(shape: typing.Union[int, tuple]) -> np.ndarray:
+    return np.empty(shape)
 
 def replace_ndarray(x: typing.Union[int, float], y: typing.Union[int, float], a: np.ndarray) -> np.ndarray:
     b = copy.deepcopy(a)
@@ -202,15 +214,32 @@ def move_ndarray(from_: tuple, shape: tuple, to: tuple, a: np.ndarray) -> np.nda
     begin = np.array(from_)
     end = np.array(from_) + np.array(shape)
     slices = tuple(slice(b, e) for b, e in zip(begin, end))
-    
+
     b = copy.deepcopy(a[slices])
-    
+
     a[slices] = np.zeros(shape)
-    
+
     return put_ndarray(to, b, a)
 
 def copy_ndarray(a: np.ndarray) -> np.ndarray:
     return np.copy(a)
+
+def fill_ndarray(x: typing.Union[int, float], a: np.ndarray) -> np.ndarray:
+    b = copy.deepcopy(a)
+
+    return b.fill(x)
+
+def min_ndarray(a: np.ndarray) -> float:
+    return a.min()
+
+def max_ndarray(a: np.ndarray) -> float:
+    return a.max()
+
+def mean_ndarray(a: np.ndarray) -> float:
+    return a.mean()
+
+def cumsum_ndarray(a: np.ndarray) -> float:
+    return a.cumsum()
 
 def add(brain: Brain):
     neuronIds = {}
@@ -270,13 +299,21 @@ def add(brain: Brain):
     neuronIds["flip_ndarray"] = brain.add(Neuron(flip_ndarray, "flip_ndarray", module = "ndarrays.functions.array"))
     neuronIds["rot90_ndarray"] = brain.add(Neuron(rot90_ndarray, "rot90_ndarray", module = "ndarrays.functions.array"))
     neuronIds["fliplr_ndarray"] = brain.add(Neuron(fliplr_ndarray, "fliplr_ndarray", module = "ndarrays.functions.array"))
+    neuronIds["flipud_ndarray"] = brain.add(Neuron(flipud_ndarray, "flipud_ndarray", module = "ndarrays.functions.array"))
     neuronIds["put_ndarray"] = brain.add(Neuron(put_ndarray, "put_ndarray", module = "ndarrays.functions.array"))
     neuronIds["transpose_ndarray"] = brain.add(Neuron(transpose_ndarray, "transpose_ndarray", module = "ndarrays.functions.array"))
     neuronIds["zeros_ndarray"] = brain.add(Neuron(zeros_ndarray, "zeros_ndarray", module = "ndarrays.functions.array"))
     neuronIds["ones_ndarray"] = brain.add(Neuron(ones_ndarray, "ones_ndarray", module = "ndarrays.functions.array"))
+    neuronIds["empty_ndarray"] = brain.add(Neuron(empty_ndarray, "empty_ndarray", module = "ndarrays.functions.array"))
     neuronIds["replace_ndarray"] = brain.add(Neuron(replace_ndarray, "replace_ndarray", module = "ndarrays.functions.array"))
     neuronIds["move_ndarray"] = brain.add(Neuron(move_ndarray, "move_ndarray", module = "ndarrays.functions.array"))
     neuronIds["copy_ndarray"] = brain.add(Neuron(copy_ndarray, "copy_ndarray", module = "ndarrays.functions.array"))
+    neuronIds["fill_ndarray"] = brain.add(Neuron(fill_ndarray, "fill_ndarray", module = "ndarrays.functions.array"))
+    neuronIds["min_ndarray"] = brain.add(Neuron(min_ndarray, "min_ndarray", module = "ndarrays.functions.array"))
+    neuronIds["max_ndarray"] = brain.add(Neuron(max_ndarray, "max_ndarray", module = "ndarrays.functions.array"))
+    neuronIds["mean_ndarray"] = brain.add(Neuron(mean_ndarray, "mean_ndarray", module = "ndarrays.functions.array"))
+    neuronIds["cumsum_ndarray"] = brain.add(Neuron(cumsum_ndarray, "cumsum_ndarray", module = "ndarrays.functions.array"))
+    neuronIds["put_value_ndarray"] = brain.add(Neuron(put_value_ndarray, "put_value_ndarray", module = "ndarrays.functions.array"))
 
     return neuronIds
 
