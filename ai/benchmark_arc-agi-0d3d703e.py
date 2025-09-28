@@ -1,5 +1,6 @@
 from brain import Brain
 from connection import Connection
+import ints
 import json
 import matplotlib.pyplot as plt
 import ndarrays
@@ -14,19 +15,16 @@ neuronIds |= ndarrays.add(brain)
 neuronIds |= tuples.add(brain)
 
 brain.deactivate_all_modules()
-brain.neurons[neuronIds["zeros_ndarray"]].activated = True
-brain.neurons[neuronIds["put_ndarray"]].activated = True
+brain.neurons[neuronIds["replace_ndarray"]].activated = True
 
-url = urllib.request.urlopen("https://raw.githubusercontent.com/arcprize/ARC-AGI-2/refs/heads/main/data/training/007bbfb7.json")
+url = urllib.request.urlopen("https://raw.githubusercontent.com/arcprize/ARC-AGI-2/refs/heads/main/data/training/0d3d703e.json")
 data = json.loads(url.read().decode())
 
 train = data["train"]
 
 neuronIds |= ndarrays.add_value(brain, np.array([]), "input")
-neuronIds |= tuples.add_value(brain, (0, ), "shape_input")
-neuronIds |= tuples.add_value(brain, (0, ), "shape_output")
 
-tupleIds = {}
+ids = {}
 
 for n in range(0, len(train)):
     brain.clear_connections()
@@ -42,17 +40,18 @@ for n in range(0, len(train)):
     #plt.show()
 
     brain.neurons[neuronIds["input"]].function = lambda input = input: input
-    brain.neurons[neuronIds["shape_input"]].function = lambda input = input: input.shape
-    brain.neurons[neuronIds["shape_output"]].function = lambda output = output: output.shape
 
-    for k, v in tupleIds.items():
+    for k, v in ids.items():
         brain.remove(v)
 
-    tupleIds = {}
+    ids = {}
 
-    for i in range(0, output.shape[0] - input.shape[0] + 1, input.shape[0]):
-        for j in range(0, output.shape[1] - input.shape[1] + 1, input.shape[1]):
-            tupleIds |= tuples.add_value(brain, (i, j))
+    for i in range(0, input.shape[0]):
+        for j in range(0, input.shape[1]):
+            ids |= tuples.add_value(brain, (i, j))
+
+    for i in range(0, 10):
+        ids |= ints.add_value(brain, i)
 
     print("input", input)
     print("output", output)
@@ -71,4 +70,4 @@ for n in range(0, len(train)):
 
     print(brain.connection_output(answers[0]) - output)
 
-    brain.save("benchmark_arc-agi-007bbfb7_brain" + str(n) + ".bin")
+    brain.save("benchmark_arc-agi-0d3d703e_brain" + str(n) + ".bin")

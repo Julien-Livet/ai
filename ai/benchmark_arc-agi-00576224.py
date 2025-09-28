@@ -1,7 +1,5 @@
 from brain import Brain
 from connection import Connection
-import digits
-import ints
 import json
 import matplotlib.pyplot as plt
 import ndarrays
@@ -12,8 +10,6 @@ import tuples
 brain = Brain()
 neuronIds = {}
 
-#neuronIds |= digits.add(brain)
-neuronIds |= ints.add(brain)
 neuronIds |= ndarrays.add(brain)
 neuronIds |= tuples.add(brain)
 

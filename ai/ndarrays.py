@@ -192,6 +192,23 @@ def zeros_ndarray(shape: typing.Union[int, tuple]) -> np.ndarray:
 def ones_ndarray(shape: typing.Union[int, tuple]) -> np.ndarray:
     return np.ones(shape)
 
+def replace_ndarray(x: typing.Union[int, float], y: typing.Union[int, float], a: np.ndarray) -> np.ndarray:
+    b = copy.deepcopy(a)
+    b[b == x] = y
+
+    return b
+
+def move_ndarray(from_: tuple, shape: tuple, to: tuple, a: np.ndarray) -> np.ndarray:
+    begin = np.array(from_)
+    end = np.array(from_) + np.array(shape)
+    slices = tuple(slice(b, e) for b, e in zip(begin, end))
+    
+    b = copy.deepcopy(a[slices])
+    
+    a[slices] = np.zeros(shape)
+    
+    return put_ndarray(to, b, a)
+
 def add(brain: Brain):
     neuronIds = {}
 
@@ -254,6 +271,8 @@ def add(brain: Brain):
     neuronIds["transpose_ndarray"] = brain.add(Neuron(transpose_ndarray, "transpose_ndarray", module = "ndarrays.functions.array"))
     neuronIds["zeros_ndarray"] = brain.add(Neuron(zeros_ndarray, "zeros_ndarray", module = "ndarrays.functions.array"))
     neuronIds["ones_ndarray"] = brain.add(Neuron(ones_ndarray, "ones_ndarray", module = "ndarrays.functions.array"))
+    neuronIds["replace_ndarray"] = brain.add(Neuron(replace_ndarray, "replace_ndarray", module = "ndarrays.functions.array"))
+    neuronIds["move_ndarray"] = brain.add(Neuron(move_ndarray, "move_ndarray", module = "ndarrays.functions.array"))
 
     return neuronIds
 
