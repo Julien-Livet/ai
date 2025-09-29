@@ -4,6 +4,7 @@ import json
 import matplotlib.pyplot as plt
 import ndarrays
 import numpy as np
+import os
 import urllib.request
 import tuples
 
@@ -11,7 +12,6 @@ brain = Brain()
 neuronIds = {}
 
 neuronIds |= ndarrays.add(brain)
-neuronIds |= tuples.add(brain)
 
 brain.deactivate_all_modules()
 brain.neurons[neuronIds["tile_ndarray"]].activated = True
@@ -19,7 +19,8 @@ brain.neurons[neuronIds["fliplr_ndarray"]].activated = True
 brain.neurons[neuronIds["floordiv_ndarray"]].activated = True
 brain.neurons[neuronIds["put_ndarray"]].activated = True
 
-url = urllib.request.urlopen("https://raw.githubusercontent.com/arcprize/ARC-AGI-2/refs/heads/main/data/training/00576224.json")
+task = os.path.basename(__file__).replace("-work", "").replace(".py", "").replace("benchmark_arc-agi-", "")
+url = urllib.request.urlopen("https://raw.githubusercontent.com/arcprize/ARC-AGI-2/refs/heads/main/data/training/" + task + ".json")
 data = json.loads(url.read().decode())
 
 train = data["train"]
@@ -49,18 +50,18 @@ print("output", output)
 answers = brain.learn(output, timeout = 4 * 1000)
 
 while (not np.all(np.isclose(brain.connection_output(answers[0]), output))):
-    #print(brain.connection_str(answers[0]), "->", brain.connection_output(answers[0]))
+    #print(brain.connection_str(answers[0]).replace("\n", "").replace("\\", "").replace(" ", ""), "->", brain.connection_output(answers[0]))
     #print(brain.connection_output(answers[0]) - output)
     brain.set_connections(answers)
     answers = brain.learn(output, timeout = 10 * 1000)
 
 brain.set_connections(answers)
 
-print(brain.connection_str(answers[0]), "->", brain.connection_output(answers[0]))
+print(brain.connection_str(answers[0]).replace("\n", "").replace("\\", "").replace(" ", ""), "->", brain.connection_output(answers[0]))
 
 print(brain.connection_output(answers[0]) - output)
 
-brain.save("benchmark_arc-agi-00576224_brain.bin")
+brain.save("benchmark_arc-agi-" + task + "_brain.bin")
 
 for i in range(1, len(train)):
     input = np.array(train[i]["input"])

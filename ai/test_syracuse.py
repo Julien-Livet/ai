@@ -59,7 +59,7 @@ brain.activate_module("ndarrays.operators.logical")
 
 answers = brain.learn(numbers[1:], compact_name = "syracuse", compact_module = "syracuse.constants", module = "syracuse.functions")
 
-print(brain.connection_str(answers[0]), "->", brain.connection_output(answers[0]))
+print(brain.connection_str(answers[0]).replace("\n", "").replace("\\", "").replace(" ", ""), "->", brain.connection_output(answers[0]))
 
 brain.set_connections(answers)
 

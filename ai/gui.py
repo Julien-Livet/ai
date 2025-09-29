@@ -249,7 +249,7 @@ class Window(QtWidgets.QWidget):
         self.moduleCheckBox.setChecked(self.brain.modules[text])
 
     def addItems(self, parent, connection: Connection):
-        connectionItem = QtWidgets.QTreeWidgetItem(["connection"])
+        connectionItem = QtWidgets.QTreeWidgetItem(["connection:" + str(self.brain.connection_output(connection))])
 
         if (parent == None):
             self.connectionTreeWidget.addTopLevelItem(connectionItem)
@@ -263,13 +263,24 @@ class Window(QtWidgets.QWidget):
             if (isinstance(input, Connection)):
                 self.addItems(item, input)
             elif (isinstance(input, Neuron)):
-                it = QtWidgets.QTreeWidgetItem([self.brain.neuron_name(input)])
+                s = self.brain.neuron_name(input)
+
+                if (len(input.inputTypes) == 0):
+                    s += ": " + str(input.output())
+
+                it = QtWidgets.QTreeWidgetItem([s])
                 item.addChild(it)
             else:
                 it = QtWidgets.QTreeWidgetItem([str(input)])
                 item.addChild(it)
 
-        item = QtWidgets.QTreeWidgetItem([self.brain.neuron_name(self.brain.neurons[connection.neuronId])])
+        neuron = self.brain.neurons[connection.neuronId]
+        s = self.brain.neuron_name(neuron)
+
+        if (len(neuron.inputTypes) == 0):
+            s += ": " + str(neuron.output())
+
+        item = QtWidgets.QTreeWidgetItem([s])
         connectionItem.addChild(item)
 
     @QtCore.Slot()

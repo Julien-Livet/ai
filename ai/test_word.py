@@ -74,7 +74,7 @@ def process(brain: Brain, function_word_neuron_ids: dict, word: str, row, max_co
 
             brain.transform_connection_into_neuron(answers[0], compact_name = word, compact_module = "languages.french.words." + cgramortho, module = "languages.french.words.functions")
 
-        print(brain.connection_str(answers[0]), "->", brain.connection_output(answers[0]))
+        print(brain.connection_str(answers[0]).replace("\n", "").replace("\\", "").replace(" ", ""), "->", brain.connection_output(answers[0]))
     else:
         print(brain.neuron_name(answers[0]), "->", answers[0].output())
 

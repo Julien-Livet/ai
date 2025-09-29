@@ -22,7 +22,7 @@ neuronIds = cv2s.add_value(brain, img_src, "img_src")
 answers = brain.learn(img_dst, depth = 10, compact_name = "img_dst", compact_module = "cv2.constants", module = "cv2.functions", timeout = 30 * 1000)
 
 if (isinstance(answers[0], Connection)):
-    print(brain.connection_str(answers[0]), "->", brain.connection_output(answers[0]))
+    print(brain.connection_str(answers[0]).replace("\n", "").replace("\\", "").replace(" ", ""), "->", brain.connection_output(answers[0]))
 else:
     print(brain.neuron_name(answers[0]), "->", answers[0].output())
 

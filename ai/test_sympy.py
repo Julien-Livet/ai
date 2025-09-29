@@ -47,7 +47,7 @@ while (True):
     answers = brain.learn(sp_output_expression, depth = 10, compact_name = str(sp_output_expression), compact_module = "sympy.constants", module = "sympy.functions")
 
     if (isinstance(answers[0], Connection)):
-        print(brain.connection_str(answers[0]), "->", brain.connection_output(answers[0]))
+        print(brain.connection_str(answers[0]).replace("\n", "").replace("\\", "").replace(" ", ""), "->", brain.connection_output(answers[0]))
     else:
         print(brain.neuron_name(answers[0]), "->", answers[0].output())
 

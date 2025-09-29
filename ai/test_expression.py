@@ -25,7 +25,7 @@ def process(brain: Brain, expression: str, module: str):
     answers = brain.learn(expression, depth = 10, module = module + ".functions", compact_module = module + ".constants", compact_name = expression)
 
     if (isinstance(answers[0], Connection)):
-        print(brain.connection_str(answers[0]), "->", brain.connection_output(answers[0]))
+        print(brain.connection_str(answers[0]).replace("\n", "").replace("\\", "").replace(" ", ""), "->", brain.connection_output(answers[0]))
     else:
         print(brain.neuron_name(answers[0]), "->", answers[0].output())
 

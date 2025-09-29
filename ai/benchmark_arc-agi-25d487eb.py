@@ -5,6 +5,7 @@ import json
 import matplotlib.pyplot as plt
 import ndarrays
 import numpy as np
+import os
 import tuples
 import urllib.request
 
@@ -17,14 +18,15 @@ brain.deactivate_all_modules()
 brain.neurons[neuronIds["copy_ndarray"]].activated = True
 brain.neurons[neuronIds["put_value_ndarray"]].activated = True
 
-url = urllib.request.urlopen("https://raw.githubusercontent.com/arcprize/ARC-AGI-2/refs/heads/main/data/training/25d487eb.json")
+task = os.path.basename(__file__).replace("-work", "").replace(".py", "").replace("benchmark_arc-agi-", "")
+url = urllib.request.urlopen("https://raw.githubusercontent.com/arcprize/ARC-AGI-2/refs/heads/main/data/training/" + task + ".json")
 data = json.loads(url.read().decode())
 
 train = data["train"]
 
 neuronIds |= ndarrays.add_value(brain, np.array([]), "input")
 
-for i in range(0, 9):
+for i in range(0, 10):
     neuronIds |= ints.add_value(brain, i)
 
 tupleIds = {}
@@ -67,8 +69,8 @@ for n in range(0, len(train)):
 
     brain.set_connections(answers)
 
-    print(brain.connection_str(answers[0]), "->", brain.connection_output(answers[0]))
+    print(brain.connection_str(answers[0]).replace("\n", "").replace("\\", "").replace(" ", ""), "->", brain.connection_output(answers[0]))
 
     print(brain.connection_output(answers[0]) - output)
 
-    brain.save("benchmark_arc-agi-25d487eb_brain" + str(n) + ".bin")
+    brain.save("benchmark_arc-agi-" + task + "_brain" + str(n) + ".bin")
