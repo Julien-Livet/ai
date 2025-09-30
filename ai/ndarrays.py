@@ -204,8 +204,28 @@ def segment_ndarray(begin: tuple, end: tuple, value: typing.Union[int, float], d
 
     step = np.linalg.norm(v) / np.linalg.norm(u)
 
-    for t in np.arange(0, 1, step):
-        m[int(begin[0] + t * u[0]), int(begin[1] + t * u[1])] = value
+    for t in np.arange(0, 1 + 0.1 * step, step):
+        m[round(begin[0] + t * u[0]), round(begin[1] + t * u[1])] = value
+
+    return m
+
+def dotsegment_ndarray(begin: tuple, end: tuple, value: typing.Union[int, float], dot_step: int, dst: np.ndarray) -> np.ndarray:
+    m = copy.deepcopy(dst)
+
+    u = np.array(end) - np.array(begin)
+    v = u / np.linalg.norm(u)
+
+    if (min(v)):
+        v *= min(v)
+
+    step = np.linalg.norm(v) / np.linalg.norm(u)
+    i = 0
+
+    for t in np.arange(0, 1 + 0.1 * step, step):
+        if (i % dot_step == 0):
+            m[round(begin[0] + t * u[0]), round(begin[1] + t * u[1])] = value
+
+        i += 1
 
     return m
 
@@ -522,6 +542,7 @@ def add(brain: Brain):
     neuronIds["vlineup_ndarray"] = brain.add(Neuron(vlineup_ndarray, "vlineup_ndarray", module = "ndarrays.functions.array"))
     neuronIds["place_region_ndarray"] = brain.add(Neuron(place_region_ndarray, "place_region_ndarray", module = "ndarrays.functions.array"))
     neuronIds["segment_ndarray"] = brain.add(Neuron(segment_ndarray, "segment_ndarray", module = "ndarrays.functions.array"))
+    neuronIds["dotsegment_ndarray"] = brain.add(Neuron(dotsegment_ndarray, "dotsegment_ndarray", module = "ndarrays.functions.array"))
 
     return neuronIds
 

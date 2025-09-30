@@ -3,7 +3,7 @@ import inspect
 import math
 
 class Neuron:
-    def __init__(self, function, name: str = "", inputTypes: list = None, outputType = None, activationDuration: float = math.inf, weight: float = 1.0, module: str = "", limitationTimeout: float = 4 * 1000):
+    def __init__(self, function, name: str = "", inputTypes: list = None, outputType = None, activationDuration: float = math.inf, weight: float = 1.0, module: str = "", limitationTimeout: float = None):
         self.function = function
         self.name = name
         self.datetime = datetime.datetime.now()

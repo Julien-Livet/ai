@@ -134,6 +134,7 @@ class Brain:
         self.originNeuronIds = []
         self.typesToConnections = {}
         self.modules = {}
+        self.neuronTimeout = math.inf
 
     def origin_neuron_ids_from_type(self, type):
         neurons_ids = []
@@ -876,8 +877,13 @@ class Brain:
                 neuronTime = datetime.datetime.now()
 
                 for combo in itertools.product(new_av, repeat = len(neuron.inputTypes)):
-                    if (datetime.datetime.now() - neuronTime > datetime.timedelta(milliseconds = neuron.limitationTimeout)):
-                        break
+                    if (neuron.limitationTimeout != None):
+                        if(not math.isinf(neuron.limitationTimeout)):
+                            if (datetime.datetime.now() - neuronTime > datetime.timedelta(milliseconds = neuron.limitationTimeout)):
+                                break
+                    elif (not math.isinf(self.neuronTimeout)):
+                        if (datetime.datetime.now() - neuronTime > datetime.timedelta(milliseconds = self.neuronTimout)):
+                            break
 
                     if (datetime.datetime.now() - time > datetime.timedelta(milliseconds = timeout)):
                         break
