@@ -47,6 +47,7 @@ conda activate gt
 
 # pip
 ```
+pip install bs4
 pip install colour
 pip install dill
 pip install matplotlib
@@ -55,6 +56,7 @@ pip install pandas
 pip install plotly
 pip install pyqtgraph
 pip install pyside6
+pip install requests
 pip install sympy
 pip install textdistance
 ```
