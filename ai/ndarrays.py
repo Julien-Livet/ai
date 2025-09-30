@@ -193,6 +193,22 @@ def put_value_ndarray(at: typing.Union[np.ndarray, tuple, list], value: typing.U
 
     return m
 
+def segment_ndarray(begin: tuple, end: tuple, value: typing.Union[int, float], dst: np.ndarray) -> np.ndarray:
+    m = copy.deepcopy(dst)
+
+    u = np.array(end) - np.array(begin)
+    v = u / np.linalg.norm(u)
+
+    if (min(v)):
+        v *= min(v)
+
+    step = np.linalg.norm(v) / np.linalg.norm(u)
+
+    for t in np.arange(0, 1, step):
+        m[int(begin[0] + t * u[0]), int(begin[1] + t * u[1])] = value
+
+    return m
+
 def hline_ndarray(at: int, value: typing.Union[int, float], dst: np.ndarray) -> np.ndarray:
     m = copy.deepcopy(dst)
     m[at, :] = value
@@ -284,12 +300,16 @@ def neighbors(idx, exclude_self = True, diagonals = True):
 
         yield t
 
-def region_ndarray(at: tuple, a: np.ndarray) -> list:
+class Region:
+    def __init__(self, indices: list = []):
+        self.indices = indices
+
+def region_ndarray(at: tuple, a: np.ndarray) -> Region:
     s = set()
     stack = set()
     stack.add(at)
     v = a[at]
-    region = []
+    indices = []
 
     while (len(stack)):
         loc = stack.pop()
@@ -299,21 +319,21 @@ def region_ndarray(at: tuple, a: np.ndarray) -> list:
 
             try:
                 if (a[loc] == v):
-                    region.append(loc)
+                    indices.append(loc)
 
                     for n in neighbors(loc):
                         stack.add(n)
             except:
                 pass
 
-    return region
+    return Region(indices)
 
-def region2_ndarray(at: tuple, a: np.ndarray) -> list:
+def region2_ndarray(at: tuple, a: np.ndarray) -> Region:
     s = set()
     stack = set()
     stack.add(at)
     v = a[at]
-    region = []
+    indices = []
 
     while (len(stack)):
         loc = stack.pop()
@@ -323,19 +343,19 @@ def region2_ndarray(at: tuple, a: np.ndarray) -> list:
 
             try:
                 if (a[loc] == v):
-                    region.append(loc)
+                    indices.append(loc)
 
                     for n in neighbors(loc, diagonals = False):
                         stack.add(n)
             except:
                 pass
 
-    return region
+    return Region(indices)
 
-def fill_region_ndarray(region: list, x: typing.Union[int, float], a: np.ndarray) -> np.ndarray:
+def fill_region_ndarray(region: Region, x: typing.Union[int, float], a: np.ndarray) -> np.ndarray:
     b = copy.deepcopy(a)
 
-    for t in region:
+    for t in region.indices:
         try:
             b[t] = x
         except:
@@ -343,12 +363,12 @@ def fill_region_ndarray(region: list, x: typing.Union[int, float], a: np.ndarray
 
     return b
 
-def place_region_ndarray(at: tuple, region: list, x: typing.Union[int, float], a: np.ndarray) -> np.ndarray:
+def place_region_ndarray(at: tuple, region: Region, x: typing.Union[int, float], a: np.ndarray) -> np.ndarray:
     b = copy.deepcopy(a)
 
-    for t in region:
+    for t in region.indices:
         try:
-            b[at[0] + t[0] - region[0][0], at[1] + t[1] - region[0][1]] = x
+            b[at[0] + t[0] - region.indices[0][0], at[1] + t[1] - region.indices[0][1]] = x
         except:
             pass
 
@@ -501,6 +521,7 @@ def add(brain: Brain):
     neuronIds["vlinedown_ndarray"] = brain.add(Neuron(vlinedown_ndarray, "vlinedown_ndarray", module = "ndarrays.functions.array"))
     neuronIds["vlineup_ndarray"] = brain.add(Neuron(vlineup_ndarray, "vlineup_ndarray", module = "ndarrays.functions.array"))
     neuronIds["place_region_ndarray"] = brain.add(Neuron(place_region_ndarray, "place_region_ndarray", module = "ndarrays.functions.array"))
+    neuronIds["segment_ndarray"] = brain.add(Neuron(segment_ndarray, "segment_ndarray", module = "ndarrays.functions.array"))
 
     return neuronIds
 

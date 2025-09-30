@@ -3,7 +3,7 @@ import inspect
 import math
 
 class Neuron:
-    def __init__(self, function, name: str = "", inputTypes: list = None, outputType = None, activationDuration: float = math.inf, weight: float = 1.0, module: str = ""):
+    def __init__(self, function, name: str = "", inputTypes: list = None, outputType = None, activationDuration: float = math.inf, weight: float = 1.0, module: str = "", limitationTimeout: float = 4 * 1000):
         self.function = function
         self.name = name
         self.datetime = datetime.datetime.now()
@@ -32,6 +32,7 @@ class Neuron:
 
         self.activated = True
         self.activationLevel = 0
+        self.limitationTimeout = limitationTimeout
 
     def __eq__(self, other):
         return isinstance(other, Neuron) \
@@ -45,6 +46,7 @@ class Neuron:
                and self.outputType == other.outputType \
                and self.activated == other.activated \
                and self.activationLevel == other.activationLevel \
+               and self.limitationTimeout == other.limitationTimeout \
                and self.module == other.module
 
     def __hash__(self):

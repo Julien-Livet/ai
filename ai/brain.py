@@ -79,11 +79,12 @@ def heuristic(val, target):
             return 999.0
 
 def canonicalize_for_visit(val):
-    if isinstance(val, np.ndarray):
+    if (isinstance(val, np.ndarray)):
         if (val.size == 1):
             return float(val.item())
 
         return ("ndarray", val.shape, hash(val.tobytes()))
+
     try:
         hash(val)
 
@@ -872,7 +873,12 @@ class Brain:
 
                 #new_av = sorted(new_av, key = lambda x: x[2].weight, reverse = True)
 
+                neuronTime = datetime.datetime.now()
+
                 for combo in itertools.product(new_av, repeat = len(neuron.inputTypes)):
+                    if (datetime.datetime.now() - neuronTime > datetime.timedelta(milliseconds = neuron.limitationTimeout)):
+                        break
+
                     if (datetime.datetime.now() - time > datetime.timedelta(milliseconds = timeout)):
                         break
 
