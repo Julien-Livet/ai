@@ -5,6 +5,7 @@ import json
 import lists
 import matplotlib.pyplot as plt
 import ndarrays
+from neuron import Neuron
 import numpy as np
 import os
 import tuples
@@ -16,7 +17,6 @@ neuronIds = {}
 neuronIds |= ndarrays.add(brain)
 
 brain.deactivate_all_modules()
-brain.neurons[neuronIds["copy_ndarray"]].activated = True
 brain.neurons[neuronIds["fill_region_ndarray"]].activated = True
 brain.neurons[neuronIds["hline_ndarray"]].activated = True
 brain.neurons[neuronIds["vline_ndarray"]].activated = True
@@ -55,7 +55,7 @@ for n in range(0, len(train)):
 
     for i in range(0, input.shape[0]):
         for j in range(0, input.shape[1]):
-            r = sorted(ndarrays.region_ndarray((i, j), input))
+            r = sorted(ndarrays.region_ndarray((i, j), input).indices)
 
             if (not tuple(r) in s):
                 s.add(tuple(r))
@@ -63,7 +63,8 @@ for n in range(0, len(train)):
     ids = {}
 
     for r in s:
-        ids |= lists.add_value(brain, list(r))
+        name = str(r)
+        ids[name] = brain.add(Neuron(lambda r = r: ndarrays.Region(r), name, outputType = ndarrays.Region, module = "ndarrays.variables"))
 
     for i in range(min(input.shape[0], input.shape[1], 9), max(input.shape[0], input.shape[1], 10)):
         ids |= ints.add_value(brain, i)

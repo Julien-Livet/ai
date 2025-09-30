@@ -5,6 +5,7 @@ import json
 import lists
 import matplotlib.pyplot as plt
 import ndarrays
+from neuron import Neuron
 import numpy as np
 import os
 import urllib.request
@@ -52,7 +53,7 @@ for n in range(0, len(train)):
 
     for i in range(0, input.shape[0]):
         for j in range(0, input.shape[1]):
-            r = sorted(ndarrays.region_ndarray((i, j), input))
+            r = sorted(ndarrays.region_ndarray((i, j), input).indices)
 
             if (not tuple(r) in s):
                 s.add(tuple(r))
@@ -60,7 +61,8 @@ for n in range(0, len(train)):
     ids = {}
 
     for r in s:
-        ids |= lists.add_value(brain, list(r))
+        name = str(r)
+        ids[name] = brain.add(Neuron(lambda r = r: ndarrays.Region(r), name, outputType = ndarrays.Region, module = "ndarrays.variables"))
 
     brain.neurons[neuronIds["input"]].function = lambda input = input: input
 

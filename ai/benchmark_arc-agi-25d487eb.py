@@ -15,7 +15,6 @@ neuronIds = {}
 neuronIds |= ndarrays.add(brain)
 
 brain.deactivate_all_modules()
-brain.neurons[neuronIds["copy_ndarray"]].activated = True
 brain.neurons[neuronIds["put_value_ndarray"]].activated = True
 
 task = os.path.basename(__file__).replace("-work", "").replace(".py", "").replace("benchmark_arc-agi-", "")
