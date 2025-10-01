@@ -6,6 +6,7 @@ import ints
 import json
 import lists
 import matplotlib.pyplot as plt
+from ndarrays import Region
 import ndarrays
 from neuron import Neuron
 import numpy as np
@@ -14,39 +15,6 @@ import re
 import requests
 import tuples
 import urllib.request
-
-brain = Brain()
-neuronIds = {}
-
-neuronIds |= ndarrays.add(brain)
-
-brain.deactivate_all_modules()
-
-neuronIds |= ndarrays.add_value(brain, np.array([]), "input")
-neuronIds |= tuples.add_value(brain, (0, ), "shape_input")
-neuronIds |= tuples.add_value(brain, (0, ), "shape_output")
-
-for i in range(0, 10):
-    neuronIds |= ints.add_value(brain, i)
-
-brain.neurons[neuronIds["zeros_ndarray"]].activated = True
-brain.neurons[neuronIds["zeros_ndarray"]].weight = 50.0
-brain.neurons[neuronIds["tile_ndarray"]].activated = True
-brain.neurons[neuronIds["tile_ndarray"]].weight = 40.0
-brain.neurons[neuronIds["fliplr_ndarray"]].activated = True
-brain.neurons[neuronIds["flipud_ndarray"]].activated = True
-brain.neurons[neuronIds["put_ndarray"]].activated = True
-brain.neurons[neuronIds["put_value_ndarray"]].activated = True
-brain.neurons[neuronIds["fill_region2_at_ndarray"]].activated = True
-brain.neurons[neuronIds["fill_region_ndarray"]].activated = True
-brain.neurons[neuronIds["place_region_ndarray"]].activated = True
-brain.neurons[neuronIds["replace_ndarray"]].activated = True
-brain.neurons[neuronIds["hline_ndarray"]].activated = True
-brain.neurons[neuronIds["vline_ndarray"]].activated = True
-brain.neurons[neuronIds["hlineleft_ndarray"]].activated = True
-brain.neurons[neuronIds["hlineright_ndarray"]].activated = True
-brain.neurons[neuronIds["vlineup_ndarray"]].activated = True
-brain.neurons[neuronIds["vlinedown_ndarray"]].activated = True
 
 tasks = []
 
@@ -66,8 +34,52 @@ del tasks[0]
 """
 
 count = 0
+globalTime = datetime.datetime.now()
 
 for ntask, task in enumerate(tasks):
+    brain = Brain()
+    neuronIds = {}
+
+    neuronIds |= ndarrays.add(brain)
+
+    brain.deactivate_all_modules()
+
+    neuronIds |= ndarrays.add_value(brain, np.array([]), "input")
+    neuronIds |= tuples.add_value(brain, (0, ), "shape_input")
+    neuronIds |= tuples.add_value(brain, (0, ), "shape_output")
+
+    brain.neurons[neuronIds["zeros_ndarray"]].activated = True
+    #brain.neurons[neuronIds["zeros_ndarray"]].weight = 50.0
+    brain.neurons[neuronIds["tile_ndarray"]].activated = True
+    #brain.neurons[neuronIds["tile_ndarray"]].weight = 40.0
+    brain.neurons[neuronIds["fliplr_ndarray"]].activated = True
+    brain.neurons[neuronIds["flipud_ndarray"]].activated = True
+    brain.neurons[neuronIds["place_region_ndarray"]].activated = True
+    #brain.neurons[neuronIds["place_region_ndarray"]].weight = 1.5
+    brain.neurons[neuronIds["hline_ndarray"]].activated = True
+    brain.neurons[neuronIds["vline_ndarray"]].activated = True
+    brain.neurons[neuronIds["hlineleft_ndarray"]].activated = True
+    brain.neurons[neuronIds["hlineright_ndarray"]].activated = True
+    brain.neurons[neuronIds["vlineup_ndarray"]].activated = True
+    brain.neurons[neuronIds["vlinedown_ndarray"]].activated = True
+    brain.neurons[neuronIds["fill_region_at_ndarray"]].activated = True
+    brain.neurons[neuronIds["fill_region2_at_ndarray"]].activated = True
+    #brain.neurons[neuronIds["fill_region2_at_ndarray"]].weight = 0.9
+    brain.neurons[neuronIds["replace_ndarray"]].activated = True
+    #brain.neurons[neuronIds["replace_ndarray"]].weight = 0.8
+    brain.neurons[neuronIds["put_ndarray"]].activated = True
+    #brain.neurons[neuronIds["put_ndarray"]].weight = 0.75
+    brain.neurons[neuronIds["put_value_ndarray"]].activated = True
+    #brain.neurons[neuronIds["put_value_ndarray"]].weight = 0.5
+    brain.neurons[neuronIds["fill_region_ndarray"]].activated = True
+    #brain.neurons[neuronIds["fill_region_ndarray"]].weight = 0.1
+    brain.neurons[neuronIds["bitwise_or_ndarray"]].activated = True
+    brain.neurons[neuronIds["bitwise_and_ndarray"]].activated = True
+    brain.neurons[neuronIds["bitwise_xor_ndarray"]].activated = True
+    brain.neurons[neuronIds["invert_ndarray"]].activated = True
+    brain.neurons[neuronIds["dotsegment_ndarray"]].activated = True
+    brain.neurons[neuronIds["rot90_ndarray"]].activated = True
+
     print("Task #" + str(ntask) + "/" + str(len(tasks) - 1) + " " + task + ":")
 
     url = urllib.request.urlopen("https://raw.githubusercontent.com/arcprize/ARC-AGI-2/refs/heads/main/data/training/" + task + ".json")
@@ -100,6 +112,9 @@ for ntask, task in enumerate(tasks):
 
         ids = {}
 
+        for i in set(input.flatten().tolist() + output.flatten().tolist()):
+            ids |= ints.add_value(brain, i)
+
         s = set()
 
         for i in range(0, input.shape[0]):
@@ -111,11 +126,31 @@ for ntask, task in enumerate(tasks):
 
         for r in s:
             name = str(r)
-            ids[name] = brain.add(Neuron(lambda r = r: ndarrays.Region(r), name, outputType = ndarrays.Region, module = "ndarrays.variables"))
+            ids[name] = brain.add(Neuron(lambda r = r: Region(r), name, outputType = ndarrays.Region, module = "ndarrays.variables"))
+            ids |= ndarrays.add_value(brain, ndarrays.matrix_region_ndarray(Region(r), input))
+
+        """
+        s = set()
+
+        for i in range(0, output.shape[0]):
+            for j in range(0, output.shape[1]):
+                r = sorted(ndarrays.region_ndarray((i, j), output).indices)
+
+                if (not tuple(r) in s):
+                    s.add(tuple(r))
+
+        for r in s:
+            name = str(r)
+            ids[name] = brain.add(Neuron(lambda r = r: Region(r), name, outputType = ndarrays.Region, module = "ndarrays.variables"))
+            ids |= ndarrays.add_value(brain, ndarrays.matrix_region_ndarray(Region(r), output))
+        """
 
         for i in range(0, max(input.shape[0], output.shape[0])):
             for j in range(0, max(input.shape[1], output.shape[1])):
                 ids |= tuples.add_value(brain, (i, j))
+
+        for i in range(0, max(input.shape[0], output.shape[0])):
+            ids |= ints.add_value(brain, i)
 
         ids |= tuples.add_value(brain, tuple(np.array(output.shape) / np.array(input.shape)))
 
@@ -126,29 +161,25 @@ for ntask, task in enumerate(tasks):
         #print("input", input)
         #print("output", output)
 
-        timeout = 5 * 60 * 1000
+        timeout = 10 * 60 * 1000
         time = datetime.datetime.now()
         passed = True
 
-        answers = brain.learn(output, max_conns = None, timeout = 2 * 1000, transform_best_into_neuron = False)
-
         learnTimeout = 2 * 1000
-
-        try:
-            previousOutput = brain.connection_output(answers[0])
-        except:
-            learnTimeout *= 2
-
-            previousOutput = np.array([])
+        previousOutput = np.array([])
+        answers = []
 
         while (previousOutput.shape != output.shape or not np.all(np.isclose(previousOutput, output))):
             if (datetime.datetime.now() - time > datetime.timedelta(milliseconds = timeout)):
                 passed = False
                 break
 
-            #print(brain.connection_str(answers[0]).replace("\n", "").replace("\\", "").replace(" ", ""), "->", brain.connection_output(answers[0]))
+            if (len(answers)):
+                #print(brain.connection_str(answers[0]).replace("\n", "").replace("\\", "").replace(" ", ""), "->", brain.connection_output(answers[0]))
+                pass
 
             brain.set_connections(answers)
+            brain.neuronTimeout = learnTimeout / 8
             answers = brain.learn(output, max_conns = None, timeout = learnTimeout, transform_best_into_neuron = False)
 
             newOutput = brain.connection_output(answers[0])
@@ -156,15 +187,19 @@ for ntask, task in enumerate(tasks):
             if (previousOutput.shape != newOutput.shape or np.all(np.isclose(previousOutput, newOutput))):
                 #learnTimeout += 1000
                 learnTimeout *= 2
-            else:
-                learnTimeout = 2 * 1000
-            """
+            #else:
+            #    learnTimeout = 2 * 1000
             elif (learnTimeout > 1000):
                 #learnTimeout -= 1000
                 learnTimeout /= 2
-            """
 
             previousOutput = newOutput
+
+        #print(brain.connection_str(answers[0]).replace("\n", "").replace("\\", "").replace(" ", ""), "->", brain.connection_output(answers[0]))
+
+        suffix = "-passed" if passed else "-failed"
+
+        brain.save("benchmark_arc-agi-" + task + "_brain" + str(n) + suffix + ".bin")
 
         if (not passed):
             break
@@ -173,11 +208,9 @@ for ntask, task in enumerate(tasks):
 
         brain.set_connections(answers)
 
-        #brain.save("benchmark_arc-agi-" + task + "_brain" + str(n) + ".bin")
-
     print("Task passed in " + str(datetime.datetime.now() - taskTime) if passed else "Failed")
 
     if (passed):
         count += 1
 
-print("Success rate:", str(count / len(tasks)) + "%")
+print(str(count) + "/" + str(len(tasks)) + " tasks passed (" + str(count / len(tasks) * 100) + "%) in " + str(datetime.datetime.now() - globalTime))
