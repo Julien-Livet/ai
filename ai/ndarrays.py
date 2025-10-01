@@ -1,6 +1,7 @@
 from brain import Brain
 import copy
 import itertools
+import math
 from neuron import Neuron
 import numpy as np
 import random
@@ -383,6 +384,20 @@ def fill_region_ndarray(region: Region, x: typing.Union[int, float], a: np.ndarr
 
     return b
 
+def matrix_region_ndarray(region: Region, a: np.ndarray) -> np.ndarray:
+    iMin = math.inf
+    iMax = 0
+    jMin = math.inf
+    jMax = 0
+
+    for t in region.indices:
+        iMin = min(iMin, t[0])
+        iMax = max(iMax, t[0])
+        jMin = min(jMin, t[1])
+        jMax = max(jMax, t[1])
+
+    return a[iMin:iMax, jMin:jMax]
+
 def place_region_ndarray(at: tuple, region: Region, x: typing.Union[int, float], a: np.ndarray) -> np.ndarray:
     b = copy.deepcopy(a)
 
@@ -543,6 +558,7 @@ def add(brain: Brain):
     neuronIds["place_region_ndarray"] = brain.add(Neuron(place_region_ndarray, "place_region_ndarray", module = "ndarrays.functions.array"))
     neuronIds["segment_ndarray"] = brain.add(Neuron(segment_ndarray, "segment_ndarray", module = "ndarrays.functions.array"))
     neuronIds["dotsegment_ndarray"] = brain.add(Neuron(dotsegment_ndarray, "dotsegment_ndarray", module = "ndarrays.functions.array"))
+    neuronIds["matrix_region_ndarray"] = brain.add(Neuron(matrix_region_ndarray, "matrix_region_ndarray", module = "ndarrays.functions.array"))
 
     return neuronIds
 
