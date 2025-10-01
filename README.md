@@ -60,3 +60,25 @@ pip install requests
 pip install sympy
 pip install textdistance
 ```
+
+# The core algorithm
+
+The main function is `learn` of `brain.py` script.
+Here are the different steps:
+- We first filter the activated connections
+- We look at the activated leaf neurons (those with no inputs) and the cost corresponding to the objective
+- We record the cost of the best connection
+- We create two lists, one for the activated leaf neurons and another for the activated other neurons
+- We sort the two lists in descending order of weights
+- We initialize the `frontier` list with the leaf neurons
+- We check that the path has not already been visited
+- We establish the `av` list of available leaf neurons and connections
+- We set this list to unique values
+- We iterate over the non-leaf neurons
+	- We keep the `av` types compatible with the inputs of the neuron in question
+	- We iterate over all possible combinations of inputs
+	- We calculate the output on the valid combinations
+	- We create a new connection, calculate the cost, and add this path to the list managed by the A* algorithm
+
+At the end, we strengthen the connections found and transform the connection that gives the exact result into neurons as needed.
+We add the found connections to the brain.
