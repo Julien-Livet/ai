@@ -1,5 +1,6 @@
 from brain import Brain
 from connection import Connection
+from ndarrays import Region
 from neuron import Neuron
 import numpy as np
 import os
