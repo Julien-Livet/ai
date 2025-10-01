@@ -744,20 +744,43 @@ class Brain:
               max_conns: int = 100, timeout = 20 * 1000):
         answers = []
 
+        start_available = []
+        connections = set()
+
+        for connection in self.connections:
+            if (connection.activated):
+                connections.add(connection)
+                val = self.connection_output(connection)
+                start_available.append((val, type(val), connection))
+
+        conns = [(compare(self.connection_output(c), value), c) for c in connections]
+
         for id in self.originNeuronIds:
             if (self.neurons[id].is_active() and self.neurons[id].activated):
                 try:
-                    if (not compare(value, self.neurons[id].output())):
+                    c = Connection([], id)
+                    comp = compare(self.connection_output(c), value)
+                    conns.append((comp, c))
+
+                    if (not comp):
                         self.neurons[id].weight += reinforcement_weight
 
-                        answers.append(self.neurons[id])
+                        answers.append(c)
 
                         if (len(answers) >= answer_number):
                             return answers
                 except:
                     pass
 
-        start_available = []
+        conns = sorted(conns, key = lambda x: x[0])
+
+        if (len(conns)):
+            best_conn = conns[0][1]
+            best_cost = conns[0][0]
+        else:
+            best_conn = None
+            best_cost = math.inf
+
         neuronIds = []
         origin_neuron_ids = []
 
@@ -771,14 +794,6 @@ class Brain:
                     origin_neuron_ids.append(id)
 
         neuronIds = sorted(neuronIds, key = lambda x: self.neurons[x].weight, reverse = True)
-
-        connections = set()
-
-        for connection in self.connections:
-            if (connection.activated):
-                connections.add(connection)
-                val = self.connection_output(connection)
-                start_available.append((val, type(val), connection))
 
         counter = itertools.count()
         frontier = []
@@ -794,16 +809,6 @@ class Brain:
         g0 = 0.0
         h0 = heuristic(start_available[0][0], value)
         heapq.heappush(frontier, (g0 + h0, next(counter), g0, start_available, []))
-
-        conns = [(compare(self.connection_output(c), value), c) for c in connections]
-        conns = sorted(conns, key = lambda x: x[0])
-
-        if (len(conns)):
-            best_conn = conns[0][1]
-            best_cost = conns[0][0]
-        else:
-            best_conn = None
-            best_cost = math.inf
 
         conns = []
         time = datetime.datetime.now()
@@ -878,11 +883,12 @@ class Brain:
 
                 for combo in itertools.product(new_av, repeat = len(neuron.inputTypes)):
                     if (neuron.limitationTimeout != None):
+                        print("here")
                         if(not math.isinf(neuron.limitationTimeout)):
                             if (datetime.datetime.now() - neuronTime > datetime.timedelta(milliseconds = neuron.limitationTimeout)):
                                 break
                     elif (not math.isinf(self.neuronTimeout)):
-                        if (datetime.datetime.now() - neuronTime > datetime.timedelta(milliseconds = self.neuronTimout)):
+                        if (datetime.datetime.now() - neuronTime > datetime.timedelta(milliseconds = self.neuronTimeout)):
                             break
 
                     if (datetime.datetime.now() - time > datetime.timedelta(milliseconds = timeout)):
@@ -924,6 +930,7 @@ class Brain:
                         cost = compare(new_value, value)
 
                         if (cost < best_cost):
+                            time = datetime.datetime.now()
                             best_cost = cost
                             best_conn = new_conn
 
