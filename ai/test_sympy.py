@@ -17,6 +17,7 @@ neuronIds = sympys.add_value(brain, sympy.Expr(), "input_expression")
 
 while (True):
     sp_input_expression = None
+
     while (not isinstance(sp_input_expression, sympy.Expr)):
         input_expression = input("What is your input expression (for example: (x**2+2*x+1)/(x+1))? ")
 
@@ -46,10 +47,8 @@ while (True):
 
     answers = brain.learn(sp_output_expression, depth = 10, compact_name = str(sp_output_expression), compact_module = "sympy.constants", module = "sympy.functions")
 
-    if (isinstance(answers[0], Connection)):
+    if (len(answers)):
         print(brain.connection_str(answers[0]).replace("\n", "").replace("\\", "").replace(" ", ""), "->", brain.connection_output(answers[0]))
-    else:
-        print(brain.neuron_name(answers[0]), "->", answers[0].output())
 
     try:
         brain.show2d(seed = 0, title = "From " + str(sp_input_expression) + " to " + str(sp_output_expression), colorBy = "weight")

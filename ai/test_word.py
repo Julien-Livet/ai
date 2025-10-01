@@ -57,26 +57,23 @@ def process(brain: Brain, function_word_neuron_ids: dict, word: str, row, max_co
 
     answers = brain.learn(word, answer_number = 1, depth = 10, transform_best_into_neuron = True, max_conns = max_conns, compact_name = word if cgram == "subword" else "", compact_module = "languages.french.words." + cgramortho, module = "languages.french.words.functions", timeout = timeout)
 
-    if (isinstance(answers[0], Connection) and brain.connection_output(answers[0]) != word):
+    if (len(answers) and brain.connection_output(answers[0]) != word):
         return []
 
-    if (isinstance(answers[0], Connection)):
-        if (cgram != "subword"):
-            inputs = [answers[0]]
+    if (cgram != "subword"):
+        inputs = [answers[0]]
 
-            names = ["str_to_adjective", "str_to_article", "str_to_noun"]
+        names = ["str_to_adjective", "str_to_article", "str_to_noun"]
 
-            if (words.french_word_function_name(cgram) in names):
-                inputs.append(genre)
-                inputs.append(nombre)
+        if (words.french_word_function_name(cgram) in names):
+            inputs.append(genre)
+            inputs.append(nombre)
 
-            answers[0] = Connection(inputs, function_word_neuron_ids[words.french_word_function_name(cgram)])
+        answers[0] = Connection(inputs, function_word_neuron_ids[words.french_word_function_name(cgram)])
 
-            brain.transform_connection_into_neuron(answers[0], compact_name = word, compact_module = "languages.french.words." + cgramortho, module = "languages.french.words.functions")
+        brain.transform_connection_into_neuron(answers[0], compact_name = word, compact_module = "languages.french.words." + cgramortho, module = "languages.french.words.functions")
 
-        print(brain.connection_str(answers[0]).replace("\n", "").replace("\\", "").replace(" ", ""), "->", brain.connection_output(answers[0]))
-    else:
-        print(brain.neuron_name(answers[0]), "->", answers[0].output())
+    print(brain.connection_str(answers[0]).replace("\n", "").replace("\\", "").replace(" ", ""), "->", brain.connection_output(answers[0]))
 
     """
     try:

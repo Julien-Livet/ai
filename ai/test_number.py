@@ -23,10 +23,8 @@ def process(brain: Brain, number: str):
 
     answers = brain.learn(number, depth = 10, compact_name = number, compact_module = "numbers.constants", module = "numbers.functions")
 
-    if (isinstance(answers[0], Connection)):
+    if (len(answers)):
         print(brain.connection_str(answers[0]).replace("\n", "").replace("\\", "").replace(" ", ""), "->", brain.connection_output(answers[0]))
-    else:
-        print(brain.neuron_name(answers[0]), "->", answers[0].output())
 
     try:
         brain.show2d(seed = 0, title = number, colorBy = "weight")
