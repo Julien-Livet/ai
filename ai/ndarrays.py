@@ -325,6 +325,9 @@ class Region:
     def __init__(self, indices: list = []):
         self.indices = indices
 
+    def __str__(self):
+        return str(self.indices)
+
 def region_ndarray(at: tuple, a: np.ndarray) -> Region:
     s = set()
     stack = set()

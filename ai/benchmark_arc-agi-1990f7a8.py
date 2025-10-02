@@ -61,7 +61,7 @@ for n in range(0, len(train)):
 
     for i in range(0, input.shape[0]):
         for j in range(0, input.shape[1]):
-            r = sorted(ndarrays.region_ndarray((i, j), input))
+            r = sorted(ndarrays.region_ndarray((i, j), input).indices)
 
             if (not tuple(r) in s):
                 if (input[r[0][0], r[0][1]] != countValues[0][1]):

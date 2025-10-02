@@ -49,13 +49,10 @@ for ntask, task in enumerate(tasks):
     neuronIds |= tuples.add_value(brain, (0, ), "shape_output")
 
     brain.neurons[neuronIds["zeros_ndarray"]].activated = True
-    #brain.neurons[neuronIds["zeros_ndarray"]].weight = 50.0
     brain.neurons[neuronIds["tile_ndarray"]].activated = True
-    #brain.neurons[neuronIds["tile_ndarray"]].weight = 40.0
     brain.neurons[neuronIds["fliplr_ndarray"]].activated = True
     brain.neurons[neuronIds["flipud_ndarray"]].activated = True
     brain.neurons[neuronIds["place_region_ndarray"]].activated = True
-    #brain.neurons[neuronIds["place_region_ndarray"]].weight = 1.5
     brain.neurons[neuronIds["hline_ndarray"]].activated = True
     brain.neurons[neuronIds["vline_ndarray"]].activated = True
     brain.neurons[neuronIds["hlineleft_ndarray"]].activated = True
@@ -64,21 +61,17 @@ for ntask, task in enumerate(tasks):
     brain.neurons[neuronIds["vlinedown_ndarray"]].activated = True
     brain.neurons[neuronIds["fill_region_at_ndarray"]].activated = True
     brain.neurons[neuronIds["fill_region2_at_ndarray"]].activated = True
-    #brain.neurons[neuronIds["fill_region2_at_ndarray"]].weight = 0.9
     brain.neurons[neuronIds["replace_ndarray"]].activated = True
-    #brain.neurons[neuronIds["replace_ndarray"]].weight = 0.8
     brain.neurons[neuronIds["put_ndarray"]].activated = True
-    #brain.neurons[neuronIds["put_ndarray"]].weight = 0.75
     brain.neurons[neuronIds["put_value_ndarray"]].activated = True
-    #brain.neurons[neuronIds["put_value_ndarray"]].weight = 0.5
     brain.neurons[neuronIds["fill_region_ndarray"]].activated = True
-    #brain.neurons[neuronIds["fill_region_ndarray"]].weight = 0.1
     brain.neurons[neuronIds["bitwise_or_ndarray"]].activated = True
     brain.neurons[neuronIds["bitwise_and_ndarray"]].activated = True
     brain.neurons[neuronIds["bitwise_xor_ndarray"]].activated = True
     brain.neurons[neuronIds["invert_ndarray"]].activated = True
     brain.neurons[neuronIds["dotsegment_ndarray"]].activated = True
     brain.neurons[neuronIds["rot90_ndarray"]].activated = True
+    brain.neurons[neuronIds["matrix_region_ndarray"]].activated = True
 
     print("Task #" + str(ntask) + "/" + str(len(tasks) - 1) + " " + task + ":")
 
@@ -208,7 +201,7 @@ for ntask, task in enumerate(tasks):
 
         brain.set_connections(answers)
 
-    print("Task passed in " + str(datetime.datetime.now() - taskTime) if passed else "Failed")
+    print("Task passed in " + str(datetime.datetime.now() - taskTime) if passed else "Task failed")
 
     if (passed):
         count += 1

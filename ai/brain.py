@@ -92,38 +92,6 @@ def canonicalize_for_visit(val):
     except TypeError:
         return repr(val)
 
-def compare(val, target):
-    if (isinstance(val, str) and isinstance(target, str)):
-        a, b = val, target
-
-        if (b in a):
-            a, b = b, a
-
-        if (a in b):
-            return 1 - 1 / target.count(a) + 1 / (1 + len(a)) - 1 / (1 + len(b))
-
-        return 1 / (1 + len(a)) - 1 / (1 + len(b)) + textdistance.Levenshtein().distance(a, b)
-    elif (isinstance(target, sympy.Expr)):
-        if (isinstance(val, sympy.Expr)):
-            if (val == target):
-                return 0
-            else:
-                return compare(str(val), str(target))
-        else:
-            return 1 + compare(str(val), str(target))
-    elif (isinstance(val, np.ndarray) and isinstance(target, np.ndarray)):
-        v = np.array(val)
-        t = np.array(target)
-
-        if (v.shape != t.shape):
-            return 100 + abs(np.sum(v) - np.sum(t))
-
-        return np.linalg.norm(np.subtract(val, target))
-    elif (is_iterable(val)):
-        return 1 - int(all(np.isclose(val, target)))
-    else:
-        return np.linalg.norm(np.subtract(val, target))
-
 class Brain:
     def __init__(self):
         self.neurons = {}
@@ -532,7 +500,7 @@ class Brain:
         for id in self.neurons:
             if (self.neurons[id].is_active() and self.neurons[id].activated):
                 try:
-                    if (not compare(value, self.neurons[id].output())):
+                    if (not heuristic(value, self.neurons[id].output())):
                         neurons.append(self.neurons[id])
                 except:
                     pass
@@ -541,7 +509,7 @@ class Brain:
 
         for connection in self.typesToConnections.get(type(value), []):
             try:
-                if (not compare(value, self.connection_output(connection))):
+                if (not heuristic(value, self.connection_output(connection))):
                     connections.append(connection)
             except:
                 pass
@@ -753,16 +721,16 @@ class Brain:
                 val = self.connection_output(connection)
                 start_available.append((val, type(val), connection))
 
-        conns = [(compare(self.connection_output(c), value), c) for c in connections]
+        conns = [(heuristic(self.connection_output(c), value), c) for c in connections]
 
         for id in self.originNeuronIds:
             if (self.neurons[id].is_active() and self.neurons[id].activated):
                 try:
                     c = Connection([], id)
-                    comp = compare(self.connection_output(c), value)
-                    conns.append((comp, c))
+                    h = heuristic(self.connection_output(c), value)
+                    conns.append((h, c))
 
-                    if (not comp):
+                    if (not h):
                         self.neurons[id].weight += reinforcement_weight
 
                         answers.append(c)
@@ -926,18 +894,15 @@ class Brain:
 
                     found = False
 
-                    try:
-                        cost = compare(new_value, value)
+                    cost = h
 
-                        if (cost < best_cost):
-                            time = datetime.datetime.now()
-                            best_cost = cost
-                            best_conn = new_conn
+                    if (cost < best_cost):
+                        time = datetime.datetime.now()
+                        best_cost = cost
+                        best_conn = new_conn
 
-                        if (not cost):
-                            found = True
-                    except:
-                        pass
+                    if (not cost):
+                        found = True
 
                     if (found):
                         solutions.append(new_path)
@@ -962,7 +927,7 @@ class Brain:
         for c in conns:
             self.reinforce_connection(c, reinforcement_weight)
 
-        if (len(conns) and transform_best_into_neuron and not compare(self.connection_output(conns[0]), value)):
+        if (len(conns) and transform_best_into_neuron and not heuristic(self.connection_output(conns[0]), value)):
             self.transform_connection_into_neuron(conns[0], name = name, module = module, compact_name = compact_name, compact_module = compact_module)
 
         self.connections |= set(conns)
