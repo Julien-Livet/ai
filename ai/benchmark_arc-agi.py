@@ -71,7 +71,6 @@ for ntask, task in enumerate(tasks):
     brain.neurons[neuronIds["invert_ndarray"]].activated = True
     brain.neurons[neuronIds["dotsegment_ndarray"]].activated = True
     brain.neurons[neuronIds["rot90_ndarray"]].activated = True
-    brain.neurons[neuronIds["matrix_region_ndarray"]].activated = True
 
     print("Task #" + str(ntask) + "/" + str(len(tasks) - 1) + " " + task + ":")
 
@@ -119,7 +118,7 @@ for ntask, task in enumerate(tasks):
 
         for r in s:
             name = str(r)
-            ids[name] = brain.add(Neuron(lambda r = r: Region(r), name, outputType = ndarrays.Region, module = "ndarrays.variables"))
+            ids[name] = brain.add(Neuron(lambda r = r: Region(r), name, outputType = Region, module = "ndarrays.variables"))
             ids |= ndarrays.add_value(brain, ndarrays.matrix_region_ndarray(Region(r), input))
 
         """

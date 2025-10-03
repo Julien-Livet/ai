@@ -4,7 +4,9 @@ import ints
 import json
 import lists
 import matplotlib.pyplot as plt
+from ndarrays import Region
 import ndarrays
+from neuron import Neuron
 import numpy as np
 import os
 import tuples
@@ -75,7 +77,8 @@ for n in range(0, len(train)):
         ids |= ints.add_value(brain, int(v[1]))
 
     for r in s:
-        ids |= lists.add_value(brain, list(r))
+        name = str(r)
+        ids[name] = brain.add(Neuron(lambda r = r: Region(r), name, outputType = Region, module = "ndarrays.variables"))
 
     for i in range(0, output.shape[0]):
         for j in range(0, output.shape[1]):
@@ -93,7 +96,7 @@ for n in range(0, len(train)):
         #print(brain.connection_str(answers[0]).replace("\\n", "").replace("\\", "").replace(" ", ""), "->", brain.connection_output(answers[0]))
         #print(brain.connection_output(answers[0]) - output)
         brain.set_connections(answers)
-        answers = brain.learn(output, max_conns = None, timeout = 45 * 1000, transform_best_into_neuron = False)
+        answers = brain.learn(output, max_conns = None, timeout = 20 * 1000, transform_best_into_neuron = False)
 
     brain.set_connections(answers)
 

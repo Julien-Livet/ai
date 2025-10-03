@@ -71,7 +71,15 @@ def heuristic(val, target):
         if (v.shape != t.shape):
             return 100 + abs(np.sum(v) - np.sum(t))
 
-        return np.linalg.norm(np.subtract(val, target))
+        #pos1 = [(i,j) for i, row in enumerate(v) for j, val in enumerate(row) if not np.allclose(val, 0)]
+        #pos2 = [(i,j) for i, row in enumerate(t) for j, val in enumerate(row) if not np.allclose(val, 0)]
+
+        d = 0
+
+        #if (pos1 and pos2):
+        #    d = np.linalg.norm(np.subtract(pos1[0], pos2[0]))
+
+        return d + np.linalg.norm(np.subtract(v, t))
     except:
         try:
             return abs(hash(val) - hash(target))
