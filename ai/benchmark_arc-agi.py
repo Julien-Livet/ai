@@ -137,8 +137,8 @@ for ntask, task in enumerate(tasks):
             ids |= ndarrays.add_value(brain, ndarrays.matrix_region_ndarray(Region(r), output))
         """
 
-        for i in range(0, max(input.shape[0], output.shape[0])):
-            for j in range(0, max(input.shape[1], output.shape[1])):
+        for i in range(0, output.shape[0]):#for i in range(0, max(input.shape[0], output.shape[0])):
+            for j in range(0, output.shape[1]):#for j in range(0, max(input.shape[1], output.shape[1])):
                 ids |= tuples.add_value(brain, (i, j))
 
         for i in range(0, max(input.shape[0], output.shape[0])):

@@ -2,7 +2,6 @@ from brain import Brain
 from connection import Connection
 import ints
 import json
-import lists
 import matplotlib.pyplot as plt
 from ndarrays import Region
 import ndarrays
