@@ -851,7 +851,6 @@ class Brain:
 
                 for combo in itertools.product(new_av, repeat = len(neuron.inputTypes)):
                     if (neuron.limitationTimeout != None):
-                        print("here")
                         if(not math.isinf(neuron.limitationTimeout)):
                             if (datetime.datetime.now() - neuronTime > datetime.timedelta(milliseconds = neuron.limitationTimeout)):
                                 break
