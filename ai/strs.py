@@ -22,6 +22,12 @@ def str_to_float(x: str) -> float:
 def str_to_int(x: str) -> int:
     return int(x)
 
+def pop_front_str(x: str) -> str:
+    return x[1:]
+
+def pop_back_str(x: str) -> str:
+    return x[:-1]
+
 def add(brain: Brain):
     neuronIds = {}
 
@@ -29,6 +35,8 @@ def add(brain: Brain):
     neuronIds["len_str"] = brain.add(Neuron(len_str, "len_str", module = "strs.functions"))
     neuronIds["lower_str"] = brain.add(Neuron(lower_str, "lower_str", module = "strs.functions"))
     neuronIds["upper_str"] = brain.add(Neuron(upper_str, "upper_str", module = "strs.functions"))
+    neuronIds["pop_front_str"] = brain.add(Neuron(pop_front_str, "pop_front_str", module = "strs.functions"))
+    neuronIds["pop_back_str"] = brain.add(Neuron(pop_back_str, "pop_back_str", module = "strs.functions"))
     neuronIds["str_to_bool"] = brain.add(Neuron(str_to_bool, "str_to_bool", module = "strs.functions.conversion"))
     neuronIds["str_to_float"] = brain.add(Neuron(str_to_float, "str_to_float", module = "strs.functions.conversion"))
     neuronIds["str_to_int"] = brain.add(Neuron(str_to_int, "str_to_int", module = "strs.functions.conversion"))

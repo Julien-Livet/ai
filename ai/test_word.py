@@ -57,7 +57,7 @@ def process(brain: Brain, function_word_neuron_ids: dict, word: str, row, max_co
 
     answers = brain.learn(word, answer_number = 1, depth = 10, transform_best_into_neuron = True, max_conns = max_conns, compact_name = word if cgram == "subword" else "", compact_module = "languages.french.words." + cgramortho, module = "languages.french.words.functions", timeout = timeout)
 
-    if (len(answers) and brain.connection_output(answers[0]) != word):
+    if (not len(answers) or (len(answers) and brain.connection_output(answers[0]) != word)):
         return []
 
     if (cgram != "subword"):

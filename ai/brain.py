@@ -38,6 +38,8 @@ def heuristic(val, target):
     if (isinstance(target, str)):
         s = val
 
+        cost = 0 if isinstance(val, str) else 1
+
         try:
             s = str(val)
         except:
@@ -50,9 +52,9 @@ def heuristic(val, target):
                 a, b = b, a
 
             if (a in b):
-                return 1 - 1 / target.count(a) + 1 / (1 + len(a)) - 1 / (1 + len(b))
+                return cost + 1 - 1 / target.count(a) + 1 / (1 + len(a)) - 1 / (1 + len(b))
 
-            return 1 / (1 + len(a)) - 1 / (1 + len(b)) + textdistance.Levenshtein().distance(a, b)
+            return cost + 1 / (1 + len(a)) - 1 / (1 + len(b)) + textdistance.Levenshtein().distance(a, b)
         else:
             return abs(hash(val) - hash(target))
     elif (isinstance(target, sympy.Expr)):
@@ -525,7 +527,7 @@ class Brain:
         connections = sorted(connections, key = lambda x: self.connection_len(x))
 
         if (transform_best_into_neuron and len(connections)):
-            id, id_compact = self.transform_connection_into_neuron(connections[0], name, module)
+            id, id_compact, ultra_compact_id = self.transform_connection_into_neuron(connections[0], name, module)
 
         return neurons + connections
 
@@ -593,19 +595,7 @@ class Brain:
 
         compact_id = self.add(Neuron(lambda value = value: value, compact_name, [], self.neurons[connection.neuronId].outputType, module = compact_module, weight = self.connection_weight(connection)))
 
-        if (len(connection.origin_input_types()) == len(connection.inputs)):
-            added = False
-
-            for input in connection.inputs:
-                try:
-                    if (not (isinstance(input, Neuron) and len(input.inputTypes) == 0)):
-                        added = True
-                        break
-                except:
-                    pass
-
-            if (not added):
-                return connection.neuronId, compact_id, ultra_compact_id
+        return connection.neuronId, compact_id, ultra_compact_id
 
         def function(*args):
             def replace_inputs(connection, arg_iter):

@@ -22,7 +22,23 @@ def process(brain: Brain, expression: str, module: str):
     brain.activate_module("symbols.functions.conversion")
     brain.activate_str(expression)
 
-    answers = brain.learn(expression, depth = 10, module = module + ".functions", compact_module = module + ".constants", compact_name = expression)
+    learnTimeout = 2 * 1000
+    previousOutput = ""
+    answers = []
+
+    while (previousOutput != expression):
+        brain.neuronTimeout = learnTimeout / 8
+        answers = brain.learn(expression, timeout = learnTimeout, module = module + ".functions", compact_module = module + ".constants", compact_name = expression)
+        brain.set_connections(answers)
+
+        newOutput = brain.connection_output(answers[0])
+
+        if (previousOutput == newOutput):
+            learnTimeout *= 2
+        elif (learnTimeout > 1000):
+            learnTimeout /= 2
+
+        previousOutput = newOutput
 
     if (len(answers)):
         print(brain.connection_str(answers[0]).replace("\n", "").replace("\\", "").replace(" ", ""), "->", brain.connection_output(answers[0]))
