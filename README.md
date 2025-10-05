@@ -13,8 +13,8 @@ Here are some test files for example:
 - **test_ai3.py**: This adds functions related to int and searches for connections translating the relationship x * y + z from input values ​​(chosen to be unambiguous), and shows the generalization with user values.
 - **test_ai4.py**: This adds functions related to np.ndarray and searches for connections translating the relationship x * y + z from input values, and shows the generalization with user values.
 - **test_full_ai.py**: This adds functions related to all the available types (currently implemented in any case) and activate certain types of neurons depending on the case with the display of connections of numbers between 100 and 999 or all possible connections of depth 2
-- **test_number.py**: The goal is to find the connection from elementary bricks to form any number. Learning takes about 20 seconds for a total of 147 neurons.
-- **test_expression.py**: The goal is to find the connection from elementary bricks to form any expression. After learning the numbers, learning takes about 30 seconds for a total of 193 neurons.
+- **test_number.py**: The goal is to find the connection from elementary bricks to form any number.
+- **test_expression.py**: The goal is to find the connection from elementary bricks to form any expression.
 - **test_word.py**: This example aims to reconstruct French words from syllables.
 - **test_sentence.py**: This example aims to reconstruct simple sentences from words.
 - **test_sympy.py**: This example aims to find the symbolic transformation between an input expression and an output expression.
