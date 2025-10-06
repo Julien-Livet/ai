@@ -28,7 +28,7 @@ def process(brain: Brain, expression: str, module: str):
 
     while (previousOutput != expression):
         brain.neuronTimeout = learnTimeout / 8
-        answers = brain.learn(expression, timeout = learnTimeout, module = module + ".functions", compact_module = module + ".constants", compact_name = expression)
+        answers = brain.learn(expression, max_conns = 250, timeout = learnTimeout, module = module + ".functions", compact_module = module + ".constants", compact_name = expression)
         brain.set_connections(answers)
 
         newOutput = brain.connection_output(answers[0])
@@ -57,8 +57,8 @@ expression_filename = "expression_brain.bin"
 numbers = ["10", "-2", "3e4", "5e-6", "-7e-8", "9.0", "1.e2", "-3.e4", "5.e-6", "-7.e-8", "9.0e0",
            "1.2e-3", "-4.5e-6", "-23", "0.3", "-6.4", "1e6", "-3e4", "2e-4", "-1e-2", "1.5e2", "-3.4e2",
            "5.1e-4", "-3.6e-2"]
-expressions = ["(-4.5)", "(-3)", "-3*2", "7*(-8)", "(-6)*(-7)", "2*x", "-3*x", "x+y", "2.*x", "3.1*x", "-4.*y", "-5.1*y", "3*x+y", "3.1*x+y", "2.3*x+5.4*y",
-               "-2.1*x+4.5*y", "x*y", "1.2*x*y", "(x+y)", "(y+z)*z", "2*(z-x)", "1.2*(y-x)", "(x-y)*4.6", "(z-y)*(-3.8)"]
+expressions = ["(-4.5)", "(-3)", "-3*2", "7*(-8)", "(-6)*(-7)", "2*x", "-3*x", "y+x", "2.*x", "3.1*y", "-4.*z", "-5.1*w", "3*y+x", "3.1*x+z", "2.3*x+5.4*y",
+               "-2.1*x+4.5*y", "x*y", "1.2*z*x", "(z+y)", "(y+z)*x", "2*(z-x)", "1.2*(y-x)", "(x-y)*4.6", "(z-w)*(-3.8)"]
 
 if (os.path.exists(expression_filename)):
     brain.load(expression_filename)
@@ -109,7 +109,7 @@ while (True):
     sp_ok = False
 
     while (not sp_ok):
-        expression = input("What is your expression (for example: x + y * z)? ")
+        expression = input("What is your expression (for example: x+y*z)? ")
 
         try:
             sympy.sympify(expression)
