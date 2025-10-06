@@ -207,7 +207,12 @@ if (__name__ == "__main__"):
     soup = BeautifulSoup(result.text, 'html.parser')
     tasks = re.findall(r'"name":"(.*?)\.json"', result.text)
 
-    del tasks[0]
+    i = -1
+
+    while (tasks[0][i].isdigit()):
+        i -= 1
+
+    tasks[0] = tasks[0][i + 1:]
 
     os.makedirs(folder, exist_ok = True)
 
