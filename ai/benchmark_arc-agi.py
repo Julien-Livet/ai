@@ -1,11 +1,13 @@
 from bs4 import BeautifulSoup
 from brain import Brain
+from concurrent.futures import ProcessPoolExecutor
 from connection import Connection
 import datetime
 import ints
 import json
 import lists
 import matplotlib.pyplot as plt
+import multiprocessing
 from ndarrays import Region
 import ndarrays
 from neuron import Neuron
@@ -16,27 +18,11 @@ import requests
 import tuples
 import urllib.request
 
-tasks = []
+folder = "benchmark_arc-agi_results"
 
-for x in os.listdir():
-    if (x.endswith(".py") and "benchmark_arc-agi-" in x):
-        tasks.append(x.replace(".py", "").replace("benchmark_arc-agi-", ""))
+def process(proc: int, ntask: int, task: str):
+    f = open("benchmark_arc-agi-results" + str(proc) + ".txt", "a")
 
-"""
-url = 'https://github.com/arcprize/ARC-AGI-2/tree/main/data/training'
-
-result = requests.get(url)
-
-soup = BeautifulSoup(result.text, 'html.parser')
-tasks = re.findall(r'"name":"(.*?)\.json"', result.text)
-
-del tasks[0]
-"""
-
-count = 0
-globalTime = datetime.datetime.now()
-
-for ntask, task in enumerate(tasks):
     brain = Brain()
     neuronIds = {}
 
@@ -72,7 +58,7 @@ for ntask, task in enumerate(tasks):
     brain.neurons[neuronIds["dotsegment_ndarray"]].activated = True
     brain.neurons[neuronIds["rot90_ndarray"]].activated = True
 
-    print("Task #" + str(ntask) + "/" + str(len(tasks) - 1) + " " + task + ":")
+    f.write("Task #" + str(ntask) + " " + task + ":\n")
 
     url = urllib.request.urlopen("https://raw.githubusercontent.com/arcprize/ARC-AGI-2/refs/heads/main/data/training/" + task + ".json")
     data = json.loads(url.read().decode())
@@ -84,7 +70,7 @@ for ntask, task in enumerate(tasks):
     taskTime = datetime.datetime.now()
 
     for n in range(0, len(train)):
-        print("Subtask #" + str(n) + "/" + str(len(train) - 1) + ":")
+        f.write("Subtask #" + str(n) + "/" + str(len(train) - 1) + ":\n")
 
         brain.clear_connections()
 
@@ -150,8 +136,12 @@ for ntask, task in enumerate(tasks):
         brain.neurons[neuronIds["shape_input"]].function = lambda input = input: input.shape
         brain.neurons[neuronIds["shape_output"]].function = lambda output = output: output.shape
 
-        #print("input", input)
-        #print("output", output)
+        #f.write("input\n")
+        #f.write(input)
+        #f.write("\n")
+        #f.write("output\n")
+        #f.write(output)
+        #f.write("\n")
 
         timeout = 10 * 60 * 1000
         time = datetime.datetime.now()
@@ -167,42 +157,72 @@ for ntask, task in enumerate(tasks):
                 break
 
             if (len(answers)):
-                #print(brain.connection_str(answers[0]).replace("\n", "").replace("\\", "").replace(" ", ""), "->", brain.connection_output(answers[0]))
+                #f.write(brain.connection_str(answers[0]).replace("\n", "").replace("\\", "").replace(" ", ""))
+                #f.write("\n")
+                #f.write(brain.connection_output(answers[0]))
+                #f.write("\n")
                 pass
 
-            brain.set_connections(answers)
             brain.neuronTimeout = learnTimeout / 8
             answers = brain.learn(output, max_conns = None, timeout = learnTimeout, transform_best_into_neuron = False)
+            brain.set_connections(answers)
 
             newOutput = brain.connection_output(answers[0])
 
             if (previousOutput.shape != newOutput.shape or np.all(np.isclose(previousOutput, newOutput))):
-                #learnTimeout += 1000
                 learnTimeout *= 2
-            #else:
-            #    learnTimeout = 2 * 1000
             elif (learnTimeout > 1000):
-                #learnTimeout -= 1000
                 learnTimeout /= 2
 
             previousOutput = newOutput
 
-        #print(brain.connection_str(answers[0]).replace("\n", "").replace("\\", "").replace(" ", ""), "->", brain.connection_output(answers[0]))
+        #f.write(brain.connection_str(answers[0]).replace("\n", "").replace("\\", "").replace(" ", ""))
+        #f.write("\n")
+        #f.write(brain.connection_output(answers[0]))
+        #f.write("\n")
 
         suffix = "-passed" if passed else "-failed"
 
-        brain.save("benchmark_arc-agi-" + task + "_brain" + str(n) + suffix + ".bin")
+        try:
+            brain.save(folder + "/task-" + task + "_brain" + str(n) + suffix + ".bin")
+        except:
+            pass
 
         if (not passed):
             break
 
-        print("Subtask passed in " + str(datetime.datetime.now() - time))
+        f.write("Subtask passed in " + str(datetime.datetime.now() - time) + "\n")
 
         brain.set_connections(answers)
 
-    print("Task passed in " + str(datetime.datetime.now() - taskTime) if passed else "Task failed")
+    prefix = "Task #" + str(ntask) + " " + task
+    prefix += " passed" if passed else " failed"
 
-    if (passed):
-        count += 1
+    f.write(prefix + " in " + str(datetime.datetime.now() - taskTime) + "\n")
+    f.close()
 
-print(str(count) + "/" + str(len(tasks)) + " tasks passed (" + str(count / len(tasks) * 100) + "%) in " + str(datetime.datetime.now() - globalTime))
+if (__name__ == "__main__"):
+    url = 'https://github.com/arcprize/ARC-AGI-2/tree/main/data/training'
+    result = requests.get(url)
+    soup = BeautifulSoup(result.text, 'html.parser')
+    tasks = re.findall(r'"name":"(.*?)\.json"', result.text)
+
+    del tasks[0]
+
+    os.makedirs(folder, exist_ok = True)
+
+    ncores = multiprocessing.cpu_count()
+
+    for i in range(0, ncores):
+        f = open("benchmark_arc-agi-results" + str(i) + ".txt", "w")
+        f.close()
+
+    with ProcessPoolExecutor(max_workers = ncores) as executor:
+        futures = []
+
+        for i, task in enumerate(tasks):
+            core_id = i % ncores
+            futures.append(executor.submit(process, core_id, i, task))
+
+        for f in futures:
+            f.result()
