@@ -1,12 +1,17 @@
 from brain import Brain
+import chars
 from connection import Connection
+import digits
 from ndarrays import Region
+import ndarrays
 from neuron import Neuron
 import numpy as np
 import os
 import pyqtgraph as pg
 from PySide6 import QtCore, QtWidgets, QtGui
+import symbols
 import sys
+import words
 
 class Window(QtWidgets.QWidget):
     def __init__(self):
@@ -69,6 +74,20 @@ class Window(QtWidgets.QWidget):
         self.neuronLayout.addWidget(self.inputTypesLineEdit)
         self.neuronLayout.addWidget(self.outputTypeLabel)
         self.neuronLayout.addWidget(self.outputTypeLineEdit)
+
+        self.inputsNeuronLabel = QtWidgets.QLabel("Inputs:")
+        self.inputsNeuronLineEdit = QtWidgets.QLineEdit()
+        self.outputNeuronLabel = QtWidgets.QLabel("Output:")
+        self.outputNeuronLineEdit = QtWidgets.QLineEdit()
+        self.outputNeuronLineEdit.setReadOnly(True)
+        self.inputsNeuronLineEdit.setText("[]")
+        self.inputsNeuronLineEdit.editingFinished.connect(self.updateOutputNeuron)
+
+        self.inputsOutputNeuronLayout = QtWidgets.QHBoxLayout()
+        self.inputsOutputNeuronLayout.addWidget(self.inputsNeuronLabel)
+        self.inputsOutputNeuronLayout.addWidget(self.inputsNeuronLineEdit)
+        self.inputsOutputNeuronLayout.addWidget(self.outputNeuronLabel)
+        self.inputsOutputNeuronLayout.addWidget(self.outputNeuronLineEdit)
 
         self.connectionTotalNumberLabel = QtWidgets.QLabel("Connection total number: " + str(len(self.brain.connections)))
 
@@ -149,6 +168,7 @@ class Window(QtWidgets.QWidget):
         self.layout.addLayout(self.colorByLayout)
         self.layout.addWidget(self.neuronTotalNumberLabel)
         self.layout.addLayout(self.neuronLayout)
+        self.layout.addLayout(self.inputsOutputNeuronLayout)
         self.layout.addWidget(self.connectionTotalNumberLabel)
         self.layout.addWidget(self.activateAllNeuronsPushButton)
         self.layout.addWidget(self.deactivateAllNeuronsPushButton)
@@ -241,6 +261,7 @@ class Window(QtWidgets.QWidget):
         self.neuronTimestampDateTimeEdit.setDateTime(dateTime)
         self.inputTypesLineEdit.setText(str(neuron.inputTypes))
         self.outputTypeLineEdit.setText(str(neuron.outputType))
+        self.updateOutputNeuron()
 
     @QtCore.Slot()
     def moduleChanged(self, text: str):
@@ -434,6 +455,13 @@ class Window(QtWidgets.QWidget):
     def sortByChanged(self, text: str):
         self.neuronsComboBox.clear()
         self.neuronsComboBox.addItems(self.neuronItems())
+
+    @QtCore.Slot()
+    def updateOutputNeuron(self):
+        try:
+            self.outputNeuronLineEdit.setText(str(self.brain.neurons[self.neuronIdFromName(self.neuronsComboBox.currentText())].output(*eval(self.inputsNeuronLineEdit.text()))))
+        except:
+            pass
 
     def neuronItems(self):
         if (self.sortByComboBox.currentText() == "name"):
