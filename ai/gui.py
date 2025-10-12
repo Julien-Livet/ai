@@ -13,6 +13,9 @@ import symbols
 import sys
 import words
 
+def process():
+    pass
+
 class Window(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()

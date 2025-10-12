@@ -72,6 +72,13 @@ def process(proc: int, ntask: int, task: str):
     for n in range(0, len(train)):
         f.write("Subtask #" + str(n) + "/" + str(len(train) - 1) + ":\n")
 
+        taskFilename = folder + "/task-" + task + "_brain" + str(n)
+
+        if (os.path.isfile(taskFilename + "-passed.bin")):
+            f.write("Subtask passed\n")
+
+            continue
+
         brain.clear_connections()
 
         input = np.array(train[n]["input"])
@@ -184,7 +191,7 @@ def process(proc: int, ntask: int, task: str):
         suffix = "-passed" if passed else "-failed"
 
         try:
-            brain.save(folder + "/task-" + task + "_brain" + str(n) + suffix + ".bin")
+            brain.save(taskFilename + suffix + ".bin")
         except:
             pass
 
@@ -222,6 +229,8 @@ if (__name__ == "__main__"):
         f = open("benchmark_arc-agi-results" + str(i) + ".txt", "w")
         f.close()
 
+    time = datetime.datetime.now()
+
     with ProcessPoolExecutor(max_workers = ncores) as executor:
         futures = []
 
@@ -231,3 +240,5 @@ if (__name__ == "__main__"):
 
         for f in futures:
             f.result()
+
+    print("Process in " + str(datetime.datetime.now() - time) + "\n")
