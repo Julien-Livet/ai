@@ -87,10 +87,10 @@ def lt_float(x: float, y: float) -> bool:
     return x < y
 
 def ge_float(x: float, y: float) -> bool:
-    return x > y
+    return x >= y
 
 def le_float(x: float, y: float) -> bool:
-    return x < y
+    return x <= y
 
 def fabs_float(x: float) -> float:
     return math.fabs(x)

@@ -68,10 +68,10 @@ def lt_int(x: int, y: int) -> bool:
     return x < y
 
 def ge_int(x: int, y: int) -> bool:
-    return x > y
+    return x >= y
 
 def le_int(x: int, y: int) -> bool:
-    return x < y
+    return x <= y
 
 def factorial_int(x: int) -> int:
     return math.factorial(x)
