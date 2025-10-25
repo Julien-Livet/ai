@@ -8,7 +8,7 @@ To run, `ai` requires a maximum of 500MB of RAM, runs on a CPU rather than a GPU
 
 Here are the final results of this approach on the ARC AGI benchmark:
 - Total number of tasks solved: 446/1000
-- Success rate: 44.5 %
+- Success rate: 44.6 %
 - Total execution time (on a CPU with 12 logical processors): 15 hours
 - Data size to analyze: 170 MB
 
