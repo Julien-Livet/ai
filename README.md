@@ -6,6 +6,14 @@ Connections between compatible types can be allowed, i.e., a neuron with an int 
 `learn` function uses an A* algorithm to target a value.
 To run, `ai` requires a maximum of 500MB of RAM, runs on a CPU rather than a GPU, is deterministic, and is explainable. A model can fit on a few MB.
 
+Here are the final results of this approach on the ARC AGI benchmark:
+- Total number of tasks solved: 446/1000
+- Success rate: 44.5 %
+- Total execution time (on a CPU with 12 logical processors): 15 hours
+- Data size to analyze: 170 MB
+
+A C++ version of the engine has been made and appears to be 5 times faster.
+
 Here are some test files for example:
 - **hello_world.py**: This adds functions related to str and searches for connections translating the relationship x + y + z from input values, and shows the generalization with a user value.
 - **test_ai1.py**: This adds functions related to numbers and str and displays connections for the number 103.
@@ -60,4 +68,5 @@ pip install pyside6
 pip install requests
 pip install sympy
 pip install textdistance
+pip install torch
 ```
